@@ -23,6 +23,7 @@
 			authStore.clearAccessToken();
 			goto('/login');
 		}
+		goto('/login');
 	};
 </script>
 

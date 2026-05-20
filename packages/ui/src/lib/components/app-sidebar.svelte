@@ -1,142 +1,75 @@
 <script lang="ts">
-	import CameraIcon from "@tabler/icons-svelte/icons/camera";
-	import ChartBarIcon from "@tabler/icons-svelte/icons/chart-bar";
-	import DashboardIcon from "@tabler/icons-svelte/icons/dashboard";
-	import DatabaseIcon from "@tabler/icons-svelte/icons/database";
-	import FileAiIcon from "@tabler/icons-svelte/icons/file-ai";
-	import FileDescriptionIcon from "@tabler/icons-svelte/icons/file-description";
-	import FileWordIcon from "@tabler/icons-svelte/icons/file-word";
-	import FolderIcon from "@tabler/icons-svelte/icons/folder";
-	import HelpIcon from "@tabler/icons-svelte/icons/help";
-	import InnerShadowTopIcon from "@tabler/icons-svelte/icons/inner-shadow-top";
-	import ListDetailsIcon from "@tabler/icons-svelte/icons/list-details";
-	import ReportIcon from "@tabler/icons-svelte/icons/report";
-	import SearchIcon from "@tabler/icons-svelte/icons/search";
-	import SettingsIcon from "@tabler/icons-svelte/icons/settings";
-	import UsersIcon from "@tabler/icons-svelte/icons/users";
-	import NavDocuments from "./nav-documents.svelte";
-	import NavMain from "./nav-main.svelte";
-	import NavSecondary from "./nav-secondary.svelte";
-	import NavUser from "./nav-user.svelte";
-	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
-	import type { ComponentProps } from "svelte";
+	import HelpIcon from '@tabler/icons-svelte/icons/help';
+	import SearchIcon from '@tabler/icons-svelte/icons/search';
+	import SettingsIcon from '@tabler/icons-svelte/icons/settings';
+	import NavSecondary from './nav-secondary.svelte';
+	import NavUser from './nav-user.svelte';
+	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
+	import type { ComponentProps } from 'svelte';
+	import BusinessSwitcher from './business-switcher.svelte';
+	import { createQuery } from '@tanstack/svelte-query';
+	import { getAllBusinessesQueryOptions } from '../../api/business/get.all.businesses.query.js';
+	import NavMenuPrimary from './nav-menu-primary.svelte';
+	import Calendar from '@tabler/icons-svelte/icons/calendar';
+	import Briefcase from '@tabler/icons-svelte/icons/briefcase';
+	import UserHeart from '@tabler/icons-svelte/icons/user-heart';
+	import Cash from '@tabler/icons-svelte/icons/cash';
+	import Puzzle from '@tabler/icons-svelte/icons/puzzle';
+	import { IconCalendarCheck } from '@tabler/icons-svelte';
 
 	const data = {
 		user: {
-			name: "shadcn",
-			email: "m@example.com",
-			avatar: "/avatars/shadcn.jpg",
+			name: 'shadcn',
+			email: 'm@example.com',
+			avatar: '/avatars/shadcn.jpg'
 		},
-		navMain: [
+		primaryMenu: [
 			{
-				title: "Dashboard",
-				url: "#",
-				icon: DashboardIcon,
+				name: 'Bookings',
+				url: '/home/bookings',
+				icon: IconCalendarCheck
 			},
 			{
-				title: "Lifecycle",
-				url: "#",
-				icon: ListDetailsIcon,
+				name: 'Services',
+				url: '/home/services',
+				icon: Briefcase
 			},
 			{
-				title: "Analytics",
-				url: "#",
-				icon: ChartBarIcon,
+				name: 'Customers',
+				url: '/home/customers',
+				icon: UserHeart
 			},
 			{
-				title: "Projects",
-				url: "#",
-				icon: FolderIcon,
+				name: 'Payments',
+				url: '/home/payments',
+				icon: Cash
 			},
 			{
-				title: "Team",
-				url: "#",
-				icon: UsersIcon,
-			},
-		],
-		navClouds: [
-			{
-				title: "Capture",
-				icon: CameraIcon,
-				isActive: true,
-				url: "#",
-				items: [
-					{
-						title: "Active Proposals",
-						url: "#",
-					},
-					{
-						title: "Archived",
-						url: "#",
-					},
-				],
-			},
-			{
-				title: "Proposal",
-				icon: FileDescriptionIcon,
-				url: "#",
-				items: [
-					{
-						title: "Active Proposals",
-						url: "#",
-					},
-					{
-						title: "Archived",
-						url: "#",
-					},
-				],
-			},
-			{
-				title: "Prompts",
-				icon: FileAiIcon,
-				url: "#",
-				items: [
-					{
-						title: "Active Proposals",
-						url: "#",
-					},
-					{
-						title: "Archived",
-						url: "#",
-					},
-				],
-			},
+				name: 'Integrations',
+				url: '/home/integrations',
+				icon: Puzzle
+			}
 		],
 		navSecondary: [
 			{
-				title: "Settings",
-				url: "#",
-				icon: SettingsIcon,
+				title: 'Settings',
+				url: '#',
+				icon: SettingsIcon
 			},
 			{
-				title: "Get Help",
-				url: "#",
-				icon: HelpIcon,
+				title: 'Get Help',
+				url: '#',
+				icon: HelpIcon
 			},
 			{
-				title: "Search",
-				url: "#",
-				icon: SearchIcon,
-			},
-		],
-		documents: [
-			{
-				name: "Data Library",
-				url: "#",
-				icon: DatabaseIcon,
-			},
-			{
-				name: "Reports",
-				url: "#",
-				icon: ReportIcon,
-			},
-			{
-				name: "Word Assistant",
-				url: "#",
-				icon: FileWordIcon,
-			},
-		],
+				title: 'Search',
+				url: '#',
+				icon: SearchIcon
+			}
+		]
 	};
+
+	const businessesQuery = createQuery(() => getAllBusinessesQueryOptions());
 
 	let { ...restProps }: ComponentProps<typeof Sidebar.Root> = $props();
 </script>
@@ -147,18 +80,18 @@
 			<Sidebar.MenuItem>
 				<Sidebar.MenuButton class="data-[slot=sidebar-menu-button]:!p-1.5">
 					{#snippet child({ props })}
-						<a href="##" {...props}>
-							<InnerShadowTopIcon class="!size-5" />
-							<span class="text-base font-semibold">Acme Inc.</span>
-						</a>
+						<a href="##" class="font-code flex items-center gap-2 px-2 text-xl"> Pikslots </a>
 					{/snippet}
 				</Sidebar.MenuButton>
 			</Sidebar.MenuItem>
 		</Sidebar.Menu>
+		{#if businessesQuery?.data !== undefined}
+			<BusinessSwitcher businesses={businessesQuery.data} />
+		{/if}
 	</Sidebar.Header>
 	<Sidebar.Content>
-		<NavMain items={data.navMain} />
-		<NavDocuments items={data.documents} />
+		<!-- <NavMain items={data.navMain} /> -->
+		<NavMenuPrimary items={data.primaryMenu} />
 		<NavSecondary items={data.navSecondary} class="mt-auto" />
 	</Sidebar.Content>
 	<Sidebar.Footer>

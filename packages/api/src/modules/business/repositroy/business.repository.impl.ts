@@ -176,4 +176,23 @@ export class BusinessRepositoryImpl implements BusinessRepository {
       });
     }
   }
+
+  async findAll(): Promise<Result<Business[], InfrastructureError>> {
+    try {
+      const rows = await this.db
+        .selectFrom('businesses')
+        .selectAll()
+        .where('is_deleted', '=', false)
+        .execute();
+
+      return ok(rows.map((row) => this.mapper.persistenceToDomain(row)));
+    } catch (cause) {
+      return err<InfrastructureError>({
+        kind: 'infrastructure',
+        message: 'Failed to fetch all businesses',
+        timestamp: new Date(),
+        cause,
+      });
+    }
+  }
 }

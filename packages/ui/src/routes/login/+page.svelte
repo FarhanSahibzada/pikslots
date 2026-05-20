@@ -9,7 +9,6 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { cn } from '$lib/utils.js';
-	import { CalendarDays } from '@lucide/svelte';
 	import loginImage from '$lib/assets/login-image.jpg';
 	import { createMutation } from '@tanstack/svelte-query';
 	import { loginUser } from '../../api/user/login.user.mutation';

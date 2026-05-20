@@ -9,3 +9,8 @@ export interface BaseErrorResponse {
   statusCode: number;
   timestamp: string;
 }
+
+export interface LoginJwtPayload {
+  userId: string;
+  role: 'superAdmin' | 'businessOwner' | 'locationOwner';
+}

@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { UnauthorizedError, ValidationError, Result } from '@pikslots/domain';
-import type { UserRole } from '@pikslots/domain';
+import type {
+  UnauthorizedError,
+  ValidationError,
+  Result,
+} from '@pikslots/domain';
+import { LoginJwtPayload } from '@pikslots/shared';
 import * as jwt from 'jsonwebtoken';
 import { Env } from 'src/shared/config/env';
-
-export interface LoginJwtPayload {
-  userId: string;
-  role: UserRole;
-}
 
 @Injectable()
 export class JwtLoginService {
@@ -24,11 +23,15 @@ export class JwtLoginService {
 
   signAccessToken(payload: LoginJwtPayload): string {
     return jwt.sign(payload, this.accessSecret, {
-      expiresIn: this.configService.getOrThrow('JWT_EXPIRES_IN', { infer: true }),
+      expiresIn: this.configService.getOrThrow('JWT_EXPIRES_IN', {
+        infer: true,
+      }),
     });
   }
 
-  verifyAccessToken(token: string): Result<LoginJwtPayload, UnauthorizedError | ValidationError> {
+  verifyAccessToken(
+    token: string,
+  ): Result<LoginJwtPayload, UnauthorizedError | ValidationError> {
     try {
       const payload = jwt.verify(token, this.accessSecret) as LoginJwtPayload;
       return { ok: true, value: payload };
@@ -39,11 +42,15 @@ export class JwtLoginService {
 
   signRefreshToken(payload: LoginJwtPayload): string {
     return jwt.sign(payload, this.refreshSecret, {
-      expiresIn: this.configService.getOrThrow('JWT_REFRESH_EXPIRES_IN', { infer: true }),
+      expiresIn: this.configService.getOrThrow('JWT_REFRESH_EXPIRES_IN', {
+        infer: true,
+      }),
     });
   }
 
-  verifyRefreshToken(token: string): Result<LoginJwtPayload, UnauthorizedError | ValidationError> {
+  verifyRefreshToken(
+    token: string,
+  ): Result<LoginJwtPayload, UnauthorizedError | ValidationError> {
     try {
       const payload = jwt.verify(token, this.refreshSecret) as LoginJwtPayload;
       return { ok: true, value: payload };
@@ -52,7 +59,10 @@ export class JwtLoginService {
     }
   }
 
-  private mapJwtError(error: unknown, tokenType: 'access' | 'refresh'): UnauthorizedError | ValidationError {
+  private mapJwtError(
+    error: unknown,
+    tokenType: 'access' | 'refresh',
+  ): UnauthorizedError | ValidationError {
     if (error instanceof jwt.TokenExpiredError) {
       // Token was valid in structure but has passed its expiry time
       return {

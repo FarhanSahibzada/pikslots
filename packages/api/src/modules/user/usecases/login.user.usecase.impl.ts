@@ -15,11 +15,9 @@ import type {
   UserRepository,
   UserSuspendedError,
 } from '@pikslots/domain';
+import { LoginJwtPayload } from '@pikslots/shared';
 import { PasswordHashingService } from 'src/shared/security/hashing/password.hashing.service';
-import {
-  JwtLoginService,
-  LoginJwtPayload,
-} from 'src/shared/security/jwt/jwt.login.service';
+import { JwtLoginService } from 'src/shared/security/jwt/jwt.login.service';
 
 type LoginError =
   | UnauthorizedError

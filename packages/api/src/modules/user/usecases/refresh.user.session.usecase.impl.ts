@@ -13,10 +13,8 @@ import type {
   UserSuspendedError,
   ValidationError,
 } from '@pikslots/domain';
-import {
-  JwtLoginService,
-  LoginJwtPayload,
-} from 'src/shared/security/jwt/jwt.login.service';
+import { LoginJwtPayload } from '@pikslots/shared';
+import { JwtLoginService } from 'src/shared/security/jwt/jwt.login.service';
 
 type RefreshError =
   | UnauthorizedError

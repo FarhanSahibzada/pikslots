@@ -10,6 +10,7 @@ export interface BusinessRepository {
   findByOwnerId(ownerId: string): Promise<Result<Business | null, BusinessNotFoundError | InfrastructureError>>;
   existsBySlug(slug: string): Promise<Result<boolean, InfrastructureError>>;
   existsByEmail(email: string): Promise<Result<boolean, InfrastructureError>>;
+  findAll(): Promise<Result<Business[], InfrastructureError>>;
 }
 
 export const IBusinessRepository = Symbol('IBusinessRepository');

@@ -32,3 +32,16 @@ export interface RegisterBusinessInput {
 export interface RegisterBusinessResponse {
   message: 'success';
 }
+
+export interface BusinessSummary {
+  id: string;
+  name: string;
+  slug: string;
+  email: string;
+  industry: BusinessIndustry;
+  status: string;
+  subscriptionPlan: string;
+  createdAt: Date;
+}
+
+export type GetAllBusinessesResponse = BusinessSummary[];
