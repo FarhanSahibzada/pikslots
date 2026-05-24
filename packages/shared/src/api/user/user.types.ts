@@ -1,4 +1,10 @@
-export type UserRole = 'superAdmin' | 'businessOwner' | 'locationOwner';
+export type UserRole =
+  | 'Platform Owner'
+  | 'Business Owner'
+  | 'No Access'
+  | 'Standard'
+  | 'Enhanced'
+  | 'Admin';
 
 // --- Requests ---
 
@@ -7,13 +13,11 @@ export interface FullNameInput {
   lastName: string;
 }
 
-export interface RegisterUserInput {
+export interface InviteUserInput {
   username: string;
   email: string;
-  password: string;
   name: FullNameInput;
   role: UserRole;
-  timezone: string;
   phone?: string;
 }
 
@@ -28,7 +32,7 @@ export interface RefreshUserSessionInput {
 
 // --- Responses ---
 
-export interface RegisterUserResponse {
+export interface InviteUserResponse {
   message: 'success';
 }
 
@@ -42,4 +46,15 @@ export interface LoginUserResponse {
 
 export interface RefreshUserSessionResponse {
   accessToken: string;
+}
+
+export interface GetUserProfileResponse {
+  id: string;
+  username: string;
+  email: string;
+  phone: string | null;
+  name: FullNameInput;
+  role: UserRole;
+  avatarUrl: string | null;
+  bookingUrl: string;
 }

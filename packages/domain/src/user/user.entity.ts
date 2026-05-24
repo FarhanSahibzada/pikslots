@@ -1,8 +1,29 @@
 // ── Enums ─────────────────────────────────────────────────────────────────────
 
-export type UserRole = 'superAdmin' | 'businessOwner' | 'locationOwner';
+/**
+ * Defines the access level of a user within the platform.
+ *
+ * ┌─────────────────┬──────────────────────────────────────────────────────────────────┐
+ * │ Role            │ Permissions                                                      │
+ * ├─────────────────┼──────────────────────────────────────────────────────────────────┤
+ * │ Platform Owner  │ Full access to all businesses on the platform                    │
+ * │ Business Owner  │ Full access to their own business only                           │
+ * │ No Access       │ Cannot log in — calendar is managed by Enhanced/Admin users      │
+ * │ Standard        │ Can manage their own calendar only                               │
+ * │ Enhanced        │ Can manage all team member calendars + customer profiles         │
+ * │ Admin           │ Enhanced permissions + ability to manage all account settings    │
+ * └─────────────────┴──────────────────────────────────────────────────────────────────┘
+ */
+export type UserRole =
+  | 'Platform Owner'
+  | 'Business Owner'
+  | 'No Access'
+  | 'Standard'
+  | 'Enhanced'
+  | 'Admin';
 
-export type UserStatus = 'pending_verification' | 'active' | 'inactive' | 'suspended';
+export type UserStatus = 'invited' | 'active' | 'inactive' | 'suspended';
+export type SupportedSoundTypes = 'chime' | 'whistle';
 
 // ── Value objects ─────────────────────────────────────────────────────────────
 
@@ -12,9 +33,15 @@ export interface FullName {
 }
 
 export interface NotificationPreferences {
-  readonly email: boolean;
-  readonly sms: boolean;
-  readonly push: boolean;
+  readonly notificationMode: 'all' | 'focus' | 'none';
+  readonly soundEnabled: boolean;
+  readonly soundType: SupportedSoundTypes;
+}
+
+export interface AppointmentReminders {
+  reminderEnabled: boolean;
+  reminderMinutesBefore: number;
+  reminderSoundType: SupportedSoundTypes;
 }
 
 // ── Props ─────────────────────────────────────────────────────────────────────
@@ -28,10 +55,11 @@ export interface UserProps {
   readonly phone: string | null;
   readonly role: UserRole;
   readonly status: UserStatus;
-  readonly timezone: string;
   readonly avatarUrl: string | null;
   readonly emailVerified: boolean;
+  readonly bookingUrl: string;
   readonly notificationPreferences: NotificationPreferences;
+  readonly appointmentReminders: AppointmentReminders;
   readonly lastLoginAt: Date | null;
   readonly suspendedReason: string | null;
   // audit
@@ -54,7 +82,7 @@ export interface CreateUserInput {
   email: string;
   phone?: string;
   role: UserRole;
-  timezone?: string;
+  bookingUrl: string;
   createdBy: string;
 }
 
@@ -81,11 +109,16 @@ export class User {
       email: input.email,
       phone: input.phone ?? null,
       role: input.role,
-      status: 'pending_verification',
-      timezone: input.timezone ?? 'UTC',
+      status: 'invited',
+      bookingUrl: input.bookingUrl,
       avatarUrl: null,
       emailVerified: false,
-      notificationPreferences: { email: true, sms: false, push: false },
+      notificationPreferences: { notificationMode: 'all', soundEnabled: true, soundType: 'chime' },
+      appointmentReminders: {
+        reminderEnabled: true,
+        reminderMinutesBefore: 10,
+        reminderSoundType: 'chime',
+      },
       lastLoginAt: null,
       suspendedReason: null,
       createdAt: now,
@@ -104,6 +137,21 @@ export class User {
    */
   static reconstitute(props: UserProps): User {
     return new User(props);
+  }
+
+  // ── Business rules ─────────────────────────────────────────────────────────
+
+  private static readonly INVITE_PERMISSIONS: Record<UserRole, UserRole[]> = {
+    'Platform Owner': ['Business Owner', 'Admin', 'Enhanced', 'Standard', 'No Access'],
+    'Business Owner': ['Admin', 'Enhanced', 'Standard', 'No Access'],
+    Admin: ['Enhanced', 'Standard', 'No Access'],
+    Enhanced: [],
+    Standard: [],
+    'No Access': [],
+  };
+
+  static canInviteRole(inviterRole: UserRole, targetRole: UserRole): boolean {
+    return User.INVITE_PERMISSIONS[inviterRole].includes(targetRole);
   }
 
   // ── Identity ───────────────────────────────────────────────────────────────
@@ -139,17 +187,20 @@ export class User {
   get status(): UserStatus {
     return this.props.status;
   }
-  get timezone(): string {
-    return this.props.timezone;
-  }
   get avatarUrl(): string | null {
     return this.props.avatarUrl;
   }
   get emailVerified(): boolean {
     return this.props.emailVerified;
   }
+  get bookingUrl(): string {
+    return this.props.bookingUrl;
+  }
   get notificationPreferences(): NotificationPreferences {
     return this.props.notificationPreferences;
+  }
+  get appointmentReminders(): AppointmentReminders {
+    return this.props.appointmentReminders;
   }
   get lastLoginAt(): Date | null {
     return this.props.lastLoginAt;

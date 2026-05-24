@@ -3,16 +3,15 @@ import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { PikslotsBaseErrorResponse } from 'src/shared/types/base.error.response';
 import { LoginUserDto } from '../dto/login.user.dto';
 import { RefreshUserSessionDto } from '../dto/refresh.user.session.dto';
-import { RegisterUserDto } from '../dto/register.user.dto';
+import { InviteUserDto } from '../dto/invite.user.dto';
 
-
-export const RegisterUserDocs = () =>
+export const InviteUserDocs = () =>
   applyDecorators(
-    ApiOperation({ summary: 'Register a new user' }),
-    ApiBody({ type: RegisterUserDto }),
+    ApiOperation({ summary: 'Invite a new user to the platform' }),
+    ApiBody({ type: InviteUserDto }),
     ApiResponse({
       status: HttpStatus.CREATED,
-      description: 'User registered successfully',
+      description: 'User invited successfully',
       schema: {
         example: {
           data: { message: 'success' },
@@ -27,8 +26,53 @@ export const RegisterUserDocs = () =>
       type: PikslotsBaseErrorResponse,
     }),
     ApiResponse({
+      status: HttpStatus.FORBIDDEN,
+      description: 'Inviter does not have permission to assign the requested role',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
       status: HttpStatus.BAD_REQUEST,
       description: 'Validation error',
+      type: PikslotsBaseErrorResponse,
+    }),
+  );
+
+export const GetUserProfileDocs = () =>
+  applyDecorators(
+    ApiOperation({ summary: 'Get the authenticated user profile' }),
+    ApiResponse({
+      status: HttpStatus.OK,
+      description: 'User profile returned successfully',
+      schema: {
+        example: {
+          data: {
+            id: 'uuid',
+            username: 'afaqjaved',
+            email: 'afaq@afaqjaved.com',
+            phone: null,
+            name: { firstName: 'Afaq', lastName: 'Javed' },
+            role: 'Platform Owner',
+            avatarUrl: null,
+            bookingUrl: 'platform-owner',
+          },
+          statusCode: 200,
+          timestamp: '2026-01-01T00:00:00.000Z',
+        },
+      },
+    }),
+    ApiResponse({
+      status: HttpStatus.NOT_FOUND,
+      description: 'User not found',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.FORBIDDEN,
+      description: 'Account is suspended or inactive',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.UNAUTHORIZED,
+      description: 'Missing or invalid access token',
       type: PikslotsBaseErrorResponse,
     }),
   );

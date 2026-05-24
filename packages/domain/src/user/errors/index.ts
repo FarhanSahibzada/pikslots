@@ -24,3 +24,20 @@ export type UserInactiveError = ErrorShape & {
   kind: 'user_inactive';
   status: 'inactive';
 };
+
+/**
+ * The inviter does not have permission to assign the requested role.
+ *
+ * Allowed invite permissions per role:
+ *   Platform Owner → Business Owner, Admin, Enhanced, Standard, No Access
+ *   Business Owner → Admin, Enhanced, Standard, No Access
+ *   Admin          → Enhanced, Standard, No Access
+ *   Enhanced / Standard / No Access → cannot invite
+ *
+ * @example { kind: 'inviter_not_authorized', message: 'You are not allowed to invite users with role Admin', timestamp, inviterRole: 'Standard', attemptedRole: 'Admin' }
+ */
+export type InviterNotAuthorizedError = ErrorShape & {
+  kind: 'inviter_not_authorized';
+  inviterRole: string;
+  attemptedRole: string;
+};

@@ -33,6 +33,7 @@ async function bootstrap() {
     .setTitle('Pikslots')
     .setDescription('pikslots swagger api')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
 
   const documentFactory = () =>

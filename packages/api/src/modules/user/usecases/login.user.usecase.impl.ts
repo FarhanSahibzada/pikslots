@@ -1,3 +1,4 @@
+import { InjectQueue } from '@nestjs/bullmq';
 import { Inject, Injectable } from '@nestjs/common';
 import {
   err,
@@ -18,6 +19,8 @@ import type {
 import { LoginJwtPayload } from '@pikslots/shared';
 import { PasswordHashingService } from 'src/shared/security/hashing/password.hashing.service';
 import { JwtLoginService } from 'src/shared/security/jwt/jwt.login.service';
+import { Queue } from 'bullmq';
+import { EVENTS } from 'src/shared/queue/queue.config';
 
 type LoginError =
   | UnauthorizedError
@@ -55,6 +58,7 @@ export class LoginUserUseCaseImpl implements LoginUserUseCase {
     @Inject(IUserRepository) private readonly userRepository: UserRepository,
     private readonly jwtLoginService: JwtLoginService,
     private readonly passwordHashingService: PasswordHashingService,
+    @InjectQueue(EVENTS) private events: Queue,
   ) {}
 
   async execute(command: LoginUserCommand): Promise<LoginResult> {
@@ -70,6 +74,7 @@ export class LoginUserUseCaseImpl implements LoginUserUseCase {
     if (user.value.status === 'suspended' && user.value.suspendedReason)
       return err(USER_SUSPENDED(user.value.suspendedReason));
 
+    this.events.add('test', { name: 'afaq' });
     return this.issueTokens(user.value);
   }
 

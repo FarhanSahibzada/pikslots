@@ -58,7 +58,7 @@ export class BusinessController {
 
   @GetAllBusinessesDocs()
   @UseGuards(RolesGuard)
-  @Roles('superAdmin')
+  // @Roles('superAdmin')
   @Get()
   async getAllBusinesses(
     @Res({ passthrough: true }) res: Response,

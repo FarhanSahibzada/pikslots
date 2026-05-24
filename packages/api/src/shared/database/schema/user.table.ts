@@ -1,5 +1,6 @@
 import { Selectable, Insertable, Updateable } from 'kysely';
 import type { AuditFields } from './audit.table';
+import { UserRole, UserStatus, SupportedSoundTypes } from '@pikslots/domain';
 
 export interface UserTable extends AuditFields {
   id: string; // uuid primary key
@@ -9,14 +10,17 @@ export interface UserTable extends AuditFields {
   last_name: string; // family name
   email: string; // unique email address
   phone: string | null; // E.164 phone number; optional
-  role: 'superAdmin' | 'businessOwner' | 'locationOwner'; // access role
-  status: 'pending_verification' | 'active' | 'inactive' | 'suspended'; // account state
-  timezone: string; // IANA timezone identifier (e.g. "UTC")
+  role: UserRole;
+  status: UserStatus;
   avatar_url: string | null; // profile picture URL; optional
   email_verified: boolean; // whether the email has been confirmed
-  notification_email: boolean; // opt-in for email notifications
-  notification_sms: boolean; // opt-in for SMS notifications
-  notification_push: boolean; // opt-in for push notifications
+  booking_url: string; // public booking page URL
+  notification_mode: 'all' | 'focus' | 'none';
+  notification_sound_enabled: boolean;
+  notification_sound_type: SupportedSoundTypes;
+  reminder_enabled: boolean;
+  reminder_mins_before: number;
+  reminder_sound_type: SupportedSoundTypes;
   last_login_at: Date | null; // timestamp of most recent login
   suspended_reason: string | null; // reason given when account was suspended
 }

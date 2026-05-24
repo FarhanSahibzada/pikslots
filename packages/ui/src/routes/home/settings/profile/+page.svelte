@@ -14,19 +14,11 @@
 	import Copy from '@tabler/icons-svelte/icons/copy';
 	import Plus from '@tabler/icons-svelte/icons/plus';
 	import Trash from '@tabler/icons-svelte/icons/trash';
+	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
+	import { createQuery } from '@tanstack/svelte-query';
+	import { getUserProfileQueryOptions } from '../../../../api/user/get.user.profile.query';
 
-	// Mock data — replace with real user data
-	const user = {
-		name: 'Afaq Javed',
-		initials: 'A',
-		location: 'Karachi, SD, PK',
-		phone: '0332 2615528',
-		email: 'afaqjavedofficial@gmail.com',
-		hoursToday: '9:00 AM - 5:00 PM',
-		timezone: 'PKT',
-		bookingUrl: 'https://pikslots.com/afaq',
-		role: 'Owner'
-	};
+	const userQuery = createQuery(() => getUserProfileQueryOptions());
 
 	function currentTime(): string {
 		return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -134,18 +126,29 @@
 <div class="flex flex-col">
 	<!-- Profile header -->
 	<div class="relative flex items-center gap-4 px-6 py-5">
-		<Avatar.Root class="size-16 text-lg">
-			<Avatar.Fallback class="bg-muted font-semibold text-foreground">
-				{user.initials}
-			</Avatar.Fallback>
-		</Avatar.Root>
-		<div class="flex flex-col gap-0.5">
-			<span class="text-base font-semibold">{user.name}</span>
-			<span class="text-xs text-muted-foreground">{user.location} · {time}</span>
-		</div>
-		<Button variant="ghost" size="icon-sm" class="absolute top-4 right-4">
-			<Pencil size={16} />
-		</Button>
+		{#if userQuery.isLoading}
+			<Skeleton class="size-16 rounded-full" />
+			<div class="flex flex-col gap-1.5">
+				<Skeleton class="h-4 w-32" />
+				<Skeleton class="h-3 w-48" />
+			</div>
+		{:else if userQuery.data}
+			{@const fullName = `${userQuery.data.name.firstName} ${userQuery.data.name.lastName}`}
+			{@const initials = `${userQuery.data.name.firstName[0]}${userQuery.data.name.lastName[0]}`}
+			<Avatar.Root class="size-16 text-lg">
+				<Avatar.Image src={userQuery.data.avatarUrl ?? ''} alt={fullName} />
+				<Avatar.Fallback class="bg-muted font-semibold text-foreground">
+					{initials}
+				</Avatar.Fallback>
+			</Avatar.Root>
+			<div class="flex flex-col gap-0.5">
+				<span class="text-base font-semibold">{fullName}</span>
+				<span class="text-xs text-muted-foreground">{time}</span>
+			</div>
+			<Button variant="ghost" size="icon-sm" class="absolute top-4 right-4">
+				<Pencil size={16} />
+			</Button>
+		{/if}
 	</div>
 
 	<!-- Tabs -->
@@ -198,63 +201,70 @@
 		<!-- About -->
 		<Tabs.Content value="about" class="mt-0">
 			<div class="flex flex-col px-6">
-				<!-- Phone -->
-				<div class="flex items-center gap-3 pt-4 pb-2">
-					<Phone size={16} class="shrink-0 text-muted-foreground" />
-					<span class="text-xs">{user.phone}</span>
-				</div>
+				{#if userQuery.isLoading}
+					<div class="flex flex-col gap-3 pt-4">
+						{#each Array(4) as _}
+							<Skeleton class="h-4 w-56" />
+						{/each}
+					</div>
+				{:else if userQuery.data}
+					<!-- Phone -->
+					<div class="flex items-center gap-3 pt-4 pb-2">
+						<Phone size={16} class="shrink-0 text-muted-foreground" />
+						<span class="text-xs">{userQuery.data.phone ?? '—'}</span>
+					</div>
 
-				<!-- Email -->
-				<div class="flex items-center gap-3 py-2">
-					<Mail size={16} class="shrink-0 text-muted-foreground" />
-					<span class="text-xs">{user.email}</span>
-				</div>
+					<!-- Email -->
+					<div class="flex items-center gap-3 py-2">
+						<Mail size={16} class="shrink-0 text-muted-foreground" />
+						<span class="text-xs">{userQuery.data.email}</span>
+					</div>
 
-				<!-- Hours today -->
-				<div class="flex items-center gap-3 py-2">
-					<Clock size={16} class="shrink-0 text-muted-foreground" />
-					<span class="text-xs">
-						Today &bull; Closed
-						<span class="text-muted-foreground">({user.timezone})</span>
-					</span>
-					<div class="ml-1 flex items-center gap-1">
-						<Button variant="ghost" size="icon-sm" class="size-6">
-							<ChevronDown size={14} />
-						</Button>
+					<!-- Hours today -->
+					<div class="flex items-center gap-3 py-2">
+						<Clock size={16} class="shrink-0 text-muted-foreground" />
+						<span class="text-xs">
+							Today &bull; Closed
+						</span>
+						<div class="ml-1 flex items-center gap-1">
+							<Button variant="ghost" size="icon-sm" class="size-6">
+								<ChevronDown size={14} />
+							</Button>
+							<Button variant="ghost" size="icon-sm" class="size-6">
+								<Pencil size={13} />
+							</Button>
+						</div>
+					</div>
+
+					<!-- Booking URL -->
+					<div class="flex items-center gap-3 py-2">
+						<Qrcode size={16} class="shrink-0 text-muted-foreground" />
+						<a
+							href={userQuery.data.bookingUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="text-xs underline underline-offset-2"
+						>
+							{userQuery.data.bookingUrl}
+						</a>
 						<Button variant="ghost" size="icon-sm" class="size-6">
 							<Pencil size={13} />
 						</Button>
 					</div>
-				</div>
 
-				<!-- Booking URL -->
-				<div class="flex items-center gap-3 py-2">
-					<Qrcode size={16} class="shrink-0 text-muted-foreground" />
-					<a
-						href={user.bookingUrl}
-						target="_blank"
-						rel="noopener noreferrer"
-						class="text-xs underline underline-offset-2"
-					>
-						{user.bookingUrl}
-					</a>
-					<Button variant="ghost" size="icon-sm" class="size-6">
-						<Pencil size={13} />
-					</Button>
-				</div>
-
-				<!-- Role -->
-				<div class="flex items-center gap-3 py-2">
-					<Lock size={16} class="shrink-0 text-muted-foreground" />
-					<button
-						type="button"
-						disabled
-						class="flex cursor-not-allowed items-center gap-1 text-xs text-muted-foreground"
-					>
-						{user.role}
-						<ChevronDown size={14} />
-					</button>
-				</div>
+					<!-- Role -->
+					<div class="flex items-center gap-3 py-2">
+						<Lock size={16} class="shrink-0 text-muted-foreground" />
+						<button
+							type="button"
+							disabled
+							class="flex cursor-not-allowed items-center gap-1 text-xs text-muted-foreground"
+						>
+							{userQuery.data.role}
+							<ChevronDown size={14} />
+						</button>
+					</div>
+				{/if}
 			</div>
 		</Tabs.Content>
 

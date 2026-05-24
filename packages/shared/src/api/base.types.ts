@@ -1,3 +1,5 @@
+import type { UserRole } from './user';
+
 export interface BaseResponse<T> {
   data: T;
   statusCode: number;
@@ -12,5 +14,5 @@ export interface BaseErrorResponse {
 
 export interface LoginJwtPayload {
   userId: string;
-  role: 'superAdmin' | 'businessOwner' | 'locationOwner';
+  role: UserRole;
 }

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpStatus,
   Post,
   Req,
@@ -12,10 +13,11 @@ import type { Request, Response } from 'express';
 import { ApiTags } from '@nestjs/swagger';
 import { mapUserError } from './errors/user.errors.map';
 import { LoginUserDto } from './dto/login.user.dto';
-import { RegisterUserDto } from './dto/register.user.dto';
+import { InviteUserDto } from './dto/invite.user.dto';
 import { UserUsecasesFactory } from './factory/user.usecases.factory';
 import {
-  RegisterUserDocs,
+  GetUserProfileDocs,
+  InviteUserDocs,
   LoginUserDocs,
   RefreshUserSessionDocs,
   LogoutUserDocs,
@@ -23,11 +25,13 @@ import {
 import { PikslotsBaseErrorResponse } from 'src/shared/types/base.error.response';
 import { PikslotsBaseResponse } from 'src/shared/types/base.response';
 import type {
+  GetUserProfileResponse,
+  InviteUserResponse,
   LoginUserResponse,
   LogoutUserResponse,
   RefreshUserSessionResponse,
-  RegisterUserResponse,
 } from '@pikslots/shared';
+import { SecurityContext } from 'src/shared/security/context/security.context';
 import { ConfigService } from '@nestjs/config';
 import { Env } from 'src/shared/config/env';
 
@@ -37,20 +41,54 @@ export class UserController {
   constructor(
     private readonly userUseCaseFactory: UserUsecasesFactory,
     private readonly configService: ConfigService<Env, true>,
+    private readonly securityContext: SecurityContext,
   ) {}
 
-  @RegisterUserDocs()
-  @Post('/register')
-  async registerUser(
+  @GetUserProfileDocs()
+  @Get('/me')
+  async getUserProfile(
     @Res({ passthrough: true }) res: Response,
-    @Body() registerUserDto: RegisterUserDto,
   ): Promise<
-    PikslotsBaseErrorResponse | PikslotsBaseResponse<RegisterUserResponse>
+    PikslotsBaseErrorResponse | PikslotsBaseResponse<GetUserProfileResponse>
+  > {
+    const result = await this.userUseCaseFactory.getUserProfileUseCase.execute(
+      this.securityContext.userId,
+    );
+
+    if (!result.ok) {
+      const errorResponse = mapUserError(result.error);
+      res.status(errorResponse.statusCode);
+      return errorResponse;
+    }
+
+    const user = result.value;
+    res.status(HttpStatus.OK);
+
+    return new PikslotsBaseResponse<GetUserProfileResponse>(
+      {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        phone: user.phone,
+        name: { firstName: user.name.firstName, lastName: user.name.lastName },
+        role: user.role,
+        avatarUrl: user.avatarUrl,
+        bookingUrl: user.bookingUrl,
+      },
+      HttpStatus.OK,
+    );
+  }
+
+  @InviteUserDocs()
+  @Post('/invite')
+  async inviteUser(
+    @Res({ passthrough: true }) res: Response,
+    @Body() inviteUserDto: InviteUserDto,
+  ): Promise<
+    PikslotsBaseErrorResponse | PikslotsBaseResponse<InviteUserResponse>
   > {
     const result =
-      await this.userUseCaseFactory.registerUserUsecase.execute(
-        registerUserDto,
-      );
+      await this.userUseCaseFactory.inviteUserUseCase.execute(inviteUserDto);
 
     if (!result.ok) {
       const errorResponse = mapUserError(result.error);

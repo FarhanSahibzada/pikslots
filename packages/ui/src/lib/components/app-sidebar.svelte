@@ -88,7 +88,7 @@
 			</Sidebar.MenuItem>
 		</Sidebar.Menu>
 		{#if businessesQuery?.data !== undefined}
-			<BusinessSwitcher businesses={businessesQuery.data} />
+			<!-- <BusinessSwitcher businesses={businessesQuery.data} /> -->
 		{/if}
 	</Sidebar.Header>
 	<Sidebar.Content>

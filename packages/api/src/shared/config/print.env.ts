@@ -9,6 +9,7 @@ export class PrintLoadedEnv {
     'DATABASE_URL',
     'JWT_SECRET',
     'JWT_REFRESH_SECRET',
+    'REDIS_PASSWORD',
   ];
 
   private readonly envKeys: Array<keyof Env> = [
@@ -20,6 +21,8 @@ export class PrintLoadedEnv {
     'JWT_REFRESH_EXPIRES_IN',
     'JWT_REFRESH_SECRET',
     'CORS_ORIGINS',
+    'REDIS_HOST',
+    'REDIS_PORT',
   ];
 
   constructor(private readonly configService: ConfigService<Env, true>) {}

@@ -1,6 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { plainToInstance, Transform } from 'class-transformer';
-import { IsArray, IsEnum, IsNumber, IsString, Min, validateSync } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsNumber,
+  IsString,
+  Min,
+  validateSync,
+} from 'class-validator';
 
 export enum NodeEnv {
   Development = 'development',
@@ -35,9 +42,20 @@ export class Env {
   @IsArray()
   @IsString({ each: true })
   @Transform(({ value }) =>
-    typeof value === 'string' ? value.split(',').map((s: string) => s.trim()) : value,
+    typeof value === 'string'
+      ? value.split(',').map((s: string) => s.trim())
+      : value,
   )
   CORS_ORIGINS: string[];
+
+  @IsString()
+  REDIS_HOST: string;
+
+  @IsString()
+  REDIS_PASSWORD: string;
+
+  @IsNumber()
+  REDIS_PORT: number;
 }
 
 export function validateEnv(config: Record<string, unknown>): Env {

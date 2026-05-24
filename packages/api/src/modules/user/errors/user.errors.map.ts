@@ -1,6 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
 import type {
   InfrastructureError,
+  InviterNotAuthorizedError,
   UnauthorizedError,
   UserAlreadyExistsError,
   UserNotFoundError,
@@ -12,6 +13,7 @@ import { PikslotsBaseErrorResponse } from 'src/shared/types/base.error.response'
 
 type UserError =
   | UserAlreadyExistsError
+  | InviterNotAuthorizedError
   | UnauthorizedError
   | UserNotFoundError
   | UserInactiveError
@@ -25,6 +27,8 @@ const userErrorMap: Record<
 > = {
   user_already_exists: (error) =>
     new PikslotsBaseErrorResponse(error.message, HttpStatus.CONFLICT),
+  inviter_not_authorized: (error) =>
+    new PikslotsBaseErrorResponse(error.message, HttpStatus.FORBIDDEN),
   user_not_found: (error) =>
     new PikslotsBaseErrorResponse(error.message, HttpStatus.NOT_FOUND),
   user_suspended: (error) =>

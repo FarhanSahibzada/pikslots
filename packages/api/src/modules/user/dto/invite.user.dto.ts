@@ -1,20 +1,15 @@
 import { Type } from 'class-transformer';
-import { IsEnum, ValidateNested } from 'class-validator';
+import { ValidateNested } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  FullNameInput,
-  RegisterUserInput,
-  type UserRole,
-} from '@pikslots/shared';
+import { FullNameInput, InviteUserInput } from '@pikslots/shared';
 import {
   PikSlotsEmailValidation,
   PikSlotsEnumValidation,
-  PikSlotsPasswordValidation,
   PikSlotsPhoneValidation,
   PikSlotsStringValidation,
-  PikSlotsTimezoneValidation,
   PikSlotsUsernameValidation,
 } from 'src/shared/decorators/validations';
+import type { UserRole } from '@pikslots/domain';
 
 export class FullNameDto implements FullNameInput {
   @ApiProperty({ example: 'John' })
@@ -26,7 +21,7 @@ export class FullNameDto implements FullNameInput {
   lastName: string;
 }
 
-export class RegisterUserDto implements RegisterUserInput {
+export class InviteUserDto implements InviteUserInput {
   @ApiProperty({ example: 'john_doe', minLength: 3, maxLength: 30 })
   @PikSlotsUsernameValidation()
   username: string;
@@ -35,26 +30,30 @@ export class RegisterUserDto implements RegisterUserInput {
   @PikSlotsEmailValidation()
   email: string;
 
-  @ApiProperty({ example: 'secret123', minLength: 8 })
-  @PikSlotsPasswordValidation()
-  password: string;
-
   @ApiProperty({ type: FullNameDto })
   @ValidateNested()
   @Type(() => FullNameDto)
   name: FullNameDto;
 
-  @ApiProperty({ enum: ['superAdmin', 'businessOwner', 'locationOwner'] })
+  @ApiProperty({
+    enum: [
+      'Platform Owner',
+      'Business Owner',
+      'No Access',
+      'Standard',
+      'Enhanced',
+      'Admin',
+    ],
+  })
   @PikSlotsEnumValidation([
-    'superAdmin',
-    'businessOwner',
-    'locationOwner',
+    'Business Owner',
+    'Platform Owner',
+    'No Access',
+    'Standard',
+    'Enhanced',
+    'Admin',
   ] as const satisfies UserRole[])
   role: UserRole;
-
-  @ApiProperty({ example: 'America/New_York' })
-  @PikSlotsTimezoneValidation()
-  timezone: string;
 
   @ApiPropertyOptional({ example: '+12025551234' })
   @PikSlotsPhoneValidation()

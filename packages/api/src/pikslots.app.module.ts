@@ -5,12 +5,14 @@ import { UserModule } from './modules/user/user.module';
 import { PikslotsSecurityModule } from './shared/security/pikslots.security.module';
 import { JwtVerificationMiddleware } from './shared/security/middleware/jwt.verficiation.middleware';
 import { BusinessModule } from './modules/business/business.module';
+import { PikslotsQueueModule } from './shared/queue/pikslots.queue.module';
 
 @Module({
   imports: [
     PikslotsSecurityModule,
     PikslotsConfigModule,
     PikslotsDatabaseModule, // also runs the migrations
+    PikslotsQueueModule,
 
     // domain modules
     UserModule,
