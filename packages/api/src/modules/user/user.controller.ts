@@ -4,6 +4,7 @@ import {
   Get,
   HttpStatus,
   Post,
+  Query,
   Req,
   Res,
   UnauthorizedException,
@@ -18,16 +19,19 @@ import { InviteUserDto } from './dto/invite.user.dto';
 import { UserUsecasesFactory } from './factory/user.usecases.factory';
 import {
   GetAllBusinessOwnersDocs,
+  GetUsersByRoleDocs,
   GetUserProfileDocs,
   InviteUserDocs,
   LoginUserDocs,
   RefreshUserSessionDocs,
   LogoutUserDocs,
 } from './docs/user.controller.docs';
+import { GetUsersByRoleDto } from './dto/get.users.by.role.dto';
 import { PikslotsBaseErrorResponse } from 'src/shared/types/base.error.response';
 import { PikslotsBaseResponse } from 'src/shared/types/base.response';
 import type {
   GetAllBusinessOwnersResponse,
+  GetUsersByRoleResponse,
   GetUserProfileResponse,
   InviteUserResponse,
   LoginUserResponse,
@@ -60,7 +64,43 @@ export class UserController {
     PikslotsBaseErrorResponse | PikslotsBaseResponse<GetAllBusinessOwnersResponse>
   > {
     const result =
-      await this.userUseCaseFactory.getAllBusinessOwnersUseCase.execute();
+      await this.userUseCaseFactory.getAllUsersByRoleUseCase.execute(
+        this.securityContext.role,
+        'Business Owner',
+      );
+
+    if (!result.ok) {
+      const errorResponse = mapUserError(result.error);
+      res.status(errorResponse.statusCode);
+      return errorResponse;
+    }
+
+    const users: UserSummary[] = result.value.map((u) => ({
+      id: u.id,
+      username: u.username,
+      email: u.email,
+      name: { firstName: u.name.firstName, lastName: u.name.lastName },
+    }));
+
+    res.status(HttpStatus.OK);
+    return new PikslotsBaseResponse(users, HttpStatus.OK);
+  }
+
+  @GetUsersByRoleDocs()
+  @UseGuards(RolesGuard)
+  @Roles('Platform Owner', 'Business Owner', 'Admin')
+  @Get('/by-role')
+  async getUsersByRole(
+    @Query() query: GetUsersByRoleDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<
+    PikslotsBaseErrorResponse | PikslotsBaseResponse<GetUsersByRoleResponse>
+  > {
+    const result =
+      await this.userUseCaseFactory.getAllUsersByRoleUseCase.execute(
+        this.securityContext.role,
+        query.role,
+      );
 
     if (!result.ok) {
       const errorResponse = mapUserError(result.error);

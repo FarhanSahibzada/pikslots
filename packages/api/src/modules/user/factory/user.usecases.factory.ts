@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   IFindUserByIdUseCase,
   IGetAllBusinessOwnersUseCase,
+  IGetAllUsersByRole,
   IGetUserProfileUseCase,
   IInviteUserUseCase,
   ILoginUserUseCase,
@@ -10,6 +11,7 @@ import {
 import type {
   FindUserByIdUseCase,
   GetAllBusinessOwnersUseCase,
+  GetAllUsersByRoleUseCase,
   GetUserProfileUseCase,
   InviteUserUseCase,
   LoginUserUseCase,
@@ -29,6 +31,9 @@ export class UserUsecasesFactory {
 
   @Inject(IGetAllBusinessOwnersUseCase)
   public readonly getAllBusinessOwnersUseCase: GetAllBusinessOwnersUseCase;
+
+  @Inject(IGetAllUsersByRole)
+  public readonly getAllUsersByRoleUseCase: GetAllUsersByRoleUseCase;
 
   @Inject(ILoginUserUseCase)
   public readonly loginUserUseCase: LoginUserUseCase;

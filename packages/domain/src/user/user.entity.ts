@@ -154,6 +154,26 @@ export class User {
     return User.INVITE_PERMISSIONS[inviterRole].includes(targetRole);
   }
 
+  private static readonly QUERY_PERMISSIONS: Record<UserRole, UserRole[]> = {
+    'Platform Owner': [
+      'Platform Owner',
+      'Business Owner',
+      'Admin',
+      'Enhanced',
+      'Standard',
+      'No Access',
+    ],
+    'Business Owner': ['Admin', 'Enhanced', 'Standard', 'No Access'],
+    Admin: ['Enhanced', 'Standard', 'No Access'],
+    Enhanced: [],
+    Standard: [],
+    'No Access': [],
+  };
+
+  static canQueryRole(callerRole: UserRole, targetRole: UserRole): boolean {
+    return User.QUERY_PERMISSIONS[callerRole].includes(targetRole);
+  }
+
   // ── Identity ───────────────────────────────────────────────────────────────
 
   get id(): string {

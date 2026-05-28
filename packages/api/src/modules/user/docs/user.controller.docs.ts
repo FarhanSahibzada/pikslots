@@ -1,5 +1,5 @@
 import { HttpStatus, applyDecorators } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { PikslotsBaseErrorResponse } from 'src/shared/types/base.error.response';
 import { LoginUserDto } from '../dto/login.user.dto';
 import { RefreshUserSessionDto } from '../dto/refresh.user.session.dto';
@@ -169,6 +169,58 @@ export const GetAllBusinessOwnersDocs = () =>
     ApiResponse({
       status: HttpStatus.FORBIDDEN,
       description: 'Caller is not a Platform Owner',
+      type: PikslotsBaseErrorResponse,
+    }),
+  );
+
+export const GetUsersByRoleDocs = () =>
+  applyDecorators(
+    ApiOperation({ summary: 'Get all users with a specific role' }),
+    ApiQuery({
+      name: 'role',
+      required: true,
+      enum: [
+        'Platform Owner',
+        'Business Owner',
+        'No Access',
+        'Standard',
+        'Enhanced',
+        'Admin',
+      ],
+      description: 'The role to query users by',
+      example: 'Business Owner',
+    }),
+    ApiResponse({
+      status: HttpStatus.OK,
+      description: 'List of users with the requested role',
+      schema: {
+        example: {
+          data: [
+            {
+              id: 'uuid',
+              username: 'john_doe',
+              email: 'john@example.com',
+              name: { firstName: 'John', lastName: 'Doe' },
+            },
+          ],
+          statusCode: 200,
+          timestamp: '2026-01-01T00:00:00.000Z',
+        },
+      },
+    }),
+    ApiResponse({
+      status: HttpStatus.FORBIDDEN,
+      description: 'Caller does not have permission to query the requested role',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.UNAUTHORIZED,
+      description: 'Missing or invalid access token',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.BAD_REQUEST,
+      description: 'Invalid role value',
       type: PikslotsBaseErrorResponse,
     }),
   );

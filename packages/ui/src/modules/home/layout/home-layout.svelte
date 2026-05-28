@@ -5,8 +5,8 @@
 	import { authStore } from '$stores/auth.svelte.js';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import PikslotsSidebar from '../components/pikslots-sidebar.svelte';
-	import PikslotHeader from '../components/pikslot-header.svelte';
+	import PikslotHeader from './header/pikslot-header.svelte';
+	import PikslotsSidebar from './sidebar/pikslots-sidebar.svelte';
 
 	let { children } = $props();
 

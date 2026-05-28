@@ -41,3 +41,20 @@ export type InviterNotAuthorizedError = ErrorShape & {
   inviterRole: string;
   attemptedRole: string;
 };
+
+/**
+ * The caller does not have permission to query users of the requested role.
+ *
+ * Allowed query permissions per role:
+ *   Platform Owner → Business Owner, Admin, Enhanced, Standard, No Access
+ *   Business Owner → Admin, Enhanced, Standard, No Access
+ *   Admin          → Enhanced, Standard, No Access
+ *   Enhanced / Standard / No Access → cannot query
+ *
+ * @example { kind: 'role_query_not_authorized', message: 'You are not allowed to query users with role Business Owner', timestamp, callerRole: 'Standard', queriedRole: 'Business Owner' }
+ */
+export type RoleQueryNotAuthorizedError = ErrorShape & {
+  kind: 'role_query_not_authorized';
+  callerRole: string;
+  queriedRole: string;
+};

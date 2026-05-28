@@ -14,8 +14,8 @@
 	import { authStore } from '$stores/auth.svelte';
 	import { goto } from '$app/navigation';
 	import { createQuery } from '@tanstack/svelte-query';
-	import { getUserProfileQueryOptions } from '../../api/user/get.user.profile.query';
-	import { logoutUser } from '../../api/user/logout.user.mutation';
+	import { getUserProfileQueryOptions } from '../../../api/user/get.user.profile.query';
+	import { logoutUser } from '../../../api/user/logout.user.mutation';
 
 	const userProfileQuery = createQuery(() => getUserProfileQueryOptions());
 

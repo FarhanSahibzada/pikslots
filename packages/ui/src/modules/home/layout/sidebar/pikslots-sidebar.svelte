@@ -1,13 +1,13 @@
 <script lang="ts">
-	import NavSecondary from './nav-secondary.svelte';
-	import NavUser from './nav-user.svelte';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import type { ComponentProps } from 'svelte';
-	import BusinessSwitcher from './business-switcher.svelte';
 	import { createQuery } from '@tanstack/svelte-query';
+	import { getAllBusinessesQueryOptions } from '../../../api/business/get.all.businesses.query';
+	import { navPrimary, navSecondary } from '../../nav-menu/menu';
 	import NavPrimary from './nav-primary.svelte';
-	import { navPrimary, navSecondary } from '../nav-menu/menu';
-	import { getAllBusinessesQueryOptions } from '../../api/business/get.all.businesses.query';
+	import NavSecondary from './nav-secondary.svelte';
+	import NavUser from './nav-user.svelte';
+	import BusinessSwitcher from './business-switcher/business-switcher.svelte';
 
 	const businessesQuery = createQuery(() => getAllBusinessesQueryOptions());
 

@@ -1,9 +1,12 @@
-import type { BaseResponse, RegisterBusinessInput, RegisterBusinessResponse } from '@pikslots/shared';
 import { BUSINESS_ENDPOINTS } from '@pikslots/shared';
 import { apiClient } from '$lib/http/axios.js';
+import type { BusinessCreateInput, BusinessCreateResult } from './models/business-model';
+import type { PikslotResponse } from '../common/common-models';
 
-export const registerBusiness = async (input: RegisterBusinessInput): Promise<RegisterBusinessResponse> => {
-	const { data } = await apiClient.post<BaseResponse<RegisterBusinessResponse>>(
+export const registerBusiness = async (
+	input: BusinessCreateInput
+): Promise<BusinessCreateResult> => {
+	const { data } = await apiClient.post<PikslotResponse<BusinessCreateResult>>(
 		BUSINESS_ENDPOINTS.REGISTER,
 		input
 	);

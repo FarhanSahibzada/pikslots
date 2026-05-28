@@ -1,8 +1,9 @@
-import type { LogoutUserResponse, BaseResponse } from '@pikslots/shared';
 import { USER_ENDPOINTS } from '@pikslots/shared';
 import { apiClient } from '$lib/http/axios.js';
+import type { UserLogoutResult } from './models/user-model';
+import type { PikslotResponse } from '../common/common-models';
 
-export const logoutUser = async (): Promise<LogoutUserResponse> => {
-	const { data } = await apiClient.post<BaseResponse<LogoutUserResponse>>(USER_ENDPOINTS.LOGOUT);
+export const logoutUser = async (): Promise<UserLogoutResult> => {
+	const { data } = await apiClient.post<PikslotResponse<UserLogoutResult>>(USER_ENDPOINTS.LOGOUT);
 	return data.data;
 };

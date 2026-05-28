@@ -16,19 +16,17 @@
 	} from '@pikslots/shared';
 	import type { AxiosError } from 'axios';
 	import { toast } from 'svelte-sonner';
-	import { registerBusiness } from '../../api/business/register.business.mutation';
-	import { getBusinessOwners } from '../../api/user/get.business.owners.query';
-	import { inviteUser } from '../../api/user/invite.user.mutation';
+	import { registerBusiness } from '../../../../api/business/register.business.mutation';
+	import { inviteUser } from '../../../../api/user/invite.user.mutation';
+	import { getUsersByRoleQueryOptions } from '../../../../api/user/get.users.by.role.query';
 
 	let { open = $bindable(false) }: { open: boolean } = $props();
 
-	let step = $state<1 | 2>(2);
-
-	const businessOwnersQuery = createQuery(() => ({
-		queryKey: ['business-owners'],
-		queryFn: getBusinessOwners,
-		enabled: open && step === 2
-	}));
+	let step = $state<1 | 2>(1);
+	//
+	const businessOwnersQuery = createQuery(() =>
+		getUsersByRoleQueryOptions({ role: 'Business Owner' })
+	);
 
 	// Step 1 — invite business owner
 	let username = $state('');

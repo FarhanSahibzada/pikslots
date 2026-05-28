@@ -5,4 +5,5 @@ export const USER_ENDPOINTS = {
   ME: '/users/me',
   INVITE: '/users/invite',
   BUSINESS_OWNERS: '/users/business-owners',
+  BY_ROLE: '/users/by-role',
 } as const;

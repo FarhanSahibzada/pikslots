@@ -67,3 +67,9 @@ export interface UserSummary {
 }
 
 export type GetAllBusinessOwnersResponse = UserSummary[];
+
+export interface GetUsersByRoleInput {
+  role: UserRole;
+}
+
+export type GetUsersByRoleResponse = UserSummary[];
