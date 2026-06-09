@@ -29,5 +29,6 @@ const serviceErrorMap: Record<
 export function mapServiceError(
   error: ServiceError,
 ): PikslotsBaseErrorResponse {
+  console.log(error);
   return serviceErrorMap[error.kind](error);
 }

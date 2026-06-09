@@ -12,3 +12,5 @@ export interface ServiceGroupResponse {
   name: string;
   businessId: string;
 }
+
+export type FindAllServiceGroupsByBusinessResponse = ServiceGroupResponse[];

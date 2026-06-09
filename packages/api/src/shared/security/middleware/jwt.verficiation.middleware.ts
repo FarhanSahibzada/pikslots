@@ -13,6 +13,8 @@ const PUBLIC_ROUTES: string[] = [
   '/users/invite/request-otp',
   '/users/invite/accept',
   '/businesses/register',
+  '/service-groups/by-business/*', // service groups by business public for booking page
+  '/services/by-business/*', // services by business public for booking page
 ];
 
 function isPublicRoute(originalUrl: string): boolean {

@@ -8,6 +8,9 @@ import { BusinessModule } from './modules/business/business.module';
 import { PikslotsQueueModule } from './shared/queue/pikslots.queue.module';
 import { PikslotEmailModule } from './shared/email/pikslot.email.module';
 import { PikslotCacheModule } from './shared/cache/pikslot.cache.module';
+import { ServiceModule } from './modules/service/service.module';
+import { ServiceGroupModule } from './modules/service-group/service.group.module';
+import { ServiceGroupAssignmentModule } from './modules/service-group-assignment/service.group.assignment.module';
 
 @Module({
   imports: [
@@ -21,6 +24,9 @@ import { PikslotCacheModule } from './shared/cache/pikslot.cache.module';
     // domain modules
     UserModule,
     BusinessModule,
+    ServiceModule,
+    ServiceGroupModule,
+    ServiceGroupAssignmentModule,
   ],
   controllers: [],
   providers: [],
