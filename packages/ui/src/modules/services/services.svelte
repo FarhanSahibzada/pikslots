@@ -39,6 +39,7 @@
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import PikslotEmpty from '$lib/components/pikslot-empty.svelte';
 	import Briefcase from '@tabler/icons-svelte/icons/briefcase';
+	import InfoCircle from '@tabler/icons-svelte/icons/info-circle';
 
 	// ── State ───────────────────────────────────────────────────────────────────
 
@@ -204,7 +205,7 @@
 							<button
 								type="button"
 								onclick={() => (selectedGroupId = null)}
-								class="text-sm font-medium">Services ({serviceGroups.length})</button
+								class="text-sm font-medium">Services ({servicesQuery.data?.length})</button
 							>
 							<button
 								type="button"
@@ -410,6 +411,21 @@
 					<div class="flex flex-1 items-center justify-center">
 						<p class="text-sm text-muted-foreground">Loading...</p>
 					</div>
+				{:else if selectedGroupId && filteredServices.length === 0}
+					<PikslotEmpty
+						icon={InfoCircle}
+						title="No services in this group"
+						description="This group has no services yet. Assign services to this group to see them here."
+						buttonLabel="Assing Services"
+						onclick={() => {
+							if (serviceGroupsQuery.isSuccess) {
+								editingGroup = serviceGroupsQuery.data?.filter(
+									(item) => item.id === selectedGroupId
+								)[0];
+								editGroupDialogOpen = true;
+							}
+						}}
+					/>
 				{:else if filteredServices.length === 0}
 					<div class="flex flex-1 items-center justify-center">
 						<p class="text-sm text-muted-foreground">No services found.</p>
