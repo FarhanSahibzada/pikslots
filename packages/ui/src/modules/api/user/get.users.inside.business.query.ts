@@ -10,8 +10,9 @@ export const getUsersInsideBusiness = async (businessId: string): Promise<Busine
 	return data.data;
 };
 
-export const getUsersInsideBusinessQueryOptions = (businessId: string) =>
+export const getUsersInsideBusinessQueryOptions = (businessId: string, enabled: boolean = true) =>
 	queryOptions({
 		queryKey: ['users-inside-business', businessId],
-		queryFn: () => getUsersInsideBusiness(businessId)
+		queryFn: () => getUsersInsideBusiness(businessId),
+		enabled
 	});

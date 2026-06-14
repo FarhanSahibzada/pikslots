@@ -131,6 +131,18 @@
 	html {
 		@apply font-sans;
 	}
+
+	button,
+	a,
+	[role='button'],
+	[role='link'],
+	[role='menuitem'],
+	[role='option'],
+	[role='tab'],
+	label[for],
+	select {
+		cursor: pointer;
+	}
 }
 
 @layer utilities {

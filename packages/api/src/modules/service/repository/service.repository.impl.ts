@@ -5,13 +5,11 @@ import {
   InfrastructureError,
   Result,
   Service,
-  ServiceAlreadyExistsError,
   ServiceNotFoundError,
   ServiceRepository,
 } from '@pikslots/domain';
 import { Kysely } from 'kysely';
 import { PIKSLOTS_DB } from 'src/shared/database/pikslots.database.module';
-import { isUniqueViolation } from 'src/shared/database/helpers/postgres.errors';
 import { PikSlotsDatabase } from 'src/shared/database/schema';
 import { ServicePersistenceMapper } from '../mappers/service.database.mapper';
 
@@ -23,9 +21,7 @@ export class ServiceRepositoryImpl implements ServiceRepository {
     @Inject(PIKSLOTS_DB) private readonly db: Kysely<PikSlotsDatabase>,
   ) {}
 
-  async save(
-    service: Service,
-  ): Promise<Result<void, ServiceAlreadyExistsError | InfrastructureError>> {
+  async save(service: Service): Promise<Result<void, InfrastructureError>> {
     try {
       await this.db
         .insertInto('services')
@@ -33,15 +29,6 @@ export class ServiceRepositoryImpl implements ServiceRepository {
         .execute();
       return ok(undefined);
     } catch (cause) {
-      if (isUniqueViolation(cause)) {
-        return err<ServiceAlreadyExistsError>({
-          kind: 'service_already_exists',
-          field: 'title',
-          message: `A service with this title already exists for this business`,
-          timestamp: new Date(),
-        });
-      }
-
       return err<InfrastructureError>({
         kind: 'infrastructure',
         message: 'Failed to save service',
@@ -53,7 +40,9 @@ export class ServiceRepositoryImpl implements ServiceRepository {
 
   async findById(
     id: string,
-  ): Promise<Result<Service | null, ServiceNotFoundError | InfrastructureError>> {
+  ): Promise<
+    Result<Service | null, ServiceNotFoundError | InfrastructureError>
+  > {
     try {
       const row = await this.db
         .selectFrom('services')
@@ -123,6 +112,36 @@ export class ServiceRepositoryImpl implements ServiceRepository {
       return err<InfrastructureError>({
         kind: 'infrastructure',
         message: 'Failed to update service',
+        timestamp: new Date(),
+        cause,
+      });
+    }
+  }
+
+  async delete(
+    id: string,
+  ): Promise<Result<void, ServiceNotFoundError | InfrastructureError>> {
+    try {
+      const result = await this.db
+        .deleteFrom('services')
+        .where('id', '=', id)
+        .executeTakeFirst();
+
+      if (!result.numDeletedRows || result.numDeletedRows === BigInt(0)) {
+        return err<ServiceNotFoundError>({
+          kind: 'service_not_found',
+          by: 'id',
+          value: id,
+          message: `Service not found against ${id}`,
+          timestamp: new Date(),
+        });
+      }
+
+      return ok(undefined);
+    } catch (cause) {
+      return err<InfrastructureError>({
+        kind: 'infrastructure',
+        message: 'Failed to delete service',
         timestamp: new Date(),
         cause,
       });

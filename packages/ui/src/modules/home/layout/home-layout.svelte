@@ -19,9 +19,10 @@
 
 	$effect(() => {
 		if (!authStore.isInitializing && !authStore.isAuthenticated) goto('/login');
+
 		if (
-			authStore.getPayloadData()?.role === 'Business Owner' ||
-			authStore.getPayloadData()?.role === 'Admin'
+			authStore.getPayloadData()?.role !== 'Platform Owner' ||
+			authStore.getPayloadData()?.role === 'No Access'
 		)
 			callGetBusinessById = true;
 
@@ -50,7 +51,7 @@
 			<PikslotHeader />
 			<div class="flex flex-1 flex-col">
 				<div class="@container/main flex flex-1 flex-col gap-2">
-					<div class="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+					<div class="flex flex-col gap-4 px-2 py-4 md:gap-6 md:py-6">
 						{@render children()}
 					</div>
 				</div>

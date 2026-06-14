@@ -1,18 +1,19 @@
 import { HttpStatus } from '@nestjs/common';
-import type {
-  InfrastructureError,
-  InviteAlreadyAcceptedError,
-  InvalidOtpError,
-  InviterNotAuthorizedError,
-  RoleQueryNotAuthorizedError,
-  UnauthorizedError,
-  UserAlreadyExistsError,
-  UserNotFoundError,
-  UserNoAccessError,
-  UserSuspendedError,
-  UserInactiveError,
-  ValidationError,
-  WorkingHoursUpdateNotAuthorizedError,
+import {
+  type InfrastructureError,
+  type InviteAlreadyAcceptedError,
+  type InvalidOtpError,
+  type InviterNotAuthorizedError,
+  type RoleQueryNotAuthorizedError,
+  type UnauthorizedError,
+  type UserAlreadyExistsError,
+  type UserNotFoundError,
+  type UserNoAccessError,
+  type UserSuspendedError,
+  type UserInactiveError,
+  type ValidationError,
+  type WorkingHoursUpdateNotAuthorizedError,
+  err,
 } from '@pikslots/domain';
 import { PikslotsBaseErrorResponse } from 'src/shared/types/base.error.response';
 
@@ -56,7 +57,10 @@ const userErrorMap: Record<
   validation: (error) =>
     new PikslotsBaseErrorResponse(error.message, HttpStatus.BAD_REQUEST),
   invalid_otp: (error) =>
-    new PikslotsBaseErrorResponse(error.message, HttpStatus.UNPROCESSABLE_ENTITY),
+    new PikslotsBaseErrorResponse(
+      error.message,
+      HttpStatus.UNPROCESSABLE_ENTITY,
+    ),
   invite_already_accepted: (error) =>
     new PikslotsBaseErrorResponse(error.message, HttpStatus.CONFLICT),
   infrastructure: () =>
@@ -67,5 +71,6 @@ const userErrorMap: Record<
 };
 
 export function mapUserError(error: UserError): PikslotsBaseErrorResponse {
+  console.log(error);
   return userErrorMap[error.kind](error);
 }

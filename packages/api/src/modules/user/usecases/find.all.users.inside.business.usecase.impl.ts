@@ -26,11 +26,7 @@ export class FindAllUsersInsideBusinessUseCaseImpl implements FindAllUsersInside
   async execute(
     businessId: string,
   ): Promise<Result<User[], InfrastructureError | UnauthorizedError>> {
-    if (
-      this.securityContext.role === 'No Access' ||
-      this.securityContext.role === 'Standard' ||
-      this.securityContext.role === 'Enhanced'
-    )
+    if (this.securityContext.role === 'No Access')
       return err(UNAUTHORIZED_ERROR);
 
     const result = await this.userRepository.findAllByBusiness(businessId);

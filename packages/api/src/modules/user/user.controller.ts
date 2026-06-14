@@ -16,6 +16,7 @@ import {
 import type { Request, Response } from 'express';
 import { ApiTags } from '@nestjs/swagger';
 import { mapUserError } from './errors/user.errors.map';
+import { USER_ENDPOINTS } from '@pikslots/shared';
 import { LoginUserDto } from './dto/login.user.dto';
 import { InviteUserDto } from './dto/invite.user.dto';
 import { UserUsecasesFactory } from './factory/user.usecases.factory';
@@ -56,7 +57,7 @@ import { RolesGuard } from 'src/shared/security/guards/roles.guard';
 import { Roles } from 'src/shared/security/guards/roles.decorator';
 
 @ApiTags('Users')
-@Controller('/users')
+@Controller('')
 export class UserController {
   constructor(
     private readonly userUseCaseFactory: UserUsecasesFactory,
@@ -68,7 +69,7 @@ export class UserController {
   @GetAllBusinessOwnersDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner')
-  @Get('/business-owners')
+  @Get(USER_ENDPOINTS.BUSINESS_OWNERS)
   async getAllBusinessOwners(
     @Res({ passthrough: true }) res: Response,
   ): Promise<PikslotsBaseErrorResponse | PikslotsBaseResponse<UserSummary[]>> {
@@ -94,13 +95,11 @@ export class UserController {
   @GetUsersByRoleDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
-  @Get('/by-role')
+  @Get(USER_ENDPOINTS.BY_ROLE)
   async getUsersByRole(
     @Query() query: GetUsersByRoleDto,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<
-    PikslotsBaseErrorResponse | PikslotsBaseResponse<UserSummary[]>
-  > {
+  ): Promise<PikslotsBaseErrorResponse | PikslotsBaseResponse<UserSummary[]>> {
     const result =
       await this.userUseCaseFactory.getAllUsersByRoleUseCase.execute(
         this.securityContext.role,
@@ -122,14 +121,12 @@ export class UserController {
 
   @GetBusinessUsersDocs()
   @UseGuards(RolesGuard)
-  @Roles('Platform Owner', 'Business Owner', 'Admin')
-  @Get('/business/:businessId')
+  @Roles('Platform Owner', 'Business Owner', 'Admin', 'Standard', 'Enhanced')
+  @Get(USER_ENDPOINTS.BUSINESS_USERS)
   async getBusinessUsers(
     @Param('businessId') businessId: string,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<
-    PikslotsBaseErrorResponse | PikslotsBaseResponse<UserSummary[]>
-  > {
+  ): Promise<PikslotsBaseErrorResponse | PikslotsBaseResponse<UserSummary[]>> {
     const result =
       await this.userUseCaseFactory.findAllUsersInsideBusinessUseCase.execute(
         businessId,
@@ -149,12 +146,10 @@ export class UserController {
   }
 
   @GetUserProfileDocs()
-  @Get('/me')
+  @Get(USER_ENDPOINTS.ME)
   async getUserProfile(
     @Res({ passthrough: true }) res: Response,
-  ): Promise<
-    PikslotsBaseErrorResponse | PikslotsBaseResponse<UserSummary>
-  > {
+  ): Promise<PikslotsBaseErrorResponse | PikslotsBaseResponse<UserSummary>> {
     const result = await this.userUseCaseFactory.getUserProfileUseCase.execute(
       this.securityContext.userId,
     );
@@ -173,7 +168,7 @@ export class UserController {
   }
 
   @InviteUserDocs()
-  @Post('/invite')
+  @Post(USER_ENDPOINTS.INVITE)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
   async inviteUser(
     @Res({ passthrough: true }) res: Response,
@@ -181,6 +176,8 @@ export class UserController {
   ): Promise<
     PikslotsBaseErrorResponse | PikslotsBaseResponse<InviteUserResponse>
   > {
+    console.log('called');
+
     const result =
       await this.userUseCaseFactory.inviteUserUseCase.execute(inviteUserDto);
 
@@ -195,7 +192,7 @@ export class UserController {
   }
 
   @LoginUserDocs()
-  @Post('/login')
+  @Post(USER_ENDPOINTS.LOGIN)
   async loginUser(
     @Res({ passthrough: true }) res: Response,
     @Body()
@@ -216,7 +213,7 @@ export class UserController {
       httpOnly: true,
       secure: this.configService.get('NODE_ENV') === 'production',
       sameSite: 'strict',
-      path: '/users/refresh',
+      path: USER_ENDPOINTS.REFRESH,
     });
 
     res.status(HttpStatus.OK);
@@ -227,7 +224,7 @@ export class UserController {
   }
 
   @RefreshUserSessionDocs()
-  @Post('/refresh')
+  @Post(USER_ENDPOINTS.REFRESH)
   async refreshUserSession(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
@@ -251,7 +248,7 @@ export class UserController {
       httpOnly: true,
       secure: this.configService.get('NODE_ENV') === 'production',
       sameSite: 'strict',
-      path: '/users/refresh',
+      path: USER_ENDPOINTS.REFRESH,
     });
 
     res.status(HttpStatus.OK);
@@ -262,7 +259,7 @@ export class UserController {
   }
 
   @UpdateUserWorkingHoursDocs()
-  @Patch('/:userId/working-hours')
+  @Patch(USER_ENDPOINTS.UPDATE_WORKING_HOURS)
   async updateWorkingHours(
     @Res({ passthrough: true }) res: Response,
     @Param('userId') userId: string,
@@ -300,7 +297,7 @@ export class UserController {
     );
   }
 
-  @Post('/invite/request-otp')
+  @Post(USER_ENDPOINTS.REQUEST_INVITE_OTP)
   async requestInviteOtp(
     @Res({ passthrough: true }) res: Response,
     @Body() dto: RequestInviteOtpDto,
@@ -325,7 +322,7 @@ export class UserController {
     );
   }
 
-  @Post('/invite/accept')
+  @Post(USER_ENDPOINTS.ACCEPT_INVITE)
   async acceptInvite(
     @Res({ passthrough: true }) res: Response,
     @Body() dto: AcceptInviteDto,
@@ -362,11 +359,11 @@ export class UserController {
 
   @LogoutUserDocs()
   @HttpCode(HttpStatus.OK)
-  @Post('/logout')
+  @Post(USER_ENDPOINTS.LOGOUT)
   logout(
     @Res({ passthrough: true }) res: Response,
   ): PikslotsBaseResponse<LogoutUserResponse> {
-    res.clearCookie('jid', { path: '/users/refresh' });
+    res.clearCookie('jid', { path: USER_ENDPOINTS.REFRESH });
     return new PikslotsBaseResponse<LogoutUserResponse>(
       { message: 'success' },
       HttpStatus.OK,

@@ -1,5 +1,7 @@
 // ── Props ─────────────────────────────────────────────────────────────────────
 
+import type { UserRole } from '../user';
+
 export interface ServiceProps {
   readonly id: string;
   readonly title: string; // should be unique per business
@@ -29,6 +31,7 @@ export interface ServiceCreateInput {
   imagesUrls: string[]; // only 5 images allowed
   durationInMins: number;
   bufferTimeInMins: number; // the time between two consecutive services
+  isHiddenFromBookingPage: boolean;
   cost: number;
   businessId: string;
   createdBy: string;
@@ -57,7 +60,7 @@ export class Service {
       durationInMins: input.durationInMins,
       bufferTimeInMins: input.bufferTimeInMins,
       cost: input.cost,
-      isHiddenFromBookingPage: false,
+      isHiddenFromBookingPage: input.isHiddenFromBookingPage,
       businessId: input.businessId,
       createdAt: now,
       createdBy: input.createdBy,
@@ -67,6 +70,57 @@ export class Service {
       deletedBy: null,
       isDeleted: false,
     });
+  }
+
+  update(input: {
+    title: string;
+    description: string;
+    imagesUrls: string[];
+    durationInMins: number;
+    bufferTimeInMins: number;
+    cost: number;
+    isHiddenFromBookingPage: boolean;
+    updatedBy: string;
+  }): Service {
+    return new Service({
+      ...this.props,
+      title: input.title,
+      description: input.description,
+      images: input.imagesUrls,
+      durationInMins: input.durationInMins,
+      bufferTimeInMins: input.bufferTimeInMins,
+      cost: input.cost,
+      isHiddenFromBookingPage: input.isHiddenFromBookingPage,
+      updatedAt: new Date(),
+      updatedBy: input.updatedBy,
+    });
+  }
+
+  static canRegisterService(callerRole: UserRole, isPartOfSameBusiness: boolean): boolean {
+    if (callerRole === 'Platform Owner') return true;
+    if ((callerRole === 'Business Owner' || callerRole === 'Admin') && isPartOfSameBusiness)
+      return true;
+
+    // Enhanced , Standard , No acess
+    return false;
+  }
+
+  static canEditService(callerRole: UserRole, isPartOfSameBusiness: boolean): boolean {
+    if (callerRole === 'Platform Owner') return true;
+    if ((callerRole === 'Business Owner' || callerRole === 'Admin') && isPartOfSameBusiness)
+      return true;
+
+    // Enhanced , Standard , No acess
+    return false;
+  }
+
+  static canDeleteService(callerRole: UserRole, isPartOfSameBusiness: boolean): boolean {
+    if (callerRole === 'Platform Owner') return true;
+    if ((callerRole === 'Business Owner' || callerRole === 'Admin') && isPartOfSameBusiness)
+      return true;
+
+    // Enhanced , Standard , No acess
+    return false;
   }
 
   /**

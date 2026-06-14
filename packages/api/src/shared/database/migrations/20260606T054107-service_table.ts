@@ -7,10 +7,13 @@ export async function up(db: Kysely<PikSlotsDatabase>): Promise<void> {
     .addColumn('id', 'uuid', (col) => col.primaryKey().notNull())
     .addColumn('title', 'varchar(255)', (col) => col.notNull())
     .addColumn('description', 'text', (col) => col.notNull())
-    .addColumn('images', 'jsonb', (col) => col.notNull().defaultTo(sql`'[]'::jsonb`))
-    .addColumn('email', 'varchar(100)', (col) => col.notNull())
+    .addColumn('images', 'jsonb', (col) =>
+      col.notNull().defaultTo(sql`'[]'::jsonb`),
+    )
     .addColumn('duration_in_mins', 'integer', (col) => col.notNull())
-    .addColumn('buffer_time_in_mins', 'integer', (col) => col.notNull().defaultTo(0))
+    .addColumn('buffer_time_in_mins', 'integer', (col) =>
+      col.notNull().defaultTo(0),
+    )
     .addColumn('cost', 'integer', (col) => col.notNull())
     .addColumn('is_hidden_from_booking_page', 'boolean', (col) =>
       col.notNull().defaultTo(false),

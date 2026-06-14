@@ -1,5 +1,5 @@
 WITH seed_id AS (
-  SELECT gen_random_uuid() AS id
+  SELECT '019f3a2c-8b1e-7d4f-9a3b-c5e7f2814d60'::uuid AS id
 )
 INSERT INTO users (
   id,
@@ -100,7 +100,7 @@ INSERT INTO businesses (
   is_deleted
 )
 SELECT
-  gen_random_uuid(),
+  '019f3a2d-4c7f-7b8e-a2d5-e9f1c3057b84',
   u.id,
   'afaqs-demo-business',
   'Afaq''s Demo Business',

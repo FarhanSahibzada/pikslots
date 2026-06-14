@@ -5,7 +5,7 @@ import { JwtLoginService } from '../jwt/jwt.login.service';
 import { PikslotsBaseErrorResponse } from 'src/shared/types/base.error.response';
 
 // Routes bypassed from JWT verification.
-// Supports exact paths ('/users/register') and wildcards ('/users/*').
+// Supports exact paths ('/users/register') and wildcards ('/users/*', '/foo/*/bar').
 const PUBLIC_ROUTES: string[] = [
   '/users/register',
   '/users/login',
@@ -20,11 +20,18 @@ function isPublicRoute(originalUrl: string): boolean {
   console.log(path);
 
   return PUBLIC_ROUTES.some((route) => {
+    if (!route.includes('*')) return path === route;
     if (route.endsWith('/*')) {
       const prefix = route.slice(0, -2);
       return path === prefix || path.startsWith(prefix + '/');
     }
-    return path === route;
+    // mid-path wildcard: convert to regex where * matches one path segment
+    const regex = new RegExp(
+      '^' +
+        route.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '[^/]+') +
+        '$',
+    );
+    return regex.test(path);
   });
 }
 

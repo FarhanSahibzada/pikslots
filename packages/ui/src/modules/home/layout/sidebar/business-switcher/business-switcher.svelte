@@ -30,8 +30,9 @@
 	$effect(() => {
 		if (authStore.getPayloadData()?.role === 'Platform Owner') callToGetAllBusinesses = true;
 
-		if (!businessStore.hasSelectedBusiness && businessesQuery.data.length > 0)
+		if (!businessStore.hasSelectedBusiness && businessesQuery.data.length > 0) {
 			businessStore.setSelectedBusiness(businessesQuery.data[0]);
+		}
 	});
 </script>
 

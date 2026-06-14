@@ -43,11 +43,7 @@ export class FindBusinessByIdUseCaseImpl implements FindBusinessByIdUseCase {
       | BusinessInactiveError
     >
   > {
-    if (
-      this.securityContext.role === 'No Access' ||
-      this.securityContext.role === 'Standard' ||
-      this.securityContext.role === 'Enhanced'
-    )
+    if (this.securityContext.role === 'No Access')
       return err(UNAUTHORIZED_ERROR);
 
     const result = await this.businessRepository.findById(businessId);

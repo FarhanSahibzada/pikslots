@@ -12,6 +12,7 @@ import {
 import type { Response } from 'express';
 import { ApiTags } from '@nestjs/swagger';
 import { mapBusinessError } from './errors/business.errors.map';
+import { BUSINESS_ENDPOINTS } from '@pikslots/shared';
 import { RegisterBusinessDto } from './dto/register.business.dto';
 import { UpdateBusinessBrandDetailsDto } from './dto/update.business.brand.details.dto';
 import { UpdateBusinessAppearanceDto } from './dto/update.business.appearance.dto';
@@ -73,14 +74,14 @@ import { Roles } from 'src/shared/security/guards/roles.decorator';
 import e from 'express';
 
 @ApiTags('Businesses')
-@Controller('/businesses')
+@Controller('')
 export class BusinessController {
   constructor(
     private readonly businessUseCaseFactory: BusinessUseCaseFactory,
   ) {}
 
   @RegisterBusinessDocs()
-  @Post('/register')
+  @Post(BUSINESS_ENDPOINTS.REGISTER)
   @Roles('Platform Owner')
   async registerBusiness(
     @Res({ passthrough: true }) res: Response,
@@ -105,8 +106,8 @@ export class BusinessController {
 
   @GetBusinessByIdDocs()
   @UseGuards(RolesGuard)
-  @Roles('Platform Owner', 'Business Owner', 'Admin')
-  @Get(':id')
+  @Roles('Platform Owner', 'Business Owner', 'Admin', 'Standard', 'Enhanced')
+  @Get(BUSINESS_ENDPOINTS.GET_BY_ID)
   async getBusinessById(
     @Res({ passthrough: true }) res: Response,
     @Param('id') id: string,
@@ -163,7 +164,7 @@ export class BusinessController {
   @GetAllBusinessesDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner')
-  @Get()
+  @Get(BUSINESS_ENDPOINTS.GET_ALL)
   async getAllBusinesses(
     @Res({ passthrough: true }) res: Response,
   ): Promise<
@@ -219,7 +220,7 @@ export class BusinessController {
   @UpdateBusinessBrandDetailsDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
-  @Patch(':id/brand-details')
+  @Patch(BUSINESS_ENDPOINTS.UPDATE_BRAND_DETAILS)
   async updateBusinessBrandDetails(
     @Res({ passthrough: true }) res: Response,
     @Param('id') id: string,
@@ -288,7 +289,7 @@ export class BusinessController {
   @UpdateBusinessAppearanceDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
-  @Patch(':id/appearance')
+  @Patch(BUSINESS_ENDPOINTS.UPDATE_APPEARANCE)
   async updateBusinessAppearance(
     @Res({ passthrough: true }) res: Response,
     @Param('id') id: string,
@@ -355,7 +356,7 @@ export class BusinessController {
   @UpdateBusinessLocationDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
-  @Patch(':id/location')
+  @Patch(BUSINESS_ENDPOINTS.UPDATE_LOCATION)
   async updateBusinessLocation(
     @Res({ passthrough: true }) res: Response,
     @Param('id') id: string,
@@ -423,7 +424,7 @@ export class BusinessController {
   @UpdateBusinessGeneralDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
-  @Patch(':id/general')
+  @Patch(BUSINESS_ENDPOINTS.UPDATE_GENERAL)
   async updateBusinessGeneral(
     @Res({ passthrough: true }) res: Response,
     @Param('id') id: string,
@@ -485,7 +486,7 @@ export class BusinessController {
   @UpdateBusinessBookingPoliciesDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
-  @Patch(':id/booking-policies')
+  @Patch(BUSINESS_ENDPOINTS.UPDATE_BOOKING_POLICIES)
   async updateBusinessBookingPolicies(
     @Res({ passthrough: true }) res: Response,
     @Param('id') id: string,
@@ -553,7 +554,7 @@ export class BusinessController {
   @UpdateBusinessBookingSetupDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
-  @Patch(':id/booking-setup')
+  @Patch(BUSINESS_ENDPOINTS.UPDATE_BOOKING_SETUP)
   async updateBusinessBookingSetup(
     @Res({ passthrough: true }) res: Response,
     @Param('id') id: string,
@@ -641,7 +642,7 @@ export class BusinessController {
   @UpdateBusinessBookingCustomizationDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
-  @Patch(':id/booking-customization')
+  @Patch(BUSINESS_ENDPOINTS.UPDATE_BOOKING_CUSTOMIZATION)
   async updateBusinessBookingCustomization(
     @Res({ passthrough: true }) res: Response,
     @Param('id') id: string,
@@ -724,7 +725,7 @@ export class BusinessController {
   @UpdateBusinessVisibilityDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
-  @Patch(':id/visibility')
+  @Patch(BUSINESS_ENDPOINTS.UPDATE_VISIBILITY)
   async updateBusinessVisibility(
     @Res({ passthrough: true }) res: Response,
     @Param('id') id: string,
@@ -788,7 +789,7 @@ export class BusinessController {
   @UpdateBusinessTeamNotificationsDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
-  @Patch(':id/team-notifications')
+  @Patch(BUSINESS_ENDPOINTS.UPDATE_TEAM_NOTIFICATIONS)
   async updateBusinessTeamNotifications(
     @Res({ passthrough: true }) res: Response,
     @Param('id') id: string,
@@ -856,7 +857,7 @@ export class BusinessController {
   @UpdateBusinessCustomerNotificationsDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
-  @Patch(':id/customer-notifications')
+  @Patch(BUSINESS_ENDPOINTS.UPDATE_CUSTOMER_NOTIFICATIONS)
   async updateBusinessCustomerNotifications(
     @Res({ passthrough: true }) res: Response,
     @Param('id') id: string,
@@ -923,7 +924,7 @@ export class BusinessController {
   @UpdateBusinessNotificationCustomizationDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
-  @Patch(':id/notification-customization')
+  @Patch(BUSINESS_ENDPOINTS.UPDATE_NOTIFICATION_CUSTOMIZATION)
   async updateBusinessNotificationCustomization(
     @Res({ passthrough: true }) res: Response,
     @Param('id') id: string,
@@ -988,7 +989,7 @@ export class BusinessController {
   @UpdateBusinessHoursDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
-  @Patch(':id/business-hours')
+  @Patch(BUSINESS_ENDPOINTS.UPDATE_BUSINESS_HOURS)
   async updateBusinessHours(
     @Res({ passthrough: true }) res: Response,
     @Param('id') id: string,
@@ -1058,7 +1059,7 @@ export class BusinessController {
   @UpdateBusinessLinksDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
-  @Patch(':id/links')
+  @Patch(BUSINESS_ENDPOINTS.UPDATE_BUSINESS_LINKS)
   async updateBusinessLinks(
     @Res({ passthrough: true }) res: Response,
     @Param('id') id: string,
@@ -1128,7 +1129,7 @@ export class BusinessController {
   @UpdateBusinessContactDetailsDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
-  @Patch(':id/contact-details')
+  @Patch(BUSINESS_ENDPOINTS.UPDATE_CONTACT_DETAILS)
   async updateBusinessContactDetails(
     @Res({ passthrough: true }) res: Response,
     @Param('id') id: string,
@@ -1138,15 +1139,17 @@ export class BusinessController {
     | PikslotsBaseResponse<UpdateBusinessContactDetailsResponse>
   > {
     const result =
-      await this.businessUseCaseFactory.updateBusinessContactDetailsUseCase.execute({
-        id,
-        contactDetails: {
-          primaryEmail: dto.primaryEmail,
-          primaryPhone: dto.primaryPhone,
-          additionalEmails: dto.additionalEmails,
-          additionalPhones: dto.additionalPhones,
+      await this.businessUseCaseFactory.updateBusinessContactDetailsUseCase.execute(
+        {
+          id,
+          contactDetails: {
+            primaryEmail: dto.primaryEmail,
+            primaryPhone: dto.primaryPhone,
+            additionalEmails: dto.additionalEmails,
+            additionalPhones: dto.additionalPhones,
+          },
         },
-      });
+      );
 
     if (!result.ok) {
       const errorResponse = mapBusinessError(result.error);
