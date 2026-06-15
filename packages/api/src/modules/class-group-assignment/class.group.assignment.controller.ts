@@ -66,8 +66,7 @@ export class ClassGroupAssignmentController {
     @Res({ passthrough: true }) res: Response,
     @Param('classGroupId') classGroupId: string,
   ): Promise<
-    | PikslotsBaseErrorResponse
-    | PikslotsBaseResponse<FindClassesByGroupResponse>
+    PikslotsBaseErrorResponse | PikslotsBaseResponse<FindClassesByGroupResponse>
   > {
     const result =
       await this.useCasesFactory.findClassesByGroupUseCase.execute(

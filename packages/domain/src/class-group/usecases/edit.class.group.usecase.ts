@@ -1,8 +1,5 @@
 import type { InfrastructureError, Result } from '../../shared';
-import type {
-  ClassGroupAlreadyExistsInBusinessError,
-  ClassGroupNotFoundError,
-} from '../errors';
+import type { ClassGroupAlreadyExistsInBusinessError, ClassGroupNotFoundError } from '../errors';
 
 export interface EditClassGroupCommand {
   classGroupId: string;

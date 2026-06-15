@@ -1,6 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import type { UpdateBusinessAppearanceInput, BrandButtonShape, BrandTheme } from '@pikslots/shared';
-import { PikSlotsEnumValidation, PikSlotsStringValidation } from 'src/shared/decorators/validations';
+import type {
+  UpdateBusinessAppearanceInput,
+  BrandButtonShape,
+  BrandTheme,
+} from '@pikslots/shared';
+import {
+  PikSlotsEnumValidation,
+  PikSlotsStringValidation,
+} from 'src/shared/decorators/validations';
 import { IsArray, IsUrl, ArrayMaxSize } from 'class-validator';
 
 const BUTTON_SHAPES: BrandButtonShape[] = ['pill', 'rounded', 'rectangle'];

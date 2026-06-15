@@ -81,7 +81,9 @@
 		if (editMutation.isSuccess) {
 			toast.success('Class group updated');
 			queryClient.invalidateQueries({ queryKey: ['class-groups'] });
-			queryClient.invalidateQueries({ queryKey: ['class-group-assignments', 'by-group', group?.id] });
+			queryClient.invalidateQueries({
+				queryKey: ['class-group-assignments', 'by-group', group?.id]
+			});
 			open = false;
 			editMutation.reset();
 		}
@@ -104,9 +106,7 @@
 		filteredClasses.length > 0 && filteredClasses.every((c) => selectedIds.has(c.id))
 	);
 
-	const someSelected = $derived(
-		filteredClasses.some((c) => selectedIds.has(c.id)) && !allSelected
-	);
+	const someSelected = $derived(filteredClasses.some((c) => selectedIds.has(c.id)) && !allSelected);
 
 	function toggleSelectAll() {
 		if (allSelected) {

@@ -1,5 +1,9 @@
 import { SERVICE_ENDPOINTS } from '@pikslots/shared';
-import type { BaseErrorResponse, RegisterServiceInput, RegisterServiceResponse } from '@pikslots/shared';
+import type {
+	BaseErrorResponse,
+	RegisterServiceInput,
+	RegisterServiceResponse
+} from '@pikslots/shared';
 import { apiClient } from '$lib/http/axios.js';
 import { mutationOptions } from '@tanstack/svelte-query';
 import type { AxiosError } from 'axios';

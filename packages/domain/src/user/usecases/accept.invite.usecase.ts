@@ -1,9 +1,5 @@
 import type { InfrastructureError, Result } from '../../shared';
-import type {
-  InviteAlreadyAcceptedError,
-  InvalidOtpError,
-  UserNotFoundError,
-} from '../errors';
+import type { InviteAlreadyAcceptedError, InvalidOtpError, UserNotFoundError } from '../errors';
 
 export interface AcceptInviteCommand {
   userId: string;
@@ -20,10 +16,7 @@ export interface AcceptInviteUseCase {
   ): Promise<
     Result<
       { message: 'success' },
-      | UserNotFoundError
-      | InviteAlreadyAcceptedError
-      | InvalidOtpError
-      | InfrastructureError
+      UserNotFoundError | InviteAlreadyAcceptedError | InvalidOtpError | InfrastructureError
     >
   >;
 }

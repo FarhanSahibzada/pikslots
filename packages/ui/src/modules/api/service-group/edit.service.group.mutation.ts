@@ -13,7 +13,11 @@ export const editServiceGroup = async (
 };
 
 export const editServiceGroupMutationOptions = () =>
-	mutationOptions<void, AxiosError<BaseErrorResponse>, { serviceGroupId: string } & EditServiceGroupInput>({
+	mutationOptions<
+		void,
+		AxiosError<BaseErrorResponse>,
+		{ serviceGroupId: string } & EditServiceGroupInput
+	>({
 		mutationKey: ['edit-service-group'],
 		mutationFn: ({ serviceGroupId, ...input }) => editServiceGroup(serviceGroupId, input)
 	});

@@ -11,7 +11,6 @@ export const PikSlotsSlugValidation = () =>
     MinLength(3),
     MaxLength(60),
     Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
-      message:
-        'slug must be lowercase alphanumeric words separated by hyphens',
+      message: 'slug must be lowercase alphanumeric words separated by hyphens',
     }),
   );

@@ -114,7 +114,9 @@
 
 	const servicesByGroupQuery = createQuery(() => getServicesByGroupQueryOptions(selectedGroupId));
 	const servicesByUserQuery = createQuery(() => getServicesByUserQueryOptions(selectedUserId));
-	const classesByGroupQuery = createQuery(() => getClassesByGroupQueryOptions(selectedClassGroupId));
+	const classesByGroupQuery = createQuery(() =>
+		getClassesByGroupQueryOptions(selectedClassGroupId)
+	);
 
 	const users = $derived(usersQuery.data ?? []);
 
@@ -231,7 +233,11 @@
 <NewServiceGroupDialog bind:open={newGroupDialogOpen} {services} />
 <EditServiceGroupDialog bind:open={editGroupDialogOpen} bind:group={editingGroup} {services} />
 <NewClassGroupDialog bind:open={newClassGroupDialogOpen} {classes} />
-<EditClassGroupDialog bind:open={editClassGroupDialogOpen} bind:group={editingClassGroup} {classes} />
+<EditClassGroupDialog
+	bind:open={editClassGroupDialogOpen}
+	bind:group={editingClassGroup}
+	{classes}
+/>
 
 <ConfirmDialog
 	open={!!deleteGroupId}
@@ -396,8 +402,7 @@
 									<button
 										type="button"
 										onclick={() => {
-											selectedClassGroupId =
-												selectedClassGroupId === group.id ? null : group.id;
+											selectedClassGroupId = selectedClassGroupId === group.id ? null : group.id;
 											rightPanelView = 'classes';
 										}}
 										class="flex flex-1 items-center py-1.5 pr-8 pl-6 text-left text-sm transition-colors hover:bg-accent
@@ -513,7 +518,9 @@
 							{/snippet}
 						</DropdownMenu.Trigger>
 						<DropdownMenu.Content align="start" class="w-44">
-							<DropdownMenu.Item onclick={() => (selectedUserId = null)}>All staff</DropdownMenu.Item>
+							<DropdownMenu.Item onclick={() => (selectedUserId = null)}
+								>All staff</DropdownMenu.Item
+							>
 							{#each users as user (user.id)}
 								<DropdownMenu.Item onclick={() => (selectedUserId = user.id)}>
 									{user.name.firstName}

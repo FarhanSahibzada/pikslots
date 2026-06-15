@@ -20,7 +20,8 @@ export class FindGroupsByServiceUseCaseImpl implements FindGroupsByServiceUseCas
   async execute(
     serviceId: string,
   ): Promise<Result<ServiceGroupSummary[], InfrastructureError>> {
-    const result = await this.assignmentRepository.findGroupsByService(serviceId);
+    const result =
+      await this.assignmentRepository.findGroupsByService(serviceId);
 
     if (!result.ok) return err(result.error);
 

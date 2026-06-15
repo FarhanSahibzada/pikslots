@@ -35,9 +35,7 @@ export class JwtInviteService {
     }
   }
 
-  private mapJwtError(
-    error: unknown,
-  ): UnauthorizedError | ValidationError {
+  private mapJwtError(error: unknown): UnauthorizedError | ValidationError {
     if (error instanceof jwt.TokenExpiredError) {
       return {
         kind: 'unauthorized',

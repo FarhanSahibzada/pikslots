@@ -14,10 +14,9 @@ export const updateBusinessCustomerNotifications = async (
 ): Promise<BusinessUpdateCustomerNotificationsResult> => {
 	const { id, ...body } = input;
 	const endpoint = BUSINESS_ENDPOINTS.UPDATE_CUSTOMER_NOTIFICATIONS.replace(':id', id);
-	const { data } = await apiClient.patch<PikslotResponse<BusinessUpdateCustomerNotificationsResult>>(
-		endpoint,
-		body
-	);
+	const { data } = await apiClient.patch<
+		PikslotResponse<BusinessUpdateCustomerNotificationsResult>
+	>(endpoint, body);
 	return data.data;
 };
 

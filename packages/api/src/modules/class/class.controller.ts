@@ -53,8 +53,8 @@ export class ClassController {
   ): Promise<
     PikslotsBaseErrorResponse | PikslotsBaseResponse<RegisterClassResponse>
   > {
-    const result =
-      await this.classUseCasesFactory.registerClassUseCase.execute({
+    const result = await this.classUseCasesFactory.registerClassUseCase.execute(
+      {
         title: dto.title,
         description: dto.description,
         imagesUrls: dto.imagesUrls,
@@ -65,7 +65,8 @@ export class ClassController {
         associatedClassGroupIds: dto.associatedClassGroupIds,
         businessId: dto.businessId,
         createdBy: this.securityContext.userId,
-      });
+      },
+    );
 
     if (!result.ok) {
       const errorResponse = mapClassError(result.error);
@@ -91,20 +92,19 @@ export class ClassController {
   ): Promise<
     PikslotsBaseErrorResponse | PikslotsBaseResponse<UpdateClassResponse>
   > {
-    const result =
-      await this.classUseCasesFactory.editClassUseCase.execute({
-        id: classId,
-        title: dto.title,
-        description: dto.description,
-        imagesUrls: dto.imagesUrls,
-        durationInMins: dto.durationInMins,
-        seats: dto.seats,
-        cost: dto.cost,
-        isHiddenFromBookingPage: dto.isHiddenFromBookingPage,
-        associatedClassGroupIds: dto.associatedClassGroupIds,
-        businessId: dto.businessId,
-        updatedBy: this.securityContext.userId,
-      });
+    const result = await this.classUseCasesFactory.editClassUseCase.execute({
+      id: classId,
+      title: dto.title,
+      description: dto.description,
+      imagesUrls: dto.imagesUrls,
+      durationInMins: dto.durationInMins,
+      seats: dto.seats,
+      cost: dto.cost,
+      isHiddenFromBookingPage: dto.isHiddenFromBookingPage,
+      associatedClassGroupIds: dto.associatedClassGroupIds,
+      businessId: dto.businessId,
+      updatedBy: this.securityContext.userId,
+    });
 
     if (!result.ok) {
       const errorResponse = mapClassError(result.error);

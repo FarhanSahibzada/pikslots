@@ -4,7 +4,9 @@ import { queryOptions } from '@tanstack/svelte-query';
 import type { ServiceGroupNameResponse } from '@pikslots/shared';
 import type { PikslotResponse } from '../common/common-models';
 
-export const getGroupsByService = async (serviceId: string): Promise<ServiceGroupNameResponse[]> => {
+export const getGroupsByService = async (
+	serviceId: string
+): Promise<ServiceGroupNameResponse[]> => {
 	const url = SERVICE_GROUP_ASSIGNMENT_ENDPOINTS.FIND_GROUPS_BY_SERVICE.replace(
 		':serviceId',
 		serviceId

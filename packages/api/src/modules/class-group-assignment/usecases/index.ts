@@ -7,6 +7,12 @@ import { FindClassesByGroupUseCaseImpl } from './find.classes.by.group.usecase.i
 import { FindGroupsByClassUseCaseImpl } from './find.groups.by.class.usecase.impl';
 
 export const CLASS_GROUP_ASSIGNMENT_USECASES: Provider[] = [
-  { useClass: FindClassesByGroupUseCaseImpl, provide: IFindClassesByGroupUseCase },
-  { useClass: FindGroupsByClassUseCaseImpl, provide: IFindGroupsByClassUseCase },
+  {
+    useClass: FindClassesByGroupUseCaseImpl,
+    provide: IFindClassesByGroupUseCase,
+  },
+  {
+    useClass: FindGroupsByClassUseCaseImpl,
+    provide: IFindGroupsByClassUseCase,
+  },
 ];

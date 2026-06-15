@@ -49,8 +49,7 @@ export class ClassGroupController {
     @Res({ passthrough: true }) res: Response,
     @Body() dto: RegisterClassGroupDto,
   ): Promise<
-    | PikslotsBaseErrorResponse
-    | PikslotsBaseResponse<RegisterClassGroupResponse>
+    PikslotsBaseErrorResponse | PikslotsBaseResponse<RegisterClassGroupResponse>
   > {
     const result =
       await this.classGroupUseCasesFactory.registerClassGroupUseCase.execute({

@@ -1,5 +1,11 @@
 import { HttpStatus, applyDecorators } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { PikslotsBaseErrorResponse } from 'src/shared/types/base.error.response';
 import { LoginUserDto } from '../dto/login.user.dto';
 import { RefreshUserSessionDto } from '../dto/refresh.user.session.dto';
@@ -28,7 +34,8 @@ export const InviteUserDocs = () =>
     }),
     ApiResponse({
       status: HttpStatus.FORBIDDEN,
-      description: 'Inviter does not have permission to assign the requested role',
+      description:
+        'Inviter does not have permission to assign the requested role',
       type: PikslotsBaseErrorResponse,
     }),
     ApiResponse({
@@ -211,7 +218,8 @@ export const GetUsersByRoleDocs = () =>
     }),
     ApiResponse({
       status: HttpStatus.FORBIDDEN,
-      description: 'Caller does not have permission to query the requested role',
+      description:
+        'Caller does not have permission to query the requested role',
       type: PikslotsBaseErrorResponse,
     }),
     ApiResponse({
@@ -245,7 +253,11 @@ export const LogoutUserDocs = () =>
 export const GetBusinessUsersDocs = () =>
   applyDecorators(
     ApiOperation({ summary: 'Get all users belonging to a business' }),
-    ApiParam({ name: 'businessId', description: 'Business ID', example: 'uuid' }),
+    ApiParam({
+      name: 'businessId',
+      description: 'Business ID',
+      example: 'uuid',
+    }),
     ApiResponse({
       status: HttpStatus.OK,
       description: 'List of users in the business returned successfully',
@@ -283,7 +295,11 @@ export const GetBusinessUsersDocs = () =>
 export const UpdateUserWorkingHoursDocs = () =>
   applyDecorators(
     ApiOperation({ summary: 'Update working hours for a user' }),
-    ApiParam({ name: 'userId', description: 'Target user ID', example: 'uuid' }),
+    ApiParam({
+      name: 'userId',
+      description: 'Target user ID',
+      example: 'uuid',
+    }),
     ApiBody({ type: UpdateUserWorkingHoursDto }),
     ApiResponse({
       status: HttpStatus.OK,
@@ -304,8 +320,24 @@ export const UpdateUserWorkingHoursDocs = () =>
         },
       },
     }),
-    ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found', type: PikslotsBaseErrorResponse }),
-    ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Validation error', type: PikslotsBaseErrorResponse }),
-    ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Missing or invalid access token', type: PikslotsBaseErrorResponse }),
-    ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Infrastructure failure', type: PikslotsBaseErrorResponse }),
+    ApiResponse({
+      status: HttpStatus.NOT_FOUND,
+      description: 'User not found',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.BAD_REQUEST,
+      description: 'Validation error',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.UNAUTHORIZED,
+      description: 'Missing or invalid access token',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.INTERNAL_SERVER_ERROR,
+      description: 'Infrastructure failure',
+      type: PikslotsBaseErrorResponse,
+    }),
   );

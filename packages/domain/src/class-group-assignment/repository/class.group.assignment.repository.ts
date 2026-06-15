@@ -11,9 +11,7 @@ export interface ClassGroupAssignmentRepository {
   findAllByClassGroup(
     classGroupId: string,
   ): Promise<Result<ClassGroupAssignment[], InfrastructureError>>;
-  findAllByClass(
-    classId: string,
-  ): Promise<Result<ClassGroupAssignment[], InfrastructureError>>;
+  findAllByClass(classId: string): Promise<Result<ClassGroupAssignment[], InfrastructureError>>;
   findAllByBusiness(
     businessId: string,
   ): Promise<Result<ClassGroupAssignment[], InfrastructureError>>;
@@ -25,12 +23,8 @@ export interface ClassGroupAssignmentRepository {
     classId: string,
     classGroupId: string,
   ): Promise<Result<boolean, InfrastructureError>>;
-  findGroupsByClass(
-    classId: string,
-  ): Promise<Result<ClassGroupSummary[], InfrastructureError>>;
-  findClassesByGroup(
-    classGroupId: string,
-  ): Promise<Result<ClassSummary[], InfrastructureError>>;
+  findGroupsByClass(classId: string): Promise<Result<ClassGroupSummary[], InfrastructureError>>;
+  findClassesByGroup(classGroupId: string): Promise<Result<ClassSummary[], InfrastructureError>>;
   update(assignment: ClassGroupAssignment): Promise<Result<void, InfrastructureError>>;
   deleteById(id: string): Promise<Result<void, InfrastructureError>>;
 }

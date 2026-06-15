@@ -8,12 +8,18 @@ export class AssignUserToServiceDto implements AssignUserToServiceInput {
   @MinLength(1)
   serviceId: string;
 
-  @ApiProperty({ example: 'usr_01j...', description: 'ID of the user to assign' })
+  @ApiProperty({
+    example: 'usr_01j...',
+    description: 'ID of the user to assign',
+  })
   @IsString()
   @MinLength(1)
   userId: string;
 
-  @ApiProperty({ example: 'biz_01j...', description: 'Business ID (denormalized)' })
+  @ApiProperty({
+    example: 'biz_01j...',
+    description: 'Business ID (denormalized)',
+  })
   @IsString()
   @MinLength(1)
   businessId: string;

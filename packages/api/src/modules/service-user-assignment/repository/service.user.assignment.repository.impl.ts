@@ -209,7 +209,13 @@ export class ServiceUserAssignmentRepositoryImpl implements ServiceUserAssignmen
         .where('sua.is_deleted', '=', false)
         .execute();
 
-      return ok(rows.map((r) => ({ id: r.id, firstName: r.first_name, lastName: r.last_name })));
+      return ok(
+        rows.map((r) => ({
+          id: r.id,
+          firstName: r.first_name,
+          lastName: r.last_name,
+        })),
+      );
     } catch (cause) {
       return err<InfrastructureError>({
         kind: 'infrastructure',

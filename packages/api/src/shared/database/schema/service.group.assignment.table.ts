@@ -8,6 +8,9 @@ export interface ServiceGroupAssignmentTable extends AuditFields {
   business_id: string; // fk → businesses.id CASCADE (denormalized)
 }
 
-export type ServiceGroupAssignmentTableSelect = Selectable<ServiceGroupAssignmentTable>;
-export type ServiceGroupAssignmentTableInsert = Insertable<ServiceGroupAssignmentTable>;
-export type ServiceGroupAssignmentTableUpdate = Updateable<ServiceGroupAssignmentTable>;
+export type ServiceGroupAssignmentTableSelect =
+  Selectable<ServiceGroupAssignmentTable>;
+export type ServiceGroupAssignmentTableInsert =
+  Insertable<ServiceGroupAssignmentTable>;
+export type ServiceGroupAssignmentTableUpdate =
+  Updateable<ServiceGroupAssignmentTable>;

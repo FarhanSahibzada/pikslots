@@ -9,7 +9,9 @@ import {
 } from 'src/shared/database/schema/service.group.assignment.table';
 
 export class ServiceGroupAssignmentPersistenceMapper {
-  public persistenceToDomain(row: ServiceGroupAssignmentTableSelect): ServiceGroupAssignment {
+  public persistenceToDomain(
+    row: ServiceGroupAssignmentTableSelect,
+  ): ServiceGroupAssignment {
     return ServiceGroupAssignment.reconstitute({
       id: row.id,
       serviceId: row.service_id,
@@ -19,7 +21,9 @@ export class ServiceGroupAssignmentPersistenceMapper {
     } as unknown as ServiceGroupAssignment);
   }
 
-  public domainToPersistence(assignment: ServiceGroupAssignment): ServiceGroupAssignmentTableInsert {
+  public domainToPersistence(
+    assignment: ServiceGroupAssignment,
+  ): ServiceGroupAssignmentTableInsert {
     return {
       id: assignment.id,
       service_id: assignment.serviceId,

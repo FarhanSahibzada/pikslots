@@ -43,8 +43,16 @@ export const AssignUserToServiceDocs = () =>
 export const RemoveUserFromServiceDocs = () =>
   applyDecorators(
     ApiOperation({ summary: 'Remove a user from a service' }),
-    ApiParam({ name: 'serviceId', description: 'Service ID', example: 'svc_01j...' }),
-    ApiParam({ name: 'userId', description: 'User ID to remove', example: 'usr_01j...' }),
+    ApiParam({
+      name: 'serviceId',
+      description: 'Service ID',
+      example: 'svc_01j...',
+    }),
+    ApiParam({
+      name: 'userId',
+      description: 'User ID to remove',
+      example: 'usr_01j...',
+    }),
     ApiResponse({
       status: HttpStatus.OK,
       description: 'User removed from service successfully',
@@ -64,7 +72,11 @@ export const RemoveUserFromServiceDocs = () =>
 export const FindUsersByServiceDocs = () =>
   applyDecorators(
     ApiOperation({ summary: 'Get all users assigned to a service' }),
-    ApiParam({ name: 'serviceId', description: 'Service ID', example: 'svc_01j...' }),
+    ApiParam({
+      name: 'serviceId',
+      description: 'Service ID',
+      example: 'svc_01j...',
+    }),
     ApiResponse({
       status: HttpStatus.OK,
       description: 'Users retrieved successfully',

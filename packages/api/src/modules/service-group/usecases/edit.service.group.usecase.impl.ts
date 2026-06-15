@@ -23,7 +23,9 @@ export class EditServiceGroupUseCaseImpl implements EditServiceGroupUseCase {
   constructor(
     @Inject(IServiceGroupRepository)
     private readonly serviceGroupRepository: ServiceGroupRepository,
-    @InjectQueue(PIKSLOT_EVENTS.SERVICE_GROUP_ASSIGNMENT.SYNC_SERVICE_GROUP_SERVICES)
+    @InjectQueue(
+      PIKSLOT_EVENTS.SERVICE_GROUP_ASSIGNMENT.SYNC_SERVICE_GROUP_SERVICES,
+    )
     private readonly serviceGroupAssignmentQueue: Queue<
       SyncServiceGroupServicesEvent,
       void,
@@ -36,11 +38,15 @@ export class EditServiceGroupUseCaseImpl implements EditServiceGroupUseCase {
   ): Promise<
     Result<
       void,
-      ServiceGroupNotFoundError | ServiceGroupAlreadyExistsInBusinessError | InfrastructureError
+      | ServiceGroupNotFoundError
+      | ServiceGroupAlreadyExistsInBusinessError
+      | InfrastructureError
     >
   > {
     // 1. Load existing group
-    const found = await this.serviceGroupRepository.findById(command.serviceGroupId);
+    const found = await this.serviceGroupRepository.findById(
+      command.serviceGroupId,
+    );
     if (!found.ok) return err(found.error);
     if (!found.value) {
       return err<ServiceGroupNotFoundError>({

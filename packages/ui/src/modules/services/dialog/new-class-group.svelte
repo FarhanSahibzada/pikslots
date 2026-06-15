@@ -84,9 +84,7 @@
 		filteredClasses.length > 0 && filteredClasses.every((c) => selectedIds.has(c.id))
 	);
 
-	const someSelected = $derived(
-		filteredClasses.some((c) => selectedIds.has(c.id)) && !allSelected
-	);
+	const someSelected = $derived(filteredClasses.some((c) => selectedIds.has(c.id)) && !allSelected);
 
 	function toggleSelectAll() {
 		if (allSelected) {

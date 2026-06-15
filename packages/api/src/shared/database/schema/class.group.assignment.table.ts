@@ -8,6 +8,9 @@ export interface ClassGroupAssignmentTable extends AuditFields {
   business_id: string; // fk → businesses.id CASCADE (denormalized)
 }
 
-export type ClassGroupAssignmentTableSelect = Selectable<ClassGroupAssignmentTable>;
-export type ClassGroupAssignmentTableInsert = Insertable<ClassGroupAssignmentTable>;
-export type ClassGroupAssignmentTableUpdate = Updateable<ClassGroupAssignmentTable>;
+export type ClassGroupAssignmentTableSelect =
+  Selectable<ClassGroupAssignmentTable>;
+export type ClassGroupAssignmentTableInsert =
+  Insertable<ClassGroupAssignmentTable>;
+export type ClassGroupAssignmentTableUpdate =
+  Updateable<ClassGroupAssignmentTable>;

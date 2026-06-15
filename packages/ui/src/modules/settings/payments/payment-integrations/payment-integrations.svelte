@@ -20,7 +20,8 @@
 		{
 			label: 'PayPal',
 			icon: BrandPaypal,
-			description: 'Accept payments conveniently via PayPal, Venmo, credit and debit cards, and more.'
+			description:
+				'Accept payments conveniently via PayPal, Venmo, credit and debit cards, and more.'
 		},
 		{
 			label: 'Cash',

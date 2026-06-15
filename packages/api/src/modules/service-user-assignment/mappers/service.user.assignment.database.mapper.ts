@@ -9,7 +9,9 @@ import {
 } from 'src/shared/database/schema/service.user.assignment.table';
 
 export class ServiceUserAssignmentPersistenceMapper {
-  public persistenceToDomain(row: ServiceUserAssignmentTableSelect): ServiceUserAssignment {
+  public persistenceToDomain(
+    row: ServiceUserAssignmentTableSelect,
+  ): ServiceUserAssignment {
     return ServiceUserAssignment.reconstitute({
       id: row.id,
       serviceId: row.service_id,
@@ -19,7 +21,9 @@ export class ServiceUserAssignmentPersistenceMapper {
     });
   }
 
-  public domainToPersistence(assignment: ServiceUserAssignment): ServiceUserAssignmentTableInsert {
+  public domainToPersistence(
+    assignment: ServiceUserAssignment,
+  ): ServiceUserAssignmentTableInsert {
     return {
       id: assignment.id,
       service_id: assignment.serviceId,

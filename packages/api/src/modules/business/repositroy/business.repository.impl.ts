@@ -136,10 +136,14 @@ export class BusinessRepositoryImpl implements BusinessRepository {
   async update(
     business: Business,
   ): Promise<
-    Result<void, BusinessNotFoundError | BusinessAlreadyExistsError | InfrastructureError>
+    Result<
+      void,
+      BusinessNotFoundError | BusinessAlreadyExistsError | InfrastructureError
+    >
   > {
     try {
-      const { id, owner_id, ...fields } = this.mapper.domainToPersistence(business);
+      const { id, owner_id, ...fields } =
+        this.mapper.domainToPersistence(business);
 
       const result = await this.db
         .updateTable('businesses')

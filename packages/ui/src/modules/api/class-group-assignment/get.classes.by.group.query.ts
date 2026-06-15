@@ -5,10 +5,7 @@ import type { ClassNameResponse } from '@pikslots/shared';
 import type { PikslotResponse } from '../common/common-models';
 
 export const getClassesByGroup = async (classGroupId: string): Promise<ClassNameResponse[]> => {
-	const url = CLASS_GROUP_ASSIGNMENT_ENDPOINTS.FIND_BY_GROUP.replace(
-		':classGroupId',
-		classGroupId
-	);
+	const url = CLASS_GROUP_ASSIGNMENT_ENDPOINTS.FIND_BY_GROUP.replace(':classGroupId', classGroupId);
 	const { data } = await apiClient.get<PikslotResponse<ClassNameResponse[]>>(url);
 	return data.data;
 };

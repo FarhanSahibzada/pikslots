@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { UserRole } from '@pikslots/domain';
 import { PikslotsBaseErrorResponse } from 'src/shared/types/base.error.response';
@@ -28,10 +33,10 @@ export class RolesGuard implements CanActivate {
   ) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>(ROLES_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>(
+      ROLES_KEY,
+      [context.getHandler(), context.getClass()],
+    );
 
     // No @Roles() decorator on this route — unrestricted, allow through.
     if (!requiredRoles || requiredRoles.length === 0) return true;
@@ -41,7 +46,9 @@ export class RolesGuard implements CanActivate {
     const res: Response = context.switchToHttp().getResponse();
     res
       .status(HttpStatus.FORBIDDEN)
-      .json(new PikslotsBaseErrorResponse('Access denied.', HttpStatus.FORBIDDEN));
+      .json(
+        new PikslotsBaseErrorResponse('Access denied.', HttpStatus.FORBIDDEN),
+      );
 
     return false;
   }

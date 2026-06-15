@@ -57,10 +57,13 @@
 			linkedin = business.businessLinks.LinkedIn ?? '';
 			// Populate extra links for non-empty optional platforms
 			const extras: typeof extraLinks = [];
-			if (tiktok) extras.push({ type: 'tiktok', label: 'TikTok', icon: BrandTiktok, value: tiktok });
+			if (tiktok)
+				extras.push({ type: 'tiktok', label: 'TikTok', icon: BrandTiktok, value: tiktok });
 			if (x) extras.push({ type: 'x', label: 'X', icon: BrandX, value: x });
-			if (youtube) extras.push({ type: 'youtube', label: 'YouTube', icon: BrandYoutube, value: youtube });
-			if (linkedin) extras.push({ type: 'linkedin', label: 'LinkedIn', icon: BrandLinkedin, value: linkedin });
+			if (youtube)
+				extras.push({ type: 'youtube', label: 'YouTube', icon: BrandYoutube, value: youtube });
+			if (linkedin)
+				extras.push({ type: 'linkedin', label: 'LinkedIn', icon: BrandLinkedin, value: linkedin });
 			extraLinks = extras;
 		}
 	});
@@ -129,8 +132,10 @@
 		const extras: typeof extraLinks = [];
 		if (tiktok) extras.push({ type: 'tiktok', label: 'TikTok', icon: BrandTiktok, value: tiktok });
 		if (x) extras.push({ type: 'x', label: 'X', icon: BrandX, value: x });
-		if (youtube) extras.push({ type: 'youtube', label: 'YouTube', icon: BrandYoutube, value: youtube });
-		if (linkedin) extras.push({ type: 'linkedin', label: 'LinkedIn', icon: BrandLinkedin, value: linkedin });
+		if (youtube)
+			extras.push({ type: 'youtube', label: 'YouTube', icon: BrandYoutube, value: youtube });
+		if (linkedin)
+			extras.push({ type: 'linkedin', label: 'LinkedIn', icon: BrandLinkedin, value: linkedin });
 		extraLinks = extras;
 	}
 
@@ -173,7 +178,9 @@
 		<section class="flex flex-col gap-5">
 			<div class="flex flex-col gap-1">
 				<h2 class="text-xs font-semibold">Your links</h2>
-				<p class="text-xs text-muted-foreground">Drive Booking Page visitors to your site, socials and more.</p>
+				<p class="text-xs text-muted-foreground">
+					Drive Booking Page visitors to your site, socials and more.
+				</p>
 			</div>
 
 			<div class="flex flex-col gap-2">
@@ -217,10 +224,7 @@
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content align="start" class="w-44">
 					{#each LINK_OPTIONS.filter((o) => !extraLinks.some((l) => l.type === o.type)) as option (option.type)}
-						<DropdownMenu.Item
-							class="flex items-center gap-2"
-							onclick={() => addLink(option)}
-						>
+						<DropdownMenu.Item class="flex items-center gap-2" onclick={() => addLink(option)}>
 							<option.icon size={15} class="text-muted-foreground" />
 							{option.label}
 						</DropdownMenu.Item>
@@ -254,7 +258,9 @@
 
 		<Card.Root class="overflow-hidden">
 			<div class="border-b px-4 py-2">
-				<div class="flex items-center gap-2 rounded-md bg-muted px-3 py-1.5 text-xs text-muted-foreground">
+				<div
+					class="flex items-center gap-2 rounded-md bg-muted px-3 py-1.5 text-xs text-muted-foreground"
+				>
 					<span>https://</span>
 					<span class="font-medium text-foreground">your-slug</span>
 					<span>.pikslots.com</span>

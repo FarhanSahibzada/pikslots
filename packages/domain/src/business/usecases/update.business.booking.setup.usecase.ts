@@ -34,9 +34,7 @@ export interface UpdateBusinessBookingSetupCommand {
   addressRequired: boolean;
 }
 
-export const IUpdateBusinessBookingSetupUseCase = Symbol(
-  'IUpdateBusinessBookingSetupUseCase',
-);
+export const IUpdateBusinessBookingSetupUseCase = Symbol('IUpdateBusinessBookingSetupUseCase');
 
 export interface UpdateBusinessBookingSetupUseCase {
   execute(

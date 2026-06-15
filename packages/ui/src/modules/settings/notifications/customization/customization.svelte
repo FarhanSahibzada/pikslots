@@ -73,7 +73,12 @@
 	<div class="flex items-center justify-between border-b px-6 py-4">
 		<h1 class="text-base font-semibold">Notifications</h1>
 		<div class="flex items-center gap-2">
-			<Button variant="outline" size="sm" onclick={handleCancel} disabled={!isDirty || updateMutation.isPending}>
+			<Button
+				variant="outline"
+				size="sm"
+				onclick={handleCancel}
+				disabled={!isDirty || updateMutation.isPending}
+			>
 				Cancel
 			</Button>
 			<Button size="sm" onclick={handleSave} disabled={!isDirty || updateMutation.isPending}>
@@ -98,7 +103,7 @@
 				<textarea
 					bind:value={emailSignature}
 					rows={4}
-					class="w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-xs shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+					class="w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-xs shadow-sm placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none"
 				></textarea>
 			</div>
 		</div>

@@ -16,9 +16,7 @@ import { PikSlotsDatabase } from 'src/shared/database/schema';
 import { ClassGroupAssignmentPersistenceMapper } from '../mappers/class.group.assignment.database.mapper';
 
 @Injectable()
-export class ClassGroupAssignmentRepositoryImpl
-  implements ClassGroupAssignmentRepository
-{
+export class ClassGroupAssignmentRepositoryImpl implements ClassGroupAssignmentRepository {
   private readonly mapper = new ClassGroupAssignmentPersistenceMapper();
 
   constructor(

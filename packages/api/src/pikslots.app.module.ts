@@ -15,6 +15,7 @@ import { ServiceUserAssignmentModule } from './modules/service-user-assignment/s
 import { ClassModule } from './modules/class/class.module';
 import { ClassGroupModule } from './modules/class-group/class.group.module';
 import { ClassGroupAssignmentModule } from './modules/class-group-assignment/class.group.assignment.module';
+import { CustomerModule } from './modules/customer/customer.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ClassGroupAssignmentModule } from './modules/class-group-assignment/cla
     ClassModule,
     ClassGroupModule,
     ClassGroupAssignmentModule,
+    CustomerModule,
   ],
   controllers: [],
   providers: [],

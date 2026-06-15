@@ -23,7 +23,8 @@ export const CreateClassGroupDocs = () =>
     }),
     ApiResponse({
       status: HttpStatus.CONFLICT,
-      description: 'A class group with this name already exists for this business',
+      description:
+        'A class group with this name already exists for this business',
       type: PikslotsBaseErrorResponse,
     }),
     ApiResponse({
@@ -40,7 +41,9 @@ export const CreateClassGroupDocs = () =>
 
 export const EditClassGroupDocs = () =>
   applyDecorators(
-    ApiOperation({ summary: 'Edit a class group name and its assigned classes' }),
+    ApiOperation({
+      summary: 'Edit a class group name and its assigned classes',
+    }),
     ApiBody({ type: EditClassGroupDto }),
     ApiParam({
       name: 'classGroupId',
@@ -65,7 +68,8 @@ export const EditClassGroupDocs = () =>
     }),
     ApiResponse({
       status: HttpStatus.CONFLICT,
-      description: 'A class group with this name already exists for this business',
+      description:
+        'A class group with this name already exists for this business',
       type: PikslotsBaseErrorResponse,
     }),
     ApiResponse({

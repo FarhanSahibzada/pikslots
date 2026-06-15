@@ -11,7 +11,10 @@ import {
   ok,
   Result,
 } from '@pikslots/domain';
-import type { SyncClassClassGroupsEvent, UnauthorizedError } from '@pikslots/domain';
+import type {
+  SyncClassClassGroupsEvent,
+  UnauthorizedError,
+} from '@pikslots/domain';
 import { SecurityContext } from 'src/shared/security/context/security.context';
 import { Queue } from 'bullmq';
 import { PIKSLOT_EVENTS } from 'src/shared/queue/jobs/pikslot.events';

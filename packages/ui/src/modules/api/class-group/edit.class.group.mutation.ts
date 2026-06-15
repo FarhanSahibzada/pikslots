@@ -13,7 +13,11 @@ export const editClassGroup = async (
 };
 
 export const editClassGroupMutationOptions = () =>
-	mutationOptions<void, AxiosError<BaseErrorResponse>, { classGroupId: string } & EditClassGroupInput>({
+	mutationOptions<
+		void,
+		AxiosError<BaseErrorResponse>,
+		{ classGroupId: string } & EditClassGroupInput
+	>({
 		mutationKey: ['edit-class-group'],
 		mutationFn: ({ classGroupId, ...input }) => editClassGroup(classGroupId, input)
 	});

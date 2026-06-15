@@ -1,7 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsBoolean, IsString, Matches, ValidateNested } from 'class-validator';
-import type { UpdateUserWorkingHoursInput, UserDayHours } from '@pikslots/shared';
+import type {
+  UpdateUserWorkingHoursInput,
+  UserDayHours,
+} from '@pikslots/shared';
 
 const TIME_PATTERN = /^\d{2}:\d{2}$/;
 

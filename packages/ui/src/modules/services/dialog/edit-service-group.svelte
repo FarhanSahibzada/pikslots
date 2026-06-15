@@ -81,7 +81,9 @@
 		if (editMutation.isSuccess) {
 			toast.success('Service group updated');
 			queryClient.invalidateQueries({ queryKey: ['service-groups'] });
-			queryClient.invalidateQueries({ queryKey: ['service-group-assignments', 'by-group', group?.id] });
+			queryClient.invalidateQueries({
+				queryKey: ['service-group-assignments', 'by-group', group?.id]
+			});
 			open = false;
 			editMutation.reset();
 		}
@@ -214,7 +216,9 @@
 									class="flex items-center gap-3 border px-3 py-3 text-left hover:bg-accent/40"
 								>
 									<Checkbox checked={selectedIds.has(service.id)} class="shrink-0 rounded-sm" />
-									<div class="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted">
+									<div
+										class="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted"
+									>
 										<Adjustments size={16} class="text-muted-foreground" />
 									</div>
 									<div class="flex flex-col">

@@ -17,7 +17,8 @@
 			<div class="flex flex-col gap-0.5">
 				<span class="text-xs font-semibold">Two-factor authentication</span>
 				<span class="text-xs text-muted-foreground">
-					An authentication code is required for all team members when logging in with email and password.
+					An authentication code is required for all team members when logging in with email and
+					password.
 				</span>
 			</div>
 

@@ -8,6 +8,7 @@ import { ServiceUserAssignmentTable } from './service.user.assignment.table';
 import { ClassTable } from './class.table';
 import { ClassGroupTable } from './class.group.table';
 import { ClassGroupAssignmentTable } from './class.group.assignment.table';
+import { CustomerTable } from './customer.table';
 
 export type { AuditFields };
 
@@ -21,4 +22,5 @@ export interface PikSlotsDatabase {
   classes: ClassTable;
   class_groups: ClassGroupTable;
   class_group_assignments: ClassGroupAssignmentTable;
+  customers: CustomerTable;
 }

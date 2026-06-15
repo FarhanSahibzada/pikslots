@@ -13,5 +13,7 @@ export const IUpdateUserWorkingHoursUseCase = Symbol('IUpdateUserWorkingHoursUse
 export interface UpdateUserWorkingHoursUseCase {
   execute(
     command: UpdateUserWorkingHoursCommand,
-  ): Promise<Result<User, UserNotFoundError | WorkingHoursUpdateNotAuthorizedError | InfrastructureError>>;
+  ): Promise<
+    Result<User, UserNotFoundError | WorkingHoursUpdateNotAuthorizedError | InfrastructureError>
+  >;
 }

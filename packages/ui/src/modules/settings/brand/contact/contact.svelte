@@ -74,14 +74,17 @@
 						business.contactDetails.additionalPhones.length ||
 				extraFields.some((f, i) => {
 					if (f.kind === 'email') {
-						const stored = business.contactDetails.additionalEmails[
-							extraFields.slice(0, i).filter((x) => x.kind === 'email').length
-						];
+						const stored =
+							business.contactDetails.additionalEmails[
+								extraFields.slice(0, i).filter((x) => x.kind === 'email').length
+							];
 						return f.value !== (stored ?? '');
 					} else {
 						const idx = extraFields.slice(0, i).filter((x) => x.kind === 'phone').length;
 						const stored = business.contactDetails.additionalPhones[idx];
-						return f.value !== (stored?.number ?? '') || f.countryCode !== (stored?.countryCode ?? '+1');
+						return (
+							f.value !== (stored?.number ?? '') || f.countryCode !== (stored?.countryCode ?? '+1')
+						);
 					}
 				}))
 	);
@@ -181,7 +184,9 @@
 		<section class="flex flex-col gap-5">
 			<div class="flex flex-col gap-1">
 				<h2 class="text-xs font-semibold">Contact details</h2>
-				<p class="text-xs text-muted-foreground">Let your leads and customers know how to reach you.</p>
+				<p class="text-xs text-muted-foreground">
+					Let your leads and customers know how to reach you.
+				</p>
 			</div>
 
 			<!-- Primary email -->
@@ -286,7 +291,9 @@
 
 		<Card.Root class="overflow-hidden">
 			<div class="border-b px-4 py-2">
-				<div class="flex items-center gap-2 rounded-md bg-muted px-3 py-1.5 text-xs text-muted-foreground">
+				<div
+					class="flex items-center gap-2 rounded-md bg-muted px-3 py-1.5 text-xs text-muted-foreground"
+				>
 					<span>https://</span>
 					<span class="font-medium text-foreground">your-slug</span>
 					<span>.pikslots.com</span>

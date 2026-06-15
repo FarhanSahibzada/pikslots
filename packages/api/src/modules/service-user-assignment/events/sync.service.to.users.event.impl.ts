@@ -26,9 +26,12 @@ export class SyncServiceToUsersEventImpl extends WorkerHost {
     const data = job.data as SyncServiceToUsersEvent;
 
     const existingResult =
-      await this.serviceUserAssignmentRepository.findAllByService(data.serviceId);
+      await this.serviceUserAssignmentRepository.findAllByService(
+        data.serviceId,
+      );
 
-    if (!existingResult.ok) throw new Error(JSON.stringify(existingResult.error));
+    if (!existingResult.ok)
+      throw new Error(JSON.stringify(existingResult.error));
 
     const existingUserIds = new Set(existingResult.value.map((a) => a.userId));
     const incomingUserIds = new Set(data.userIds);

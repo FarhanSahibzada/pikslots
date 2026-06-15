@@ -134,46 +134,49 @@
 			</div>
 
 			<Tabs.Root value="about" class="flex flex-col">
-				<Tabs.List class="h-auto justify-start rounded-none border-b bg-transparent px-6 pb-0">
+				<Tabs.List
+					variant="line"
+					class="h-auto justify-start rounded-none bg-transparent px-6 pb-0"
+				>
 					<Tabs.Trigger
 						value="about"
-						class="cursor-pointer rounded-none border-b-2 border-transparent px-3 pt-0 pb-2 text-muted-foreground data-[state=active]:border-b-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
+						class="cursor-pointer rounded-none border-b-2 border-transparent px-3 pt-0 pb-2 text-muted-foreground  "
 					>
 						About
 					</Tabs.Trigger>
 					<Tabs.Trigger
 						value="integrations"
-						class="cursor-pointer rounded-none border-b-2 border-transparent px-3 pt-0 pb-2 text-muted-foreground data-[state=active]:border-b-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
+						class="cursor-pointer rounded-none border-b-2 border-transparent px-3 pt-0 pb-2 text-muted-foreground "
 					>
 						Integrations
 					</Tabs.Trigger>
 					<Tabs.Trigger
 						value="services"
-						class="cursor-pointer rounded-none border-b-2 border-transparent px-3 pt-0 pb-2 text-muted-foreground data-[state=active]:border-b-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
+						class="cursor-pointer rounded-none border-b-2 border-transparent px-3 pt-0 pb-2 text-muted-foreground "
 					>
 						Services
 					</Tabs.Trigger>
 					<Tabs.Trigger
 						value="working-hours"
-						class="cursor-pointer rounded-none border-b-2 border-transparent px-3 pt-0 pb-2 text-muted-foreground data-[state=active]:border-b-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
+						class="cursor-pointer rounded-none border-b-2 border-transparent px-3 pt-0 pb-2 text-muted-foreground"
 					>
 						Working hours
 					</Tabs.Trigger>
 					<Tabs.Trigger
 						value="breaks"
-						class="cursor-pointer rounded-none border-b-2 border-transparent px-3 pt-0 pb-2 text-muted-foreground data-[state=active]:border-b-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
+						class="cursor-pointer rounded-none border-b-2 border-transparent px-3 pt-0 pb-2 text-muted-foreground"
 					>
 						Breaks
 					</Tabs.Trigger>
 					<Tabs.Trigger
 						value="time-off"
-						class="cursor-pointer rounded-none border-b-2 border-transparent px-3 pt-0 pb-2 text-muted-foreground data-[state=active]:border-b-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
+						class="cursor-pointer rounded-none border-b-2 border-transparent px-3 pt-0 pb-2 text-muted-foreground"
 					>
 						Time off
 					</Tabs.Trigger>
 					<Tabs.Trigger
 						value="updates"
-						class="cursor-pointer rounded-none border-b-2 border-transparent px-3 pt-0 pb-2 text-muted-foreground data-[state=active]:border-b-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
+						class="cursor-pointer rounded-none border-b-2 border-transparent px-3 pt-0 pb-2 text-muted-foreground"
 					>
 						Updates
 					</Tabs.Trigger>
@@ -192,10 +195,7 @@
 				</Tabs.Content>
 
 				<Tabs.Content value="working-hours" class="mt-0">
-					<WorkingHoursTab
-						userWorkingHours={selected.userWorkingHours}
-						userId={selected.id}
-					/>
+					<WorkingHoursTab userWorkingHours={selected.userWorkingHours} userId={selected.id} />
 				</Tabs.Content>
 
 				<Tabs.Content value="breaks" class="mt-0">

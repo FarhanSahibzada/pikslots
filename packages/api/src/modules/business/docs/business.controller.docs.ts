@@ -20,15 +20,40 @@ import { UpdateBusinessContactDetailsDto } from '../dto/update.business.contact.
 export const GetBusinessByIdDocs = () =>
   applyDecorators(
     ApiOperation({ summary: 'Get a business by ID' }),
-    ApiParam({ name: 'id', description: 'Business UUID', example: '01932b4a-5f3c-7e1d-b2a8-3c9d4e5f6a7b' }),
+    ApiParam({
+      name: 'id',
+      description: 'Business UUID',
+      example: '01932b4a-5f3c-7e1d-b2a8-3c9d4e5f6a7b',
+    }),
     ApiResponse({
       status: HttpStatus.OK,
       description: 'Business returned successfully',
-      schema: { example: { data: { id: 'uuid', name: "Joe's Barbershop", slug: 'joes-barbershop', status: 'active' } } },
+      schema: {
+        example: {
+          data: {
+            id: 'uuid',
+            name: "Joe's Barbershop",
+            slug: 'joes-barbershop',
+            status: 'active',
+          },
+        },
+      },
     }),
-    ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Business not found', type: PikslotsBaseErrorResponse }),
-    ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Business suspended or inactive', type: PikslotsBaseErrorResponse }),
-    ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized', type: PikslotsBaseErrorResponse }),
+    ApiResponse({
+      status: HttpStatus.NOT_FOUND,
+      description: 'Business not found',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.FORBIDDEN,
+      description: 'Business suspended or inactive',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.UNAUTHORIZED,
+      description: 'Unauthorized',
+      type: PikslotsBaseErrorResponse,
+    }),
   );
 
 export const GetAllBusinessesDocs = () =>
@@ -247,7 +272,9 @@ export const UpdateBusinessGeneralDocs = () =>
 
 export const UpdateBusinessTeamNotificationsDocs = () =>
   applyDecorators(
-    ApiOperation({ summary: 'Update team notification settings for a business' }),
+    ApiOperation({
+      summary: 'Update team notification settings for a business',
+    }),
     ApiParam({ name: 'id', description: 'Business ID', example: 'biz_01j...' }),
     ApiBody({ type: UpdateBusinessTeamNotificationsDto }),
     ApiResponse({
@@ -255,15 +282,31 @@ export const UpdateBusinessTeamNotificationsDocs = () =>
       description: 'Team notifications updated successfully',
       schema: {
         example: {
-          data: { id: 'biz_01j...', teamNotifications: {}, updatedAt: '2026-01-01T00:00:00.000Z' },
+          data: {
+            id: 'biz_01j...',
+            teamNotifications: {},
+            updatedAt: '2026-01-01T00:00:00.000Z',
+          },
           statusCode: 200,
           timestamp: '2026-01-01T00:00:00.000Z',
         },
       },
     }),
-    ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Business not found', type: PikslotsBaseErrorResponse }),
-    ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Validation error', type: PikslotsBaseErrorResponse }),
-    ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Database or infrastructure failure', type: PikslotsBaseErrorResponse }),
+    ApiResponse({
+      status: HttpStatus.NOT_FOUND,
+      description: 'Business not found',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.BAD_REQUEST,
+      description: 'Validation error',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.INTERNAL_SERVER_ERROR,
+      description: 'Database or infrastructure failure',
+      type: PikslotsBaseErrorResponse,
+    }),
   );
 
 export const UpdateBusinessVisibilityDocs = () =>
@@ -276,20 +319,39 @@ export const UpdateBusinessVisibilityDocs = () =>
       description: 'Visibility updated successfully',
       schema: {
         example: {
-          data: { id: 'biz_01j...', appearInSearchResults: true, updatedAt: '2026-01-01T00:00:00.000Z' },
+          data: {
+            id: 'biz_01j...',
+            appearInSearchResults: true,
+            updatedAt: '2026-01-01T00:00:00.000Z',
+          },
           statusCode: 200,
           timestamp: '2026-01-01T00:00:00.000Z',
         },
       },
     }),
-    ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Business not found', type: PikslotsBaseErrorResponse }),
-    ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Validation error', type: PikslotsBaseErrorResponse }),
-    ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Database or infrastructure failure', type: PikslotsBaseErrorResponse }),
+    ApiResponse({
+      status: HttpStatus.NOT_FOUND,
+      description: 'Business not found',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.BAD_REQUEST,
+      description: 'Validation error',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.INTERNAL_SERVER_ERROR,
+      description: 'Database or infrastructure failure',
+      type: PikslotsBaseErrorResponse,
+    }),
   );
 
 export const UpdateBusinessBookingCustomizationDocs = () =>
   applyDecorators(
-    ApiOperation({ summary: 'Update booking customization and label overrides for a business' }),
+    ApiOperation({
+      summary:
+        'Update booking customization and label overrides for a business',
+    }),
     ApiParam({ name: 'id', description: 'Business ID', example: 'biz_01j...' }),
     ApiBody({ type: UpdateBusinessBookingCustomizationDto }),
     ApiResponse({
@@ -297,20 +359,39 @@ export const UpdateBusinessBookingCustomizationDocs = () =>
       description: 'Booking customization updated successfully',
       schema: {
         example: {
-          data: { id: 'biz_01j...', bookingCustomization: {}, bookingLabelOverrides: {}, updatedAt: '2026-01-01T00:00:00.000Z' },
+          data: {
+            id: 'biz_01j...',
+            bookingCustomization: {},
+            bookingLabelOverrides: {},
+            updatedAt: '2026-01-01T00:00:00.000Z',
+          },
           statusCode: 200,
           timestamp: '2026-01-01T00:00:00.000Z',
         },
       },
     }),
-    ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Business not found', type: PikslotsBaseErrorResponse }),
-    ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Validation error', type: PikslotsBaseErrorResponse }),
-    ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Database or infrastructure failure', type: PikslotsBaseErrorResponse }),
+    ApiResponse({
+      status: HttpStatus.NOT_FOUND,
+      description: 'Business not found',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.BAD_REQUEST,
+      description: 'Validation error',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.INTERNAL_SERVER_ERROR,
+      description: 'Database or infrastructure failure',
+      type: PikslotsBaseErrorResponse,
+    }),
   );
 
 export const UpdateBusinessBookingSetupDocs = () =>
   applyDecorators(
-    ApiOperation({ summary: 'Update booking setup and contact fields for a business' }),
+    ApiOperation({
+      summary: 'Update booking setup and contact fields for a business',
+    }),
     ApiParam({ name: 'id', description: 'Business ID', example: 'biz_01j...' }),
     ApiBody({ type: UpdateBusinessBookingSetupDto }),
     ApiResponse({
@@ -318,15 +399,32 @@ export const UpdateBusinessBookingSetupDocs = () =>
       description: 'Booking setup updated successfully',
       schema: {
         example: {
-          data: { id: 'biz_01j...', bookingSetup: {}, bookingContactFields: {}, updatedAt: '2026-01-01T00:00:00.000Z' },
+          data: {
+            id: 'biz_01j...',
+            bookingSetup: {},
+            bookingContactFields: {},
+            updatedAt: '2026-01-01T00:00:00.000Z',
+          },
           statusCode: 200,
           timestamp: '2026-01-01T00:00:00.000Z',
         },
       },
     }),
-    ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Business not found', type: PikslotsBaseErrorResponse }),
-    ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Validation error', type: PikslotsBaseErrorResponse }),
-    ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Database or infrastructure failure', type: PikslotsBaseErrorResponse }),
+    ApiResponse({
+      status: HttpStatus.NOT_FOUND,
+      description: 'Business not found',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.BAD_REQUEST,
+      description: 'Validation error',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.INTERNAL_SERVER_ERROR,
+      description: 'Database or infrastructure failure',
+      type: PikslotsBaseErrorResponse,
+    }),
   );
 
 export const UpdateBusinessBookingPoliciesDocs = () =>
@@ -401,7 +499,9 @@ export const RegisterBusinessDocs = () =>
 
 export const UpdateBusinessCustomerNotificationsDocs = () =>
   applyDecorators(
-    ApiOperation({ summary: 'Update customer notification settings for a business' }),
+    ApiOperation({
+      summary: 'Update customer notification settings for a business',
+    }),
     ApiParam({ name: 'id', description: 'Business ID', example: 'biz_01j...' }),
     ApiBody({ type: UpdateBusinessCustomerNotificationsDto }),
     ApiResponse({
@@ -409,21 +509,38 @@ export const UpdateBusinessCustomerNotificationsDocs = () =>
       description: 'Customer notifications updated successfully',
       schema: {
         example: {
-          data: { id: 'biz_01j...', customerNotifications: {}, updatedAt: '2026-01-01T00:00:00.000Z' },
+          data: {
+            id: 'biz_01j...',
+            customerNotifications: {},
+            updatedAt: '2026-01-01T00:00:00.000Z',
+          },
           statusCode: 200,
           timestamp: '2026-01-01T00:00:00.000Z',
         },
       },
     }),
-    ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Business not found', type: PikslotsBaseErrorResponse }),
-    ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Validation error', type: PikslotsBaseErrorResponse }),
-    ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Database or infrastructure failure', type: PikslotsBaseErrorResponse }),
+    ApiResponse({
+      status: HttpStatus.NOT_FOUND,
+      description: 'Business not found',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.BAD_REQUEST,
+      description: 'Validation error',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.INTERNAL_SERVER_ERROR,
+      description: 'Database or infrastructure failure',
+      type: PikslotsBaseErrorResponse,
+    }),
   );
-
 
 export const UpdateBusinessNotificationCustomizationDocs = () =>
   applyDecorators(
-    ApiOperation({ summary: 'Update notification customization for a business' }),
+    ApiOperation({
+      summary: 'Update notification customization for a business',
+    }),
     ApiParam({ name: 'id', description: 'Business ID', example: 'biz_01j...' }),
     ApiBody({ type: UpdateBusinessNotificationCustomizationDto }),
     ApiResponse({
@@ -431,15 +548,31 @@ export const UpdateBusinessNotificationCustomizationDocs = () =>
       description: 'Notification customization updated successfully',
       schema: {
         example: {
-          data: { id: 'biz_01j...', notificationCustomization: {}, updatedAt: '2026-01-01T00:00:00.000Z' },
+          data: {
+            id: 'biz_01j...',
+            notificationCustomization: {},
+            updatedAt: '2026-01-01T00:00:00.000Z',
+          },
           statusCode: 200,
           timestamp: '2026-01-01T00:00:00.000Z',
         },
       },
     }),
-    ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Business not found', type: PikslotsBaseErrorResponse }),
-    ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Validation error', type: PikslotsBaseErrorResponse }),
-    ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Database or infrastructure failure', type: PikslotsBaseErrorResponse }),
+    ApiResponse({
+      status: HttpStatus.NOT_FOUND,
+      description: 'Business not found',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.BAD_REQUEST,
+      description: 'Validation error',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.INTERNAL_SERVER_ERROR,
+      description: 'Database or infrastructure failure',
+      type: PikslotsBaseErrorResponse,
+    }),
   );
 
 export const UpdateBusinessHoursDocs = () =>
@@ -452,15 +585,31 @@ export const UpdateBusinessHoursDocs = () =>
       description: 'Business hours updated successfully',
       schema: {
         example: {
-          data: { id: 'biz_01j...', businessHours: {}, updatedAt: '2026-01-01T00:00:00.000Z' },
+          data: {
+            id: 'biz_01j...',
+            businessHours: {},
+            updatedAt: '2026-01-01T00:00:00.000Z',
+          },
           statusCode: 200,
           timestamp: '2026-01-01T00:00:00.000Z',
         },
       },
     }),
-    ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Business not found', type: PikslotsBaseErrorResponse }),
-    ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Validation error', type: PikslotsBaseErrorResponse }),
-    ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Database or infrastructure failure', type: PikslotsBaseErrorResponse }),
+    ApiResponse({
+      status: HttpStatus.NOT_FOUND,
+      description: 'Business not found',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.BAD_REQUEST,
+      description: 'Validation error',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.INTERNAL_SERVER_ERROR,
+      description: 'Database or infrastructure failure',
+      type: PikslotsBaseErrorResponse,
+    }),
   );
 
 export const UpdateBusinessLinksDocs = () =>
@@ -473,15 +622,39 @@ export const UpdateBusinessLinksDocs = () =>
       description: 'Business links updated successfully',
       schema: {
         example: {
-          data: { id: 'biz_01j...', businessLinks: { Website: '', Instagram: '', Facebook: '', Tiktok: '', X: '', Youtube: '', LinkedIn: '' }, updatedAt: '2026-01-01T00:00:00.000Z' },
+          data: {
+            id: 'biz_01j...',
+            businessLinks: {
+              Website: '',
+              Instagram: '',
+              Facebook: '',
+              Tiktok: '',
+              X: '',
+              Youtube: '',
+              LinkedIn: '',
+            },
+            updatedAt: '2026-01-01T00:00:00.000Z',
+          },
           statusCode: 200,
           timestamp: '2026-01-01T00:00:00.000Z',
         },
       },
     }),
-    ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Business not found', type: PikslotsBaseErrorResponse }),
-    ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Validation error', type: PikslotsBaseErrorResponse }),
-    ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Database or infrastructure failure', type: PikslotsBaseErrorResponse }),
+    ApiResponse({
+      status: HttpStatus.NOT_FOUND,
+      description: 'Business not found',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.BAD_REQUEST,
+      description: 'Validation error',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.INTERNAL_SERVER_ERROR,
+      description: 'Database or infrastructure failure',
+      type: PikslotsBaseErrorResponse,
+    }),
   );
 
 export const UpdateBusinessContactDetailsDocs = () =>
@@ -494,13 +667,34 @@ export const UpdateBusinessContactDetailsDocs = () =>
       description: 'Contact details updated successfully',
       schema: {
         example: {
-          data: { id: 'biz_01j...', contactDetails: { primaryEmail: '', primaryPhone: { countryCode: '+1', number: '' }, additionalEmails: [], additionalPhones: [] }, updatedAt: '2026-01-01T00:00:00.000Z' },
+          data: {
+            id: 'biz_01j...',
+            contactDetails: {
+              primaryEmail: '',
+              primaryPhone: { countryCode: '+1', number: '' },
+              additionalEmails: [],
+              additionalPhones: [],
+            },
+            updatedAt: '2026-01-01T00:00:00.000Z',
+          },
           statusCode: 200,
           timestamp: '2026-01-01T00:00:00.000Z',
         },
       },
     }),
-    ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Business not found', type: PikslotsBaseErrorResponse }),
-    ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Validation error', type: PikslotsBaseErrorResponse }),
-    ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Database or infrastructure failure', type: PikslotsBaseErrorResponse }),
+    ApiResponse({
+      status: HttpStatus.NOT_FOUND,
+      description: 'Business not found',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.BAD_REQUEST,
+      description: 'Validation error',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.INTERNAL_SERVER_ERROR,
+      description: 'Database or infrastructure failure',
+      type: PikslotsBaseErrorResponse,
+    }),
   );

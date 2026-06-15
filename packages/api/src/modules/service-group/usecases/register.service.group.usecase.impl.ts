@@ -72,8 +72,7 @@ export class RegisterServiceGroupUseCaseImpl implements RegisterServiceGroupUseC
       // TODO fire event
       // (single) service group --> assing to --> services(multiple)
       await this.serviceGroupAssignmentQueue.add(
-        PIKSLOT_EVENTS.SERVICE_GROUP_ASSIGNMENT
-          .SYNC_SERVICE_GROUP_SERVICES,
+        PIKSLOT_EVENTS.SERVICE_GROUP_ASSIGNMENT.SYNC_SERVICE_GROUP_SERVICES,
         {
           serviceGroupId: group.id,
           serviceIds: command.associatedServices,

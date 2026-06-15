@@ -150,7 +150,10 @@
 <aside
 	class="flex h-svh w-64 shrink-0 flex-col border-r border-l bg-sidebar text-sidebar-foreground"
 >
-	<div class="flex shrink-0 items-center gap-2 border-b px-4 py-3" style="height: var(--header-height)">
+	<div
+		class="flex shrink-0 items-center gap-2 border-b px-4 py-3"
+		style="height: var(--header-height)"
+	>
 		<button
 			onclick={() => settingsStore.toggle()}
 			class="-ms-1 inline-flex size-7 items-center justify-center rounded-md text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
@@ -161,55 +164,55 @@
 	</div>
 
 	<ScrollArea class="min-h-0 flex-1">
-	<div class="flex flex-col gap-1 py-2">
-		{#each menuGroups as group (group.label ?? '__default')}
-			<Sidebar.Group>
-				{#if group.label}
-					<Sidebar.GroupLabel>{group.label}</Sidebar.GroupLabel>
-				{/if}
-				<Sidebar.Menu>
-					{#each group.items as item (item.label)}
-						<Sidebar.MenuItem>
-							{#if item.children}
-								<Sidebar.MenuButton
-									isActive={isItemActive(item)}
-									onclick={() => (openState[item.label] = !openState[item.label])}
-								>
-									<item.icon />
-									<span>{item.label}</span>
-									<ChevronDown
-										class="ml-auto transition-transform duration-200 {openState[item.label]
-											? 'rotate-180'
-											: ''}"
-									/>
-								</Sidebar.MenuButton>
-								{#if openState[item.label]}
-									<Sidebar.MenuSub>
-										{#each item.children as sub (sub.href)}
-											<Sidebar.MenuSubItem>
-												<Sidebar.MenuSubButton isActive={$page.url.pathname === sub.href}>
-													{#snippet child({ props })}
-														<a href={sub.href} {...props}>{sub.label}</a>
-													{/snippet}
-												</Sidebar.MenuSubButton>
-											</Sidebar.MenuSubItem>
-										{/each}
-									</Sidebar.MenuSub>
+		<div class="flex flex-col gap-1 py-2">
+			{#each menuGroups as group (group.label ?? '__default')}
+				<Sidebar.Group>
+					{#if group.label}
+						<Sidebar.GroupLabel>{group.label}</Sidebar.GroupLabel>
+					{/if}
+					<Sidebar.Menu>
+						{#each group.items as item (item.label)}
+							<Sidebar.MenuItem>
+								{#if item.children}
+									<Sidebar.MenuButton
+										isActive={isItemActive(item)}
+										onclick={() => (openState[item.label] = !openState[item.label])}
+									>
+										<item.icon />
+										<span>{item.label}</span>
+										<ChevronDown
+											class="ml-auto transition-transform duration-200 {openState[item.label]
+												? 'rotate-180'
+												: ''}"
+										/>
+									</Sidebar.MenuButton>
+									{#if openState[item.label]}
+										<Sidebar.MenuSub>
+											{#each item.children as sub (sub.href)}
+												<Sidebar.MenuSubItem>
+													<Sidebar.MenuSubButton isActive={$page.url.pathname === sub.href}>
+														{#snippet child({ props })}
+															<a href={sub.href} {...props}>{sub.label}</a>
+														{/snippet}
+													</Sidebar.MenuSubButton>
+												</Sidebar.MenuSubItem>
+											{/each}
+										</Sidebar.MenuSub>
+									{/if}
+								{:else}
+									<Sidebar.MenuButton isActive={isItemActive(item)}>
+										{#snippet child({ props })}
+											<a href={item.href} {...props}>
+												<item.icon /><span>{item.label}</span>
+											</a>
+										{/snippet}
+									</Sidebar.MenuButton>
 								{/if}
-							{:else}
-								<Sidebar.MenuButton isActive={isItemActive(item)}>
-									{#snippet child({ props })}
-										<a href={item.href} {...props}>
-											<item.icon /><span>{item.label}</span>
-										</a>
-									{/snippet}
-								</Sidebar.MenuButton>
-							{/if}
-						</Sidebar.MenuItem>
-					{/each}
-				</Sidebar.Menu>
-			</Sidebar.Group>
-		{/each}
-	</div>
+							</Sidebar.MenuItem>
+						{/each}
+					</Sidebar.Menu>
+				</Sidebar.Group>
+			{/each}
+		</div>
 	</ScrollArea>
 </aside>

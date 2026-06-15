@@ -53,7 +53,11 @@
 			const cf = business.bookingContactFields;
 
 			sections = [
-				{ label: 'Book appointment', key: 'bookAppointmentSectionVisible', enabled: s.bookAppointmentSectionVisible },
+				{
+					label: 'Book appointment',
+					key: 'bookAppointmentSectionVisible',
+					enabled: s.bookAppointmentSectionVisible
+				},
 				{ label: 'Book class', key: 'bookClassSectionVisible', enabled: s.bookClassSectionVisible },
 				{ label: 'About us', key: 'aboutUsSectionVisible', enabled: s.aboutUsSectionVisible },
 				{ label: 'Our team', key: 'ourTeamSectionVisible', enabled: s.ourTeamSectionVisible },
@@ -76,7 +80,12 @@
 				{ label: 'Name', enabled: cf.name.enabled, required: cf.name.required, locked: true },
 				{ label: 'Phone', enabled: cf.phone.enabled, required: cf.phone.required, locked: false },
 				{ label: 'Email', enabled: cf.email.enabled, required: cf.email.required, locked: false },
-				{ label: 'Address', enabled: cf.address.enabled, required: cf.address.required, locked: false }
+				{
+					label: 'Address',
+					enabled: cf.address.enabled,
+					required: cf.address.required,
+					locked: false
+				}
 			];
 		}
 	});
@@ -171,7 +180,6 @@
 	</div>
 
 	<div class="flex w-[60%] flex-col gap-6 px-6 py-4">
-
 		<!-- Booking setup heading -->
 		<h2 class="text-sm font-semibold">Booking setup</h2>
 
@@ -179,7 +187,9 @@
 		<div class="flex flex-col gap-3">
 			<div class="flex flex-col gap-0.5">
 				<span class="text-xs font-medium">Sections</span>
-				<span class="text-xs text-muted-foreground">What sections will be visible to your Booking Page visitors?</span>
+				<span class="text-xs text-muted-foreground"
+					>What sections will be visible to your Booking Page visitors?</span
+				>
 			</div>
 			<div class="flex flex-col gap-2.5">
 				{#if business === null}
@@ -204,7 +214,9 @@
 		<div class="flex flex-col gap-3">
 			<div class="flex flex-col gap-0.5">
 				<span class="text-xs font-medium">Booking flow</span>
-				<span class="text-xs text-muted-foreground">Streamline the scheduling experience to fill your calendar faster.</span>
+				<span class="text-xs text-muted-foreground"
+					>Streamline the scheduling experience to fill your calendar faster.</span
+				>
 			</div>
 
 			<div class="flex flex-col gap-2.5">
@@ -290,7 +302,9 @@
 		<div class="flex flex-col gap-3">
 			<div class="flex flex-col gap-0.5">
 				<span class="text-xs font-medium">Contact fields</span>
-				<span class="text-xs text-muted-foreground">What form fields will display when customers book online?</span>
+				<span class="text-xs text-muted-foreground"
+					>What form fields will display when customers book online?</span
+				>
 			</div>
 
 			<div class="flex flex-col gap-2.5">
@@ -309,7 +323,9 @@
 					{#each contactFields as field (field.label)}
 						<div class="flex items-center gap-3">
 							<Switch bind:checked={field.enabled} disabled={field.locked} />
-							<span class="text-xs {field.locked ? 'text-muted-foreground' : ''}">{field.label}</span>
+							<span class="text-xs {field.locked ? 'text-muted-foreground' : ''}"
+								>{field.label}</span
+							>
 							<div class="ml-auto flex items-center gap-2">
 								<span class="text-xs text-muted-foreground">Required</span>
 								<Switch
@@ -328,6 +344,5 @@
 				Add field
 			</Button>
 		</div>
-
 	</div>
 </div>

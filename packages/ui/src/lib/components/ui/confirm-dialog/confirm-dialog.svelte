@@ -31,7 +31,12 @@
 </script>
 
 <Dialog.Root bind:open>
-	<Dialog.Content class="max-w-sm" showCloseButton={false} interactOutsideBehavior="ignore" escapeKeydownBehavior="ignore">
+	<Dialog.Content
+		class="max-w-sm"
+		showCloseButton={false}
+		interactOutsideBehavior="ignore"
+		escapeKeydownBehavior="ignore"
+	>
 		<Dialog.Header>
 			<Dialog.Title class="text-sm font-semibold">{title}</Dialog.Title>
 			<Dialog.Description class="text-xs text-muted-foreground">{description}</Dialog.Description>

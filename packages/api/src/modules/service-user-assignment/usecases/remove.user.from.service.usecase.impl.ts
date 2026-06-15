@@ -20,7 +20,9 @@ export class RemoveUserFromServiceUseCaseImpl implements RemoveUserFromServiceUs
 
   async execute(
     command: RemoveUserFromServiceCommand,
-  ): Promise<Result<void, ServiceUserAssignmentNotFoundError | InfrastructureError>> {
+  ): Promise<
+    Result<void, ServiceUserAssignmentNotFoundError | InfrastructureError>
+  > {
     const found = await this.assignmentRepository.findByServiceAndUser(
       command.serviceId,
       command.userId,

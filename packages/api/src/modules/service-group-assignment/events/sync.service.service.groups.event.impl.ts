@@ -80,8 +80,7 @@ export class SyncServiceServiceGroupsEventImpl extends WorkerHost {
       const deleteResult =
         await this.serviceGroupAssignmentRepository.deleteById(assignment.id);
 
-      if (!deleteResult.ok)
-        throw new Error(JSON.stringify(deleteResult.error));
+      if (!deleteResult.ok) throw new Error(JSON.stringify(deleteResult.error));
     }
   }
 }

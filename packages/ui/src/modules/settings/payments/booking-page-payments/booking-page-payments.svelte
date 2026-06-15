@@ -16,12 +16,13 @@
 	</div>
 
 	<div class="flex w-[60%] flex-col gap-6 px-6 py-4">
-
 		<!-- Booking Page payments -->
 		<div class="flex flex-col gap-3">
 			<div class="flex flex-col gap-0.5">
 				<h2 class="text-sm font-semibold">Booking Page payments</h2>
-				<span class="text-xs text-muted-foreground">Manage how your customers can pay for your services</span>
+				<span class="text-xs text-muted-foreground"
+					>Manage how your customers can pay for your services</span
+				>
 			</div>
 
 			<div class="flex items-start gap-2 text-xs text-muted-foreground">
@@ -40,7 +41,9 @@
 					<Switch bind:checked={acceptPayments} disabled class="mt-0.5 opacity-40" />
 					<div class="flex flex-col gap-0.5">
 						<span class="text-xs text-muted-foreground">Accept payments</span>
-						<span class="text-xs text-muted-foreground">Allow clients to pay online while booking</span>
+						<span class="text-xs text-muted-foreground"
+							>Allow clients to pay online while booking</span
+						>
 					</div>
 				</div>
 
@@ -48,7 +51,9 @@
 					<Switch bind:checked={requireFullPayment} disabled class="mt-0.5 opacity-40" />
 					<div class="flex flex-col gap-0.5">
 						<span class="text-xs text-muted-foreground">Require full payment</span>
-						<span class="text-xs text-muted-foreground">Make payment mandatory at the time of booking</span>
+						<span class="text-xs text-muted-foreground"
+							>Make payment mandatory at the time of booking</span
+						>
 					</div>
 				</div>
 			</div>
@@ -70,11 +75,12 @@
 				<InfoCircle size={15} class="mt-0.5 shrink-0" />
 				<p>
 					To verify that your new settings have taken effect, open your
-					<a href="#" class="font-medium text-foreground underline underline-offset-2">Booking Page</a>
+					<a href="#" class="font-medium text-foreground underline underline-offset-2"
+						>Booking Page</a
+					>
 					and schedule a test appointment.
 				</p>
 			</div>
 		</div>
-
 	</div>
 </div>

@@ -24,9 +24,7 @@ const BUSINESS_NOT_FOUND = (id: string): BusinessNotFoundError => ({
 });
 
 @Injectable()
-export class UpdateBusinessBookingPoliciesUseCaseImpl
-  implements UpdateBusinessBookingPoliciesUseCase
-{
+export class UpdateBusinessBookingPoliciesUseCaseImpl implements UpdateBusinessBookingPoliciesUseCase {
   constructor(
     @Inject(IBusinessRepository)
     private readonly businessRepository: BusinessRepository,
@@ -53,7 +51,9 @@ export class UpdateBusinessBookingPoliciesUseCaseImpl
 
     const updateResult = await this.businessRepository.update(updated);
     if (!updateResult.ok)
-      return err(updateResult.error as BusinessNotFoundError | InfrastructureError);
+      return err(
+        updateResult.error as BusinessNotFoundError | InfrastructureError,
+      );
 
     return ok(updated);
   }

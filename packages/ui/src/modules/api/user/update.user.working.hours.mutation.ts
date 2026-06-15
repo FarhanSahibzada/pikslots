@@ -15,7 +15,11 @@ export const updateUserWorkingHours = async (
 };
 
 export const updateUserWorkingHoursMutationOptions = () =>
-	mutationOptions<UpdateWorkingHoursResult, AxiosError<PikslotErrorResponse>, UpdateWorkingHoursInput>({
+	mutationOptions<
+		UpdateWorkingHoursResult,
+		AxiosError<PikslotErrorResponse>,
+		UpdateWorkingHoursInput
+	>({
 		mutationKey: ['user', 'working-hours', 'update'],
 		mutationFn: updateUserWorkingHours
 	});

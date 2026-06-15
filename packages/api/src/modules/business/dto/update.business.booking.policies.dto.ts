@@ -1,6 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import type { UpdateBusinessBookingPoliciesInput, TimeUnit } from '@pikslots/shared';
-import { PikSlotsEnumValidation, PikSlotsStringValidation } from 'src/shared/decorators/validations';
+import type {
+  UpdateBusinessBookingPoliciesInput,
+  TimeUnit,
+} from '@pikslots/shared';
+import {
+  PikSlotsEnumValidation,
+  PikSlotsStringValidation,
+} from 'src/shared/decorators/validations';
 import { Type } from 'class-transformer';
 import {
   IsBoolean,
@@ -23,9 +29,7 @@ class TimeValueDto {
   value: number;
 }
 
-export class UpdateBusinessBookingPoliciesDto
-  implements UpdateBusinessBookingPoliciesInput
-{
+export class UpdateBusinessBookingPoliciesDto implements UpdateBusinessBookingPoliciesInput {
   @ApiProperty({ type: TimeValueDto })
   @ValidateNested()
   @Type(() => TimeValueDto)

@@ -243,9 +243,7 @@ export class ServiceGroupAssignmentRepositoryImpl implements ServiceGroupAssignm
     }
   }
 
-  async deleteById(
-    id: string,
-  ): Promise<Result<void, InfrastructureError>> {
+  async deleteById(id: string): Promise<Result<void, InfrastructureError>> {
     try {
       await this.db
         .deleteFrom('service_group_assignments')

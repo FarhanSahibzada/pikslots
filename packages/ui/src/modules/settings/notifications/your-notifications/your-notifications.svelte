@@ -24,7 +24,6 @@
 	</div>
 
 	<div class="flex w-[60%] flex-col gap-6 px-6 py-4">
-
 		<!-- Your notifications -->
 		<div class="flex flex-col gap-3">
 			<div class="flex flex-col gap-0.5">
@@ -44,7 +43,9 @@
 					/>
 					<div class="flex flex-col gap-0.5">
 						<span class="text-xs font-medium">All</span>
-						<span class="text-xs text-muted-foreground">All chats, mentions and booking updates</span>
+						<span class="text-xs text-muted-foreground"
+							>All chats, mentions and booking updates</span
+						>
 					</div>
 				</label>
 
@@ -59,7 +60,9 @@
 					/>
 					<div class="flex flex-col gap-0.5">
 						<span class="text-xs font-medium">Focus mode</span>
-						<span class="text-xs text-muted-foreground">Only your chats, mentions and booking updates</span>
+						<span class="text-xs text-muted-foreground"
+							>Only your chats, mentions and booking updates</span
+						>
 					</div>
 				</label>
 
@@ -105,6 +108,5 @@
 				</Select.Root>
 			</div>
 		</div>
-
 	</div>
 </div>

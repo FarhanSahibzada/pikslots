@@ -266,7 +266,14 @@
 								class="absolute top-1 right-1 hidden size-5 items-center justify-center rounded-full bg-black/60 text-white group-hover:flex"
 								aria-label="Remove photo"
 							>
-								<svg viewBox="0 0 12 12" class="size-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+								<svg
+									viewBox="0 0 12 12"
+									class="size-3"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+								>
 									<path d="M2 2l8 8M10 2l-8 8" />
 								</svg>
 							</button>

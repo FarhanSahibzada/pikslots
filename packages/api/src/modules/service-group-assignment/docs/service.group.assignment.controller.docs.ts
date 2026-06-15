@@ -5,7 +5,11 @@ import { PikslotsBaseErrorResponse } from 'src/shared/types/base.error.response'
 export const FindServicesByGroupDocs = () =>
   applyDecorators(
     ApiOperation({ summary: 'Get all services belonging to a group' }),
-    ApiParam({ name: 'serviceGroupId', description: 'Service group ID', example: 'grp_01j...' }),
+    ApiParam({
+      name: 'serviceGroupId',
+      description: 'Service group ID',
+      example: 'grp_01j...',
+    }),
     ApiResponse({
       status: HttpStatus.OK,
       description: 'Services retrieved successfully',
@@ -27,7 +31,11 @@ export const FindServicesByGroupDocs = () =>
 export const FindGroupsByServiceDocs = () =>
   applyDecorators(
     ApiOperation({ summary: 'Get all groups a service belongs to' }),
-    ApiParam({ name: 'serviceId', description: 'Service ID', example: 'svc_01j...' }),
+    ApiParam({
+      name: 'serviceId',
+      description: 'Service ID',
+      example: 'svc_01j...',
+    }),
     ApiResponse({
       status: HttpStatus.OK,
       description: 'Groups retrieved successfully',

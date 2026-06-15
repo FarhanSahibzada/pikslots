@@ -4,6 +4,11 @@ export interface DayHours {
   closeTime: string; // 'HH:mm' 24-hour, e.g. '17:00'
 }
 
+export interface FullName {
+  readonly firstName: string;
+  readonly lastName: string;
+}
+
 export type WeekDay =
   | 'monday'
   | 'tuesday'
@@ -12,6 +17,15 @@ export type WeekDay =
   | 'friday'
   | 'saturday'
   | 'sunday';
+
+export type SocialPlatforms =
+  | 'Website'
+  | 'Instagram'
+  | 'Facebook'
+  | 'Tiktok'
+  | 'X'
+  | 'Youtube'
+  | 'LinkedIn';
 
 export interface ServiceSummary {
   id: string;

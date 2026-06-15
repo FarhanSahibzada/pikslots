@@ -142,9 +142,7 @@
 	// ── Derived ──────────────────────────────────────────────────────────────────
 
 	const canSave = $derived(
-		$form.title.trim().length > 0 &&
-			Number($form.durationInMins) >= 1 &&
-			Number($form.seats) >= 1
+		$form.title.trim().length > 0 && Number($form.durationInMins) >= 1 && Number($form.seats) >= 1
 	);
 
 	// ── Handlers ─────────────────────────────────────────────────────────────────

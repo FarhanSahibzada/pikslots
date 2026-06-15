@@ -1,7 +1,8 @@
 // ── Props ─────────────────────────────────────────────────────────────────────
 
+import type { FullName } from '../shared';
 import type { UserRole, UserStatus } from './types';
-import type { AppointmentReminders, FullName, NotificationPreferences } from './value-objects';
+import type { AppointmentReminders, NotificationPreferences } from './value-objects';
 import type { UserWorkingHours } from './value-objects/user.working.hours.vo';
 
 export interface UserProps {

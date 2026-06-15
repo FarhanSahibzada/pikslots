@@ -6,7 +6,9 @@ import { EditClassDto } from '../dto/edit.class.dto';
 
 export const RegisterClassDocs = () =>
   applyDecorators(
-    ApiOperation({ summary: 'Register a new class for the authenticated business' }),
+    ApiOperation({
+      summary: 'Register a new class for the authenticated business',
+    }),
     ApiBody({ type: RegisterClassDto }),
     ApiResponse({
       status: HttpStatus.CREATED,
@@ -39,7 +41,11 @@ export const RegisterClassDocs = () =>
 export const EditClassDocs = () =>
   applyDecorators(
     ApiOperation({ summary: 'Update an existing class' }),
-    ApiParam({ name: 'classId', description: 'Class ID', example: 'cls_01j...' }),
+    ApiParam({
+      name: 'classId',
+      description: 'Class ID',
+      example: 'cls_01j...',
+    }),
     ApiBody({ type: EditClassDto }),
     ApiResponse({
       status: HttpStatus.OK,
@@ -72,7 +78,11 @@ export const EditClassDocs = () =>
 export const DeleteClassDocs = () =>
   applyDecorators(
     ApiOperation({ summary: 'Delete a class by ID' }),
-    ApiParam({ name: 'classId', description: 'Class ID', example: 'cls_01j...' }),
+    ApiParam({
+      name: 'classId',
+      description: 'Class ID',
+      example: 'cls_01j...',
+    }),
     ApiResponse({
       status: HttpStatus.OK,
       description: 'Class deleted successfully',
@@ -99,7 +109,11 @@ export const DeleteClassDocs = () =>
 export const FindAllClassesByBusinessDocs = () =>
   applyDecorators(
     ApiOperation({ summary: 'Get all classes for a business' }),
-    ApiParam({ name: 'businessId', description: 'Business ID', example: 'biz_01j...' }),
+    ApiParam({
+      name: 'businessId',
+      description: 'Business ID',
+      example: 'biz_01j...',
+    }),
     ApiResponse({
       status: HttpStatus.OK,
       description: 'Classes retrieved successfully',

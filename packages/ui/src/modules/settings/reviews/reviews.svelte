@@ -27,13 +27,13 @@
 			<Tabs.List class="h-auto justify-start rounded-none border-b bg-transparent pb-0">
 				<Tabs.Trigger
 					value="reviews"
-					class="cursor-pointer rounded-none border-b-2 border-transparent px-3 pb-2 pt-0 text-muted-foreground data-[state=active]:border-b-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
+					class="cursor-pointer rounded-none border-b-2 border-transparent px-3 pt-0 pb-2 text-muted-foreground data-[state=active]:border-b-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
 				>
 					Reviews
 				</Tabs.Trigger>
 				<Tabs.Trigger
 					value="preferences"
-					class="cursor-pointer rounded-none border-b-2 border-transparent px-3 pb-2 pt-0 text-muted-foreground data-[state=active]:border-b-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
+					class="cursor-pointer rounded-none border-b-2 border-transparent px-3 pt-0 pb-2 text-muted-foreground data-[state=active]:border-b-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
 				>
 					Preferences
 				</Tabs.Trigger>
@@ -45,7 +45,9 @@
 					<div class="flex flex-col items-center justify-center gap-2 py-32 text-center">
 						<InfoCircle size={24} class="text-muted-foreground" />
 						<span class="text-xs font-semibold">No reviews to display</span>
-						<span class="text-xs text-muted-foreground">Request reviews to share on your Booking Page.</span>
+						<span class="text-xs text-muted-foreground"
+							>Request reviews to share on your Booking Page.</span
+						>
 						<Button variant="outline" class="mt-2">Request review</Button>
 					</div>
 				{/if}
@@ -54,7 +56,6 @@
 			<!-- Preferences tab -->
 			<Tabs.Content value="preferences" class="mt-0">
 				<div class="flex w-[60%] flex-col gap-6 py-4">
-
 					<!-- Review source cards -->
 					<div class="grid grid-cols-2 gap-3">
 						<!-- Google Reviews -->
@@ -72,7 +73,10 @@
 
 						<!-- Pikslot Reviews -->
 						<div class="relative flex flex-col gap-2 rounded-lg border p-4">
-							<Badge variant="secondary" class="absolute top-3 right-3 gap-1 text-xs text-green-600">
+							<Badge
+								variant="secondary"
+								class="absolute top-3 right-3 gap-1 text-xs text-green-600"
+							>
 								<Check size={11} />
 								Connected
 							</Badge>
@@ -96,7 +100,9 @@
 							<Switch bind:checked={sendReviewEmails} class="mt-0.5" />
 							<div class="flex flex-col gap-0.5">
 								<span class="text-xs font-medium">Send review request emails</span>
-								<span class="text-xs text-muted-foreground">Requests sent 1 hr after the appointment.</span>
+								<span class="text-xs text-muted-foreground"
+									>Requests sent 1 hr after the appointment.</span
+								>
 							</div>
 						</div>
 
@@ -104,7 +110,9 @@
 							<Switch bind:checked={autoPublish} class="mt-0.5" />
 							<div class="flex flex-col gap-0.5">
 								<span class="text-xs font-medium">Auto-publish reviews</span>
-								<span class="text-xs text-muted-foreground">New Pikslot reviews display automatically.</span>
+								<span class="text-xs text-muted-foreground"
+									>New Pikslot reviews display automatically.</span
+								>
 							</div>
 						</div>
 					</div>
@@ -113,13 +121,17 @@
 					<div class="flex flex-col gap-3">
 						<div class="flex flex-col gap-0.5">
 							<span class="text-xs font-semibold">Select a platform</span>
-							<span class="text-xs text-muted-foreground">Where will customers write a review?</span>
+							<span class="text-xs text-muted-foreground">Where will customers write a review?</span
+							>
 						</div>
 
 						<div class="grid grid-cols-2 gap-3">
 							<!-- Google Reviews option -->
 							<label
-								class="flex cursor-pointer flex-col items-center gap-2 rounded-lg border p-4 {selectedPlatform === 'google' ? 'border-foreground' : 'border-border'}"
+								class="flex cursor-pointer flex-col items-center gap-2 rounded-lg border p-4 {selectedPlatform ===
+								'google'
+									? 'border-foreground'
+									: 'border-border'}"
 							>
 								<input
 									type="radio"
@@ -143,7 +155,10 @@
 
 							<!-- Pikslot Reviews option -->
 							<label
-								class="flex cursor-pointer flex-col items-center gap-2 rounded-lg border p-4 {selectedPlatform === 'pikslot' ? 'border-foreground' : 'border-border'}"
+								class="flex cursor-pointer flex-col items-center gap-2 rounded-lg border p-4 {selectedPlatform ===
+								'pikslot'
+									? 'border-foreground'
+									: 'border-border'}"
 							>
 								<input
 									type="radio"
@@ -166,7 +181,6 @@
 							</label>
 						</div>
 					</div>
-
 				</div>
 			</Tabs.Content>
 		</Tabs.Root>

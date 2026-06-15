@@ -45,7 +45,9 @@ export const CreateServiceGroupDocs = () =>
 
 export const EditServiceGroupDocs = () =>
   applyDecorators(
-    ApiOperation({ summary: 'Edit a service group name and its assigned services' }),
+    ApiOperation({
+      summary: 'Edit a service group name and its assigned services',
+    }),
     ApiBody({ type: EditServiceGroupDto }),
     ApiParam({
       name: 'serviceGroupId',
@@ -70,7 +72,8 @@ export const EditServiceGroupDocs = () =>
     }),
     ApiResponse({
       status: HttpStatus.CONFLICT,
-      description: 'A service group with this name already exists for this business',
+      description:
+        'A service group with this name already exists for this business',
       type: PikslotsBaseErrorResponse,
     }),
     ApiResponse({

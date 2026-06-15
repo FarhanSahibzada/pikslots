@@ -14,9 +14,10 @@ export const updateBusinessBookingCustomization = async (
 ): Promise<BusinessUpdateBookingCustomizationResult> => {
 	const { id, ...body } = input;
 	const endpoint = BUSINESS_ENDPOINTS.UPDATE_BOOKING_CUSTOMIZATION.replace(':id', id);
-	const { data } = await apiClient.patch<
-		PikslotResponse<BusinessUpdateBookingCustomizationResult>
-	>(endpoint, body);
+	const { data } = await apiClient.patch<PikslotResponse<BusinessUpdateBookingCustomizationResult>>(
+		endpoint,
+		body
+	);
 	return data.data;
 };
 

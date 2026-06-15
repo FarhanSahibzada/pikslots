@@ -14,7 +14,11 @@ export interface LoginUserUseCase {
   ): Promise<
     Result<
       { accessToken: string; refreshToken: string },
-      UnauthorizedError | UserSuspendedError | UserInactiveError | UserNoAccessError | InfrastructureError
+      | UnauthorizedError
+      | UserSuspendedError
+      | UserInactiveError
+      | UserNoAccessError
+      | InfrastructureError
     >
   >;
 }

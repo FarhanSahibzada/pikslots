@@ -7,6 +7,12 @@ import { FindServicesByGroupUseCaseImpl } from './find.services.by.group.usecase
 import { FindGroupsByServiceUseCaseImpl } from './find.groups.by.service.usecase.impl';
 
 export const SERVICE_GROUP_ASSIGNMENT_USECASES: Provider[] = [
-  { useClass: FindServicesByGroupUseCaseImpl, provide: IFindServicesByGroupUseCase },
-  { useClass: FindGroupsByServiceUseCaseImpl, provide: IFindGroupsByServiceUseCase },
+  {
+    useClass: FindServicesByGroupUseCaseImpl,
+    provide: IFindServicesByGroupUseCase,
+  },
+  {
+    useClass: FindGroupsByServiceUseCaseImpl,
+    provide: IFindGroupsByServiceUseCase,
+  },
 ];

@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import type { UpdateBusinessLocationInput, SupportedCurrencies } from '@pikslots/shared';
-import { PikSlotsEnumValidation, PikSlotsStringValidation } from 'src/shared/decorators/validations';
+import type {
+  UpdateBusinessLocationInput,
+  SupportedCurrencies,
+} from '@pikslots/shared';
+import {
+  PikSlotsEnumValidation,
+  PikSlotsStringValidation,
+} from 'src/shared/decorators/validations';
 
 const CURRENCIES: SupportedCurrencies[] = ['USD', 'PKR', 'RUB'];
 

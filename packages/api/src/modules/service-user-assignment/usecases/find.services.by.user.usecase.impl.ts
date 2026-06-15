@@ -17,7 +17,9 @@ export class FindServicesByUserUseCaseImpl implements FindServicesByUserUseCase 
     private readonly assignmentRepository: ServiceUserAssignmentRepository,
   ) {}
 
-  async execute(userId: string): Promise<Result<ServiceSummary[], InfrastructureError>> {
+  async execute(
+    userId: string,
+  ): Promise<Result<ServiceSummary[], InfrastructureError>> {
     const result = await this.assignmentRepository.findServicesByUser(userId);
 
     if (!result.ok) return err(result.error);

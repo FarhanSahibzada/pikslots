@@ -128,7 +128,9 @@ export class UserRepositoryImpl implements UserRepository {
     }
   }
 
-  async findAllByBusiness(businessId: string): Promise<Result<User[], InfrastructureError>> {
+  async findAllByBusiness(
+    businessId: string,
+  ): Promise<Result<User[], InfrastructureError>> {
     try {
       const rows = await this.db
         .selectFrom('users')
@@ -147,7 +149,9 @@ export class UserRepositoryImpl implements UserRepository {
     }
   }
 
-  async findAllByRole(role: UserRole): Promise<Result<User[], InfrastructureError>> {
+  async findAllByRole(
+    role: UserRole,
+  ): Promise<Result<User[], InfrastructureError>> {
     try {
       const rows = await this.db
         .selectFrom('users')

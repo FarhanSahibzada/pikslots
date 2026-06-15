@@ -6,7 +6,9 @@ import { EditServiceDto } from '../dto/edit.service.dto';
 
 export const RegisterServiceDocs = () =>
   applyDecorators(
-    ApiOperation({ summary: 'Register a new service for the authenticated business' }),
+    ApiOperation({
+      summary: 'Register a new service for the authenticated business',
+    }),
     ApiBody({ type: RegisterServiceDto }),
     ApiResponse({
       status: HttpStatus.CREATED,
@@ -39,11 +41,21 @@ export const RegisterServiceDocs = () =>
 export const DeleteServiceDocs = () =>
   applyDecorators(
     ApiOperation({ summary: 'Delete a service by ID' }),
-    ApiParam({ name: 'serviceId', description: 'Service ID', example: 'svc_01j...' }),
+    ApiParam({
+      name: 'serviceId',
+      description: 'Service ID',
+      example: 'svc_01j...',
+    }),
     ApiResponse({
       status: HttpStatus.OK,
       description: 'Service deleted successfully',
-      schema: { example: { data: { message: 'success' }, statusCode: 200, timestamp: '2026-01-01T00:00:00.000Z' } },
+      schema: {
+        example: {
+          data: { message: 'success' },
+          statusCode: 200,
+          timestamp: '2026-01-01T00:00:00.000Z',
+        },
+      },
     }),
     ApiResponse({
       status: HttpStatus.NOT_FOUND,
@@ -60,12 +72,22 @@ export const DeleteServiceDocs = () =>
 export const EditServiceDocs = () =>
   applyDecorators(
     ApiOperation({ summary: 'Update an existing service' }),
-    ApiParam({ name: 'serviceId', description: 'Service ID', example: 'svc_01j...' }),
+    ApiParam({
+      name: 'serviceId',
+      description: 'Service ID',
+      example: 'svc_01j...',
+    }),
     ApiBody({ type: EditServiceDto }),
     ApiResponse({
       status: HttpStatus.OK,
       description: 'Service updated successfully',
-      schema: { example: { data: { message: 'success' }, statusCode: 200, timestamp: '2026-01-01T00:00:00.000Z' } },
+      schema: {
+        example: {
+          data: { message: 'success' },
+          statusCode: 200,
+          timestamp: '2026-01-01T00:00:00.000Z',
+        },
+      },
     }),
     ApiResponse({
       status: HttpStatus.NOT_FOUND,
@@ -87,7 +109,11 @@ export const EditServiceDocs = () =>
 export const FindAllServicesByBusinessDocs = () =>
   applyDecorators(
     ApiOperation({ summary: 'Get all services for a business' }),
-    ApiParam({ name: 'businessId', description: 'Business ID', example: 'biz_01j...' }),
+    ApiParam({
+      name: 'businessId',
+      description: 'Business ID',
+      example: 'biz_01j...',
+    }),
     ApiResponse({
       status: HttpStatus.OK,
       description: 'Services retrieved successfully',

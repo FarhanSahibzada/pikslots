@@ -14,15 +14,6 @@ export type BusinessIndustry =
   | 'retail'
   | 'other';
 
-export type SocialPlatforms =
-  | 'Website'
-  | 'Instagram'
-  | 'Facebook'
-  | 'Tiktok'
-  | 'X'
-  | 'Youtube'
-  | 'LinkedIn';
-
 export type SubscriptionPlan = 'free' | 'starter' | 'pro' | 'enterprise';
 export type SubscriptionStatus = 'trialing' | 'active' | 'past_due' | 'cancelled';
 export type BrandButtonShape = 'pill' | 'rounded' | 'rectangle';

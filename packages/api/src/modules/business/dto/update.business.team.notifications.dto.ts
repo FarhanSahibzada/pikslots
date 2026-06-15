@@ -1,8 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
-import type { UpdateBusinessTeamNotificationsInput, TimeUnit, NotificationType } from '@pikslots/shared';
+import type {
+  UpdateBusinessTeamNotificationsInput,
+  TimeUnit,
+  NotificationType,
+} from '@pikslots/shared';
 import { PikSlotsEnumValidation } from 'src/shared/decorators/validations';
 import { Type } from 'class-transformer';
-import { IsArray, IsBoolean, IsEmail, IsInt, Min, ValidateNested } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsEmail,
+  IsInt,
+  Min,
+  ValidateNested,
+} from 'class-validator';
 
 const TIME_UNITS: TimeUnit[] = ['minutes', 'hours', 'days', 'weeks', 'months'];
 const NOTIFICATION_TYPES: NotificationType[] = ['email', 'sms'];
@@ -24,9 +35,7 @@ class ReminderTimeDto {
   value: number;
 }
 
-export class UpdateBusinessTeamNotificationsDto
-  implements UpdateBusinessTeamNotificationsInput
-{
+export class UpdateBusinessTeamNotificationsDto implements UpdateBusinessTeamNotificationsInput {
   @ApiProperty() @IsBoolean() notifyBookingConfirmation: boolean;
   @ApiProperty() @IsBoolean() notifyBookingChanges: boolean;
   @ApiProperty() @IsBoolean() notifyBookingCancellations: boolean;
@@ -34,7 +43,12 @@ export class UpdateBusinessTeamNotificationsDto
   @ApiProperty({ type: ReminderTimeDto })
   @ValidateNested()
   @Type(() => ReminderTimeDto)
-  bookingRemindersTime: { active: boolean; type: NotificationType; unit: TimeUnit; value: number };
+  bookingRemindersTime: {
+    active: boolean;
+    type: NotificationType;
+    unit: TimeUnit;
+    value: number;
+  };
 
   @ApiProperty({ type: [String], example: [] })
   @IsArray()
