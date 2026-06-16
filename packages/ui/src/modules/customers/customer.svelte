@@ -90,6 +90,13 @@
 		deleteCustomerId = customer.id;
 		deleteCustomerName = `${customer.firstName} ${customer.lastName}`;
 	}
+
+	// ── Effect ───────────────────────────────────────────────────────────────
+	$effect(() => {
+		if (customersQuery.data) {
+			selectedCustomerId = customersQuery.data[0].id;
+		}
+	});
 </script>
 
 <div class="flex h-full overflow-hidden">
