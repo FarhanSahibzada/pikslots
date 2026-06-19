@@ -2,7 +2,7 @@ import * as path from 'path';
 import { promises as fs } from 'fs';
 import pg from 'pg';
 import { Kysely, PostgresDialect } from 'kysely';
-import { Migrator, FileMigrationProvider } from 'kysely/migration';
+import { Migrator, FileMigrationProvider } from 'kysely';
 import { run } from 'kysely-migration-cli';
 import { PikSlotsDatabase } from './schema';
 

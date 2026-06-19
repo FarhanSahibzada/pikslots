@@ -46,7 +46,7 @@
     "class-validator": "^0.15.1",
     "cookie-parser": "^1.4.7",
     "jsonwebtoken": "^9.0.3",
-    "kysely": "^0.29.0",
+    "kysely": "0.28",
     "nodemailer": "^8.0.9",
     "pg": "^8.20.0",
     "reflect-metadata": "^0.2.2",

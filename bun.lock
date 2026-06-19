@@ -52,7 +52,7 @@
         "class-validator": "^0.15.1",
         "cookie-parser": "^1.4.7",
         "jsonwebtoken": "^9.0.3",
-        "kysely": "^0.29.0",
+        "kysely": "0.28",
         "nodemailer": "^8.0.9",
         "pg": "^8.20.0",
         "reflect-metadata": "^0.2.2",
@@ -2094,7 +2094,7 @@
 
     "known-css-properties": ["known-css-properties@0.37.0", "", {}, "sha512-JCDrsP4Z1Sb9JwG0aJ8Eo2r7k4Ou5MwmThS/6lcIe1ICyb7UBJKGRIUUdqc2ASdE/42lgz6zFUnzAIhtXnBVrQ=="],
 
-    "kysely": ["kysely@0.29.0", "", {}, "sha512-LrQfPUeTW7MXbMvT62moEMnpMTuj9TO3lqjCeLKjM975PJ4Alrl/43f2tlDX7xOsNptKgH4LSNGwIbXwEkLg4g=="],
+    "kysely": ["kysely@0.28.17", "", {}, "sha512-nbD8lB9EB3wNdMhOCdx5Li8DxnLbvKByylRLcJ1h+4SkrowVeECAyZlyiKMThF7xFdRz0jSQ2MoJr+wXux2y0Q=="],
 
     "kysely-migration-cli": ["kysely-migration-cli@0.4.2", "", { "dependencies": { "@commander-js/extra-typings": "^11.1.0", "commander": "^11.1.0" }, "bin": { "kysely-migration-cli": "bin/kysely-migration-cli.js" } }, "sha512-904MSUdzkdxl+k3C67ogvP6ogPOEr0D6ZZDtxAmDeIHEJxZAA+eC+TLAcJt3HQABTPetwsW3pj6y1MPmaveQUg=="],
 
