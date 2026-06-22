@@ -2,21 +2,22 @@ import type { InfrastructureError, Result, UnauthorizedError } from '../../share
 import type { BookingConflictError } from '../errors';
 import type { Booking, ServiceSnapshot } from '../booking.entity';
 
-export interface CreateBookingCommand {
+export interface RegisterBookingCommand {
   bookingDate: string;
   bookingStartTime: string;
   bookingEndTime: string;
   businessId: string;
   serviceId: string;
+  userId: string;
   serviceSnapshot: ServiceSnapshot;
   customerId: string;
   createdBy: string;
 }
 
-export const ICreateBookingUseCase = Symbol('ICreateBookingUseCase');
+export const IRegisterBookingUseCase = Symbol('IRegisterBookingUseCase');
 
-export interface CreateBookingUseCase {
+export interface RegisterBookingUseCase {
   execute(
-    command: CreateBookingCommand,
+    command: RegisterBookingCommand,
   ): Promise<Result<Booking, BookingConflictError | UnauthorizedError | InfrastructureError>>;
 }

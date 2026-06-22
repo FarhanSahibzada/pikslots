@@ -1,3 +1,5 @@
+import type { UserRole } from '../user';
+
 // --- Types
 export interface ServiceSnapshot {
   readonly title: string;
@@ -18,7 +20,8 @@ export interface BookingProps {
 
   //relations
   readonly customerId: string;
-  readonly serviceId: string | null;
+  readonly serviceId: string;
+  readonly userId: string;
 
   // audit
   readonly createdAt: Date;
@@ -40,6 +43,7 @@ export interface CreateBookingInput {
   bookingEndTime: string; /** ISO 8601 UTC datetime string, e.g. "2025-06-16T10:00:00.000Z" */
   businessId: string;
   serviceId: string;
+  userId: string;
   serviceSnapshot: ServiceSnapshot;
   customerId: string;
   createdBy: string;
@@ -79,6 +83,7 @@ export class Booking {
       bookingEndTime: input.bookingEndTime,
       businessId: input.businessId,
       serviceId: input.serviceId,
+      userId: input.userId,
       serviceSnapshot: input.serviceSnapshot,
       customerId: input.customerId,
       createdAt: now,
@@ -112,8 +117,9 @@ export class Booking {
     bookingDate: string;
     bookingStartTime: string;
     bookingEndTime: string;
-    serviceId: string | null;
+    serviceId: string;
     customerId: string;
+    userId: string;
     updatedBy: string;
   }): Booking {
     Booking.assertUtcDatetime(input.bookingStartTime, 'bookingStartTime');
@@ -125,6 +131,7 @@ export class Booking {
       bookingEndTime: input.bookingEndTime,
       serviceId: input.serviceId,
       customerId: input.customerId,
+      userId: input.userId,
       updatedAt: new Date(),
       updatedBy: input.updatedBy,
     });
@@ -157,6 +164,26 @@ export class Booking {
     return this.props.id === other.props.id;
   }
 
+  // -- Business Rules
+  //
+  static canRegisterBooking(
+    callerRole: UserRole,
+    isPartOfSameBusiness: boolean,
+    isSelf: boolean,
+  ): boolean {
+    if (callerRole === 'Platform Owner') return true;
+    if (
+      (callerRole === 'Business Owner' || callerRole === 'Admin' || callerRole === 'Enhanced') &&
+      isPartOfSameBusiness
+    )
+      return true;
+
+    if (isPartOfSameBusiness && isSelf && callerRole === 'Standard') return true;
+
+    // No acess
+    return false;
+  }
+
   // ── Core fields ─────────────────────────────────────────────────────────────
 
   get bookingId(): string {
@@ -174,14 +201,17 @@ export class Booking {
   get businessId(): string {
     return this.props.businessId;
   }
-  get serviceId(): string | null {
+  get serviceId(): string {
     return this.props.serviceId;
   }
-  get customerId(): string | null {
+  get customerId(): string {
     return this.props.customerId;
   }
   get serviceSnapshot(): ServiceSnapshot {
     return this.props.serviceSnapshot;
+  }
+  get userId(): string {
+    return this.props.userId;
   }
   // ── Audit fields ─────────────────────────────────────────────────────────────
 

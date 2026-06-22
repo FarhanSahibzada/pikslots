@@ -9,3 +9,4 @@ export * from './class/';
 export * from './class-group/';
 export * from './class-group-assignment/';
 export * from './customer/';
+export * from './booking/';
