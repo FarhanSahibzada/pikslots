@@ -38,5 +38,5 @@
 <Toaster position="top-right" title="Notification" theme={themeStore.current} richColors={true} />
 <QueryClientProvider client={query}
 	>{@render children()}
-	<SvelteQueryDevtools />
+	<!-- <SvelteQueryDevtools /> -->
 </QueryClientProvider>

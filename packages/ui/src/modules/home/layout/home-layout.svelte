@@ -39,8 +39,8 @@
 {#if !authStore.isInitializing && authStore.isAuthenticated}
 	<Sidebar.Provider
 		style="
-		--sidebar-width: calc(var(--spacing) * 64); /* 72 * 0.25rem = 18rem (288px), change multiplier to resize: 64=16rem, 80=20rem, 96=24rem */
-		--header-height: calc(var(--spacing) * 12); /* 12 * 0.25rem = 3rem (48px) */
+		--sidebar-width: calc(var(--spacing) * 64);
+		--header-height: calc(var(--spacing) * 12);
 	"
 	>
 		<PikslotsSidebar variant="inset" />

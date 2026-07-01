@@ -29,6 +29,14 @@ export class FindAllUsersInsideBusinessUseCaseImpl implements FindAllUsersInside
     if (this.securityContext.role === 'No Access')
       return err(UNAUTHORIZED_ERROR);
 
+    if (this.securityContext.role === 'Standard') {
+      const result = await this.userRepository.findAllByBusiness(businessId);
+      if (!result.ok) return err(result.error);
+      return ok(
+        result.value.filter((user) => user.id === this.securityContext.userId),
+      );
+    }
+
     const result = await this.userRepository.findAllByBusiness(businessId);
 
     if (!result.ok) return err(result.error);

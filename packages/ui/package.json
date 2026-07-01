@@ -56,6 +56,10 @@
 	},
 	"dependencies": {
 		"@fontsource-variable/fira-code": "^5.2.7",
+		"@fullcalendar/core": "^6.1.21",
+		"@fullcalendar/daygrid": "^6.1.21",
+		"@fullcalendar/list": "^6.1.21",
+		"@fullcalendar/timegrid": "^6.1.21",
 		"@lucide/svelte": "^1.17.0",
 		"@pikslots/shared": "workspace:*",
 		"@tanstack/svelte-query": "^6.1.29",
