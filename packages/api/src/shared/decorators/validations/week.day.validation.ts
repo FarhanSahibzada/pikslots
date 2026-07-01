@@ -13,8 +13,7 @@ const WEEK_DAYS: WeekDay[] = [
 ];
 
 /** Required WeekDay value ('monday' – 'sunday'). */
-export const PikSlotsWeekDayValidation = () =>
-  applyDecorators(IsIn(WEEK_DAYS));
+export const PikSlotsWeekDayValidation = () => applyDecorators(IsIn(WEEK_DAYS));
 
 /** Optional WeekDay value ('monday' – 'sunday'). */
 export const PikSlotsOptionalWeekDayValidation = () =>

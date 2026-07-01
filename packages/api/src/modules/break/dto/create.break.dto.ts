@@ -10,7 +10,15 @@ import {
 export class CreateBreakDto implements CreateBreakRequest {
   @ApiProperty({
     example: 'monday',
-    enum: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
+    enum: [
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+      'sunday',
+    ],
   })
   @PikSlotsWeekDayValidation()
   day: WeekDay;

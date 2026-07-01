@@ -103,9 +103,7 @@
 
 	const hasConflicts = $derived(conflictsByDay.some((s) => s.size > 0));
 
-	const isSaving = $derived(
-		createMut.isPending || updateMut.isPending || deleteMut.isPending
-	);
+	const isSaving = $derived(createMut.isPending || updateMut.isPending || deleteMut.isPending);
 
 	async function save() {
 		const apiBreaks = breaksQuery.data ?? [];
@@ -134,9 +132,7 @@
 				const endTime = toHHmm(brk.end);
 
 				if (!brk.id) {
-					ops.push(
-						createMut.mutateAsync({ day: day.day, startTime, endTime, userId, businessId })
-					);
+					ops.push(createMut.mutateAsync({ day: day.day, startTime, endTime, userId, businessId }));
 				} else {
 					const orig = originalDayBreaks.find((b) => b.id === brk.id);
 					if (orig && (orig.startTime !== startTime || orig.endTime !== endTime)) {
