@@ -13,4 +13,5 @@ export const USER_ENDPOINTS = {
   FREE_SLOTS: '/users/free-slots/:userId',
   AVAILABLE_DATES: '/users/available-dates/:userId',
   UPDATE_AVATAR: '/users/:userId/avatar',
+  UPDATE_PROFILE: '/users/me',
 } as const;

@@ -130,3 +130,91 @@ describe('User.canUpdateWorkingHours', () => {
     });
   });
 });
+
+// ── canUpdateProfile permission matrix ──────────────────────────────────────
+
+describe('User.canUpdateProfile', () => {
+  describe('Platform Owner', () => {
+    it('can update any user (isSelf=false, different business)', () => {
+      expect(User.canUpdateProfile('Platform Owner', false, false)).toBe(true);
+    });
+
+    it('can update any user (isSelf=true)', () => {
+      expect(User.canUpdateProfile('Platform Owner', true, false)).toBe(true);
+    });
+
+    it('can update any user (same business)', () => {
+      expect(User.canUpdateProfile('Platform Owner', false, true)).toBe(true);
+    });
+  });
+
+  describe('Business Owner', () => {
+    it('can update a user in the same business', () => {
+      expect(User.canUpdateProfile('Business Owner', false, true)).toBe(true);
+    });
+
+    it('cannot update a user in a different business', () => {
+      expect(User.canUpdateProfile('Business Owner', false, false)).toBe(false);
+    });
+
+    it('can update self within the same business', () => {
+      expect(User.canUpdateProfile('Business Owner', true, true)).toBe(true);
+    });
+  });
+
+  describe('Admin', () => {
+    it('can update a user in the same business', () => {
+      expect(User.canUpdateProfile('Admin', false, true)).toBe(true);
+    });
+
+    it('cannot update a user in a different business', () => {
+      expect(User.canUpdateProfile('Admin', false, false)).toBe(false);
+    });
+
+    it('can update self within the same business', () => {
+      expect(User.canUpdateProfile('Admin', true, true)).toBe(true);
+    });
+  });
+
+  describe('Enhanced', () => {
+    it('can update self', () => {
+      expect(User.canUpdateProfile('Enhanced', true, false)).toBe(true);
+    });
+
+    it('cannot update another user in the same business', () => {
+      expect(User.canUpdateProfile('Enhanced', false, true)).toBe(false);
+    });
+
+    it('cannot update another user in a different business', () => {
+      expect(User.canUpdateProfile('Enhanced', false, false)).toBe(false);
+    });
+  });
+
+  describe('Standard', () => {
+    it('can update self', () => {
+      expect(User.canUpdateProfile('Standard', true, false)).toBe(true);
+    });
+
+    it('cannot update another user in the same business', () => {
+      expect(User.canUpdateProfile('Standard', false, true)).toBe(false);
+    });
+
+    it('cannot update another user in a different business', () => {
+      expect(User.canUpdateProfile('Standard', false, false)).toBe(false);
+    });
+  });
+
+  describe('No Access', () => {
+    it('cannot update self', () => {
+      expect(User.canUpdateProfile('No Access', true, false)).toBe(false);
+    });
+
+    it('cannot update another user in the same business', () => {
+      expect(User.canUpdateProfile('No Access', false, true)).toBe(false);
+    });
+
+    it('cannot update any user', () => {
+      expect(User.canUpdateProfile('No Access', false, false)).toBe(false);
+    });
+  });
+});

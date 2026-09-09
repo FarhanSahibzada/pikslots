@@ -172,6 +172,18 @@ export class User {
     return false;
   }
 
+  static canUpdateProfile(
+    updaterRole: UserRole,
+    isSelf: boolean,
+    isPartOfSameBusiness: boolean,
+  ): boolean {
+    if (updaterRole === 'Platform Owner') return true;
+    if ((updaterRole === 'Business Owner' || updaterRole === 'Admin') && isPartOfSameBusiness)
+      return true;
+    if (isSelf && (updaterRole === 'Enhanced' || updaterRole === 'Standard')) return true;
+    return false;
+  }
+
   // ── Identity ───────────────────────────────────────────────────────────────
 
   get id(): string {
@@ -284,5 +296,29 @@ export class User {
 
   updateAvatarUrl(avatarUrl: string): User {
     return new User({ ...this.props, avatarUrl });
+  }
+
+  updateProfile({
+    name,
+    phone,
+    email,
+    role,
+    updatedBy,
+  }: {
+    name: FullName;
+    phone: string | null;
+    email: string;
+    role?: UserRole;
+    updatedBy: string;
+  }): User {
+    return new User({
+      ...this.props,
+      name,
+      phone,
+      email,
+      ...(role !== undefined ? { role } : {}),
+      updatedAt: new Date(),
+      updatedBy,
+    });
   }
 }

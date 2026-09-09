@@ -8,6 +8,8 @@ import type {
 	RefreshUserSessionResponse,
 	UpdateUserAvatarInput,
 	UpdateUserAvatarResponse,
+	UpdateUserProfileInput,
+	UpdateUserProfileResponse,
 	UpdateUserWorkingHoursInput,
 	UpdateUserWorkingHoursResponse,
 	UserSummary
@@ -29,3 +31,5 @@ export type UpdateWorkingHoursInput = UpdateUserWorkingHoursInput & { userId: st
 export type UpdateWorkingHoursResult = UpdateUserWorkingHoursResponse;
 export type UpdateAvatarInput = UpdateUserAvatarInput & { userId: string };
 export type UpdateAvatarResult = UpdateUserAvatarResponse;
+export type UpdateProfileInput = UpdateUserProfileInput;
+export type UpdateProfileResult = UpdateUserProfileResponse;

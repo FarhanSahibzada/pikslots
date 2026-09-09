@@ -301,8 +301,8 @@
 
 <div class="flex h-full min-h-0 flex-1">
 	<!-- ── Left: sidebar ──────────────────────────────────────────────────── -->
-	<div class=" flex w-56 shrink-0 flex-col gap-5 px-3 py-4">
-		<div class="-mb-2 flex items-center justify-end">
+	<div class=" flex w-56 shrink-0 flex-col gap-5 px-3 pb-4">
+		<!-- <div class="-mb-2 flex items-center justify-end">
 			<Button
 				class="rounded-full px-2 py-3"
 				size="sm"
@@ -313,7 +313,7 @@
 			>
 				<Plus size={16} />
 			</Button>
-		</div>
+		</div> -->
 		<!-- Your calendars -->
 		<div class="flex flex-col gap-1">
 			<span class="px-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase"

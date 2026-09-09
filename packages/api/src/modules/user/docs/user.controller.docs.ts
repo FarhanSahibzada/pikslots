@@ -12,6 +12,7 @@ import { RefreshUserSessionDto } from '../dto/refresh.user.session.dto';
 import { InviteUserDto } from '../dto/invite.user.dto';
 import { UpdateUserWorkingHoursDto } from '../dto/update.user.working.hours.dto';
 import { UpdateUserAvatarDto } from '../dto/update.user.avatar.dto';
+import { UpdateUserProfileDto } from '../dto/update.user.profile.dto';
 
 export const InviteUserDocs = () =>
   applyDecorators(
@@ -453,6 +454,43 @@ export const UpdateUserAvatarDocs = () =>
     ApiResponse({
       status: HttpStatus.BAD_REQUEST,
       description: 'Validation error',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.INTERNAL_SERVER_ERROR,
+      description: 'Infrastructure failure',
+      type: PikslotsBaseErrorResponse,
+    }),
+  );
+
+export const UpdateUserProfileDocs = () =>
+  applyDecorators(
+    ApiOperation({ summary: 'Update the authenticated user profile' }),
+    ApiBody({ type: UpdateUserProfileDto }),
+    ApiResponse({
+      status: HttpStatus.OK,
+      description: 'Profile updated successfully',
+      schema: {
+        example: {
+          data: { message: 'success' },
+          statusCode: 200,
+          timestamp: '2026-01-01T00:00:00.000Z',
+        },
+      },
+    }),
+    ApiResponse({
+      status: HttpStatus.NOT_FOUND,
+      description: 'User not found',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.BAD_REQUEST,
+      description: 'Validation error',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.UNAUTHORIZED,
+      description: 'Missing or invalid access token',
       type: PikslotsBaseErrorResponse,
     }),
     ApiResponse({

@@ -14,6 +14,7 @@ import {
   IUpdateUserWorkingHoursUseCase,
   IUpdateUserAvatarUseCase,
   IGetAvailableDatesForBookingUseCase,
+  IUpdateUserProfileUseCase,
 } from '@pikslots/domain';
 import type {
   AcceptInviteUseCase,
@@ -30,6 +31,7 @@ import type {
   UpdateUserWorkingHoursUseCase,
   UpdateUserAvatarUseCase,
   GetAvailableDatesForBookingUseCase,
+  UpdateUserProfileUseCase,
 } from '@pikslots/domain';
 
 @Injectable()
@@ -75,4 +77,7 @@ export class UserUsecasesFactory {
 
   @Inject(IUpdateUserAvatarUseCase)
   public readonly updateUserAvatarUseCase: UpdateUserAvatarUseCase;
+
+  @Inject(IUpdateUserProfileUseCase)
+  public readonly updateUserProfileUseCase: UpdateUserProfileUseCase;
 }

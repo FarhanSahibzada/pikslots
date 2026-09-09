@@ -14,6 +14,8 @@
 	import BreaksTab from './tabs/breaks.svelte';
 	import TimeOffTab from './tabs/timeoff.svelte';
 	import UpdatesTab from './tabs/updates.svelte';
+	import EditProfileDialog from './dialog/edit-profile-dialog.svelte';
+	import PlatformOwnerProfileDialog from './dialog/platform-owner-profile-dialog.svelte';
 	import { toast } from 'svelte-sonner';
 	import axios from 'axios';
 
@@ -34,6 +36,10 @@
 	}
 
 	let time = $state(currentTime());
+	let editProfileOpen = $state(false);
+	let platformOwnerDialogOpen = $state(false);
+
+	const isPlatformOwner = $derived(authStore.getPayloadData()?.role === 'Platform Owner');
 </script>
 
 <div class="flex flex-col">
@@ -58,7 +64,7 @@
 				<span class="text-base font-semibold">{fullName}</span>
 				<span class="text-xs text-muted-foreground">{time}</span>
 			</div>
-			<Button variant="ghost" size="icon-sm" class="absolute top-4 right-4">
+			<Button variant="ghost" size="icon-sm" class="absolute top-4 right-4" onclick={() => (isPlatformOwner ? (platformOwnerDialogOpen = true) : (editProfileOpen = true))}>
 				<Pencil size={16} />
 			</Button>
 		{/if}
@@ -124,3 +130,6 @@
 		</Tabs.Content>
 	</Tabs.Root>
 </div>
+
+<EditProfileDialog bind:open={editProfileOpen} user={query} />
+<PlatformOwnerProfileDialog bind:open={platformOwnerDialogOpen} user={query} />

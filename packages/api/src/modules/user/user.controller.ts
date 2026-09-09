@@ -33,6 +33,7 @@ import {
   UpdateUserWorkingHoursDocs,
   GetFreeSlotsForUserDocs,
   UpdateUserAvatarDocs,
+  UpdateUserProfileDocs,
 } from './docs/user.controller.docs';
 import { GetUsersByRoleDto } from './dto/get.users.by.role.dto';
 import { PikslotsBaseErrorResponse } from 'src/shared/types/base.error.response';
@@ -47,12 +48,14 @@ import type {
   RefreshUserSessionResponse,
   RequestInviteOtpResponse,
   UpdateUserAvatarResponse,
+  UpdateUserProfileResponse,
   UpdateUserWorkingHoursResponse,
   UserSummary,
 } from '@pikslots/shared';
 import { UserResponseMapper } from './mappers/user.response.mapper';
 import { UpdateUserWorkingHoursDto } from './dto/update.user.working.hours.dto';
 import { UpdateUserAvatarDto } from './dto/update.user.avatar.dto';
+import { UpdateUserProfileDto } from './dto/update.user.profile.dto';
 import { RequestInviteOtpDto } from './dto/request.invite.otp.dto';
 import { AcceptInviteDto } from './dto/accept.invite.dto';
 import { GetFreeSlotsForUserDto } from './dto/get.free.slots.for.user.dto';
@@ -189,6 +192,37 @@ export class UserController {
     res.status(HttpStatus.OK);
     return new PikslotsBaseResponse<UserSummary>(
       await UserResponseMapper.toUserSummary(result.value, this.s3Service),
+      HttpStatus.OK,
+    );
+  }
+
+  @UpdateUserProfileDocs()
+  @Patch(USER_ENDPOINTS.UPDATE_PROFILE)
+  async updateUserProfile(
+    @Res({ passthrough: true }) res: Response,
+    @Body() dto: UpdateUserProfileDto,
+  ): Promise<
+    PikslotsBaseErrorResponse | PikslotsBaseResponse<UpdateUserProfileResponse>
+  > {
+    const result =
+      await this.userUseCaseFactory.updateUserProfileUseCase.execute({
+        userId: dto.userId ?? this.securityContext.userId,
+        firstName: dto.firstName,
+        lastName: dto.lastName,
+        phone: dto.phone,
+        email: dto.email,
+        role: dto.role,
+      });
+
+    if (!result.ok) {
+      const errorResponse = mapUserError(result.error);
+      res.status(errorResponse.statusCode);
+      return errorResponse;
+    }
+
+    res.status(HttpStatus.OK);
+    return new PikslotsBaseResponse<UpdateUserProfileResponse>(
+      { message: 'success' },
       HttpStatus.OK,
     );
   }
