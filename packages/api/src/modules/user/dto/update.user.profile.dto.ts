@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsOptional, IsEmail, IsIn } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsEmail,
+  IsIn,
+} from 'class-validator';
 import type { UpdateUserProfileInput, UserRole } from '@pikslots/shared';
 
 export class UpdateUserProfileDto implements UpdateUserProfileInput {

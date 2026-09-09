@@ -13,10 +13,7 @@
 	import { deleteTimeoffMutationOptions } from '../../../../api/timeoff/delete.timeoff.mutation';
 	import Separator from '$lib/components/ui/separator/separator.svelte';
 
-	let {
-		userId,
-		businessId
-	}: { userId: string; businessId: string } = $props();
+	let { userId, businessId }: { userId: string; businessId: string } = $props();
 
 	const queryClient = useQueryClient();
 

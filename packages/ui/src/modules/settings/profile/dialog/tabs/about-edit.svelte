@@ -92,7 +92,9 @@
 			onClose();
 		}
 		if (updateProfileMutation.isError) {
-			toast.error(updateProfileMutation.error?.response?.data?.message ?? 'Failed to update profile');
+			toast.error(
+				updateProfileMutation.error?.response?.data?.message ?? 'Failed to update profile'
+			);
 		}
 	});
 
@@ -103,10 +105,7 @@
 </script>
 
 <div class="flex flex-col">
-	<form
-		use:enhance
-		class="flex flex-col gap-4"
-	>
+	<form use:enhance class="flex flex-col gap-4">
 		<h2 class="text-sm font-semibold text-muted-foreground">Main Details</h2>
 		<Separator />
 		<FieldGroup>

@@ -64,7 +64,13 @@
 				<span class="text-base font-semibold">{fullName}</span>
 				<span class="text-xs text-muted-foreground">{time}</span>
 			</div>
-			<Button variant="ghost" size="icon-sm" class="absolute top-4 right-4" onclick={() => (isPlatformOwner ? (platformOwnerDialogOpen = true) : (editProfileOpen = true))}>
+			<Button
+				variant="ghost"
+				size="icon-sm"
+				class="absolute top-4 right-4"
+				onclick={() =>
+					isPlatformOwner ? (platformOwnerDialogOpen = true) : (editProfileOpen = true)}
+			>
 				<Pencil size={16} />
 			</Button>
 		{/if}

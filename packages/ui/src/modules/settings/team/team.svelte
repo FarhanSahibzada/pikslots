@@ -54,12 +54,16 @@
 
 <InviteTeamMemberDialog bind:open={inviteOpen} />
 {#if selected}
-	<EditTeamMemberDialog bind:open={editMemberOpen} user={selected} businessId={businessStore.selectedBusiness?.id ?? ''} />
+	<EditTeamMemberDialog
+		bind:open={editMemberOpen}
+		user={selected}
+		businessId={businessStore.selectedBusiness?.id ?? ''}
+	/>
 {/if}
 
 <div class="flex h-full min-h-0 flex-1 overflow-hidden">
 	<!-- Left: team list -->
-	<div class="flex w-64 shrink-0 flex-col border-r overflow-hidden">
+	<div class="flex w-64 shrink-0 flex-col overflow-hidden border-r">
 		<div class="flex items-center justify-between border-b px-4 py-3">
 			<span class="text-sm font-semibold">Your team</span>
 			<Button
@@ -83,7 +87,7 @@
 		</div>
 
 		<!-- Members -->
-		<div class="flex flex-1 flex-col overflow-y-auto min-h-0">
+		<div class="flex min-h-0 flex-1 flex-col overflow-y-auto">
 			{#if usersQuery.isPending}
 				<p class="px-4 py-3 text-xs text-muted-foreground">Loading...</p>
 			{:else}
@@ -127,7 +131,7 @@
 	</div>
 
 	<!-- Right: member detail -->
-	<div class="flex flex-1 flex-col min-h-0 overflow-hidden">
+	<div class="flex min-h-0 flex-1 flex-col overflow-hidden">
 		{#if selected}
 			<div class="relative flex items-center gap-4 px-6 py-5">
 				<Avatar.Root class="size-16 text-lg">
