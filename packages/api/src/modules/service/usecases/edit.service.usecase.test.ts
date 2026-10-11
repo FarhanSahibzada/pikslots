@@ -422,11 +422,11 @@ describe('EditServiceUseCaseImpl', () => {
       );
     });
 
-    it('still enqueues both sync jobs even when associatedServiceGroups and associatedUsers are empty, so removals are processed', async () => {
+    it('still enqueues the service-group sync job when associatedServiceGroups is empty, so removals are processed', async () => {
       const command = buildCommand({
         id: 'service-haircut-1',
         associatedServiceGroups: [],
-        associatedUsers: [],
+        associatedUsers: ['user-standard-1'],
       });
 
       await useCase.execute(command);
@@ -439,8 +439,47 @@ describe('EditServiceUseCaseImpl', () => {
       expect(userAddSpy).toHaveBeenCalledTimes(1);
       expect(userAddSpy).toHaveBeenCalledWith(
         PIKSLOT_EVENTS.SERVICE_USER_ASSIGNMENT.SYNC_SERVICE_TO_USERS,
-        expect.objectContaining({ userIds: [] }),
+        expect.objectContaining({ userIds: ['user-standard-1'] }),
       );
+    });
+  });
+
+  describe('team member requirement', () => {
+    it('rejects an edit that would remove the last assigned team member', async () => {
+      const updateSpy = jest.spyOn(repository, 'update');
+
+      const command = buildCommand({
+        id: 'service-haircut-1',
+        associatedServiceGroups: ['service-group-1'],
+        associatedUsers: [],
+      });
+
+      const result = await useCase.execute(command);
+
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error.kind).toBe('validation');
+        expect(result.error.message).toMatch(/team member/i);
+      }
+      expect(updateSpy).not.toHaveBeenCalled();
+      expect(groupAddSpy).not.toHaveBeenCalled();
+      expect(userAddSpy).not.toHaveBeenCalled();
+
+      const persisted = SERVICE_TEST_DATA.find(
+        (s) => s.id === 'service-haircut-1',
+      );
+      expect(persisted?.title).toBe('Haircut & Style');
+    });
+
+    it('returns service_not_found before the team member check for an unknown id', async () => {
+      const result = await useCase.execute(
+        buildCommand({ id: 'unknown-service', associatedUsers: [] }),
+      );
+
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error.kind).toBe('service_not_found');
+      }
     });
   });
 });

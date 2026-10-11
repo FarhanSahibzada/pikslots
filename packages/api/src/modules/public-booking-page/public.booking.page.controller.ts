@@ -1,20 +1,29 @@
 import {
+  Body,
   Controller,
   Get,
   HttpStatus,
   Param,
+  Post,
   Res,
   Inject,
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { ApiTags } from '@nestjs/swagger';
-import { PUBLIC_BOOKING_PAGE_ENDPOINTS } from '@pikslots/shared';
+import {
+  PUBLIC_BOOKING_PAGE_ENDPOINTS,
+  type RegisterPublicBookingResponse,
+} from '@pikslots/shared';
 import type { PublicBookingPage } from '@pikslots/domain';
 import { PikslotsBaseErrorResponse } from 'src/shared/types/base.error.response';
 import { PikslotsBaseResponse } from 'src/shared/types/base.response';
 import { PublicBookingPageUseCaseFactory } from './factory/public.booking.page.usecases.factory';
 import { mapPublicBookingPageError } from './errors/public.booking.page.errors.map';
-import { GetPublicBookingPageDetailsDocs } from './docs/public.booking.page.controller.docs';
+import {
+  GetPublicBookingPageDetailsDocs,
+  RegisterPublicBookingDocs,
+} from './docs/public.booking.page.controller.docs';
+import { RegisterPublicBookingDto } from './dto/register.public.booking.dto';
 import {
   IPikslotS3Service,
   type PikslotS3Service,
@@ -56,5 +65,48 @@ export class PublicBookingPageController {
 
     res.status(HttpStatus.OK);
     return new PikslotsBaseResponse(bookingPaeDetails, HttpStatus.OK);
+  }
+
+  @RegisterPublicBookingDocs()
+  @Post(PUBLIC_BOOKING_PAGE_ENDPOINTS.REGISTER)
+  async registerPublicBooking(
+    @Res({ passthrough: true }) res: Response,
+    @Body() dto: RegisterPublicBookingDto,
+  ): Promise<
+    | PikslotsBaseErrorResponse
+    | PikslotsBaseResponse<RegisterPublicBookingResponse>
+  > {
+    const result =
+      await this.publicBookingPageUseCaseFactory.registerPublicBookingUseCase.execute(
+        {
+          bookingDate: dto.bookingDate,
+          bookingStartTime: dto.bookingStartTime,
+          bookingEndTime: dto.bookingEndTime,
+          businessId: dto.businessId,
+          serviceId: dto.serviceId,
+          userId: dto.userId,
+          contact: {
+            firstName: dto.contact.firstName,
+            lastName: dto.contact.lastName,
+            email: dto.contact.email ?? null,
+            phone: dto.contact.phone ?? null,
+            address: dto.contact.address ?? null,
+            customFields: dto.contact.customFields,
+          },
+          termsAccepted: dto.termsAccepted,
+        },
+      );
+
+    if (!result.ok) {
+      const errorResponse = mapPublicBookingPageError(result.error);
+      res.status(errorResponse.statusCode);
+      return errorResponse;
+    }
+
+    res.status(HttpStatus.CREATED);
+    return new PikslotsBaseResponse<RegisterPublicBookingResponse>(
+      { message: 'success', bookingId: result.value.bookingId },
+      HttpStatus.CREATED,
+    );
   }
 }

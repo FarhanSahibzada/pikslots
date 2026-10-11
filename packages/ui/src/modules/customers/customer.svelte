@@ -28,6 +28,7 @@
 	import CustomerUpdatesTab from './tabs/customer-updates-tab.svelte';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import { page } from '$app/stores';
 
 	// ── State ─────────────────────────────────────────────────────────────────
 
@@ -38,6 +39,13 @@
 	let editCustomerOpen = $state(false);
 	let deleteCustomerId = $state<string | null>(null);
 	let deleteCustomerName = $state<string>('');
+
+	$effect(() => {
+		if ($page.url.searchParams.get('add') === 'true') {
+			addCustomerOpen = true;
+			goto(resolve('/home/customers'), { replaceState: true, keepFocus: true });
+		}
+	});
 
 	// ── Queries ───────────────────────────────────────────────────────────────
 
@@ -50,6 +58,10 @@
 		...getCustomerByIdQueryOptions(selectedCustomerId ?? ''),
 		enabled: !!selectedCustomerId
 	}));
+
+	$effect(() => {
+		console.log('customer query', customersQuery.data);
+	});
 
 	// ── Derived ───────────────────────────────────────────────────────────────
 
@@ -268,9 +280,7 @@
 					<CustomerUpdatesTab {customer} />
 				</Tabs.Content>
 			</Tabs.Root>
-			<Button onclick={() => (addCustomerOpen = true)}><Plus />Add</Button>
 		</div>
-		Up
 	{:else}
 		<div class="flex flex-1 items-center justify-center text-sm text-muted-foreground">
 			Select a customer to view details

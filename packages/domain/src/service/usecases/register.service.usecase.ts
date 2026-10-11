@@ -1,4 +1,4 @@
-import type { InfrastructureError, Result, UnauthorizedError } from '../../shared';
+import type { InfrastructureError, Result, UnauthorizedError, ValidationError } from '../../shared';
 import type { Service } from '../service.entity';
 
 export interface RegisterServiceCommand {
@@ -21,5 +21,5 @@ export const IRegisterServiceUseCase = Symbol('IRegisterServiceUseCase');
 export interface RegisterServiceUseCase {
   execute(
     command: RegisterServiceCommand,
-  ): Promise<Result<Service, UnauthorizedError | InfrastructureError>>;
+  ): Promise<Result<Service, UnauthorizedError | InfrastructureError | ValidationError>>;
 }

@@ -13,5 +13,6 @@ import { IServiceRepository } from '@pikslots/domain';
     ...SERVICE_USECASES,
     { useClass: ServiceRepositoryImpl, provide: IServiceRepository },
   ],
+  exports: [IServiceRepository],
 })
 export class ServiceModule {}

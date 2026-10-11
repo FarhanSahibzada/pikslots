@@ -20,9 +20,19 @@
 	import BreaksTab from './tabs/breaks.svelte';
 	import TimeOffTab from './tabs/timeoff.svelte';
 	import UpdatesTab from './tabs/updates.svelte';
+	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	let inviteOpen = $state(false);
 	let editMemberOpen = $state(false);
+
+	$effect(() => {
+		if ($page.url.searchParams.get('invite') === 'true') {
+			inviteOpen = true;
+			goto(resolve('/home/settings/team'), { replaceState: true, keepFocus: true });
+		}
+	});
 
 	const usersQuery = createQuery(() => ({
 		...getUsersInsideBusinessQueryOptions(businessStore.selectedBusiness?.id ?? ''),

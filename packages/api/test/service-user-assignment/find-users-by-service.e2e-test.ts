@@ -21,19 +21,30 @@ describe(`GET ${SERVICE_USER_ASSIGNMENT_ENDPOINTS.FIND_BY_SERVICE}`, () => {
 
   it('returns a user assigned via the direct assign endpoint', async () => {
     const { id: businessId } = await createBusiness(ctx);
-    const { id: serviceId } = await registerService(ctx, businessId);
+    const { id: memberId } = await createStaffUser(ctx, businessId, 'Standard');
     const { id: userId } = await createStaffUser(ctx, businessId, 'Standard');
+    const { id: serviceId } = await registerService(ctx, businessId, {
+      associatedUsers: [memberId],
+    });
+    await waitForActiveAssignmentCountByService(ctx, serviceId, 1);
     const token = tokenForRole(ctx, 'Admin', businessId);
     await createAssignment(ctx, { serviceId, userId, businessId }, token);
+    await waitForActiveAssignmentCountByService(ctx, serviceId, 2);
 
     const response = await findUsersByService(ctx, serviceId, token);
 
     expect(response.status).toBe(200);
     const data = successBody<Record<string, unknown>[]>(response).data;
-    expect(data).toHaveLength(1);
-    expect(data[0]).toMatchObject({ id: userId });
-    expect(data[0]).toHaveProperty('firstName');
-    expect(data[0]).toHaveProperty('lastName');
+    expect(data).toHaveLength(2);
+    expect(data).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: userId }),
+        expect.objectContaining({ id: memberId }),
+      ]),
+    );
+    const assigned = data.find((u) => u.id === userId);
+    expect(assigned).toHaveProperty('firstName');
+    expect(assigned).toHaveProperty('lastName');
   });
 
   it('returns a user assigned via registering the service with associatedUsers, once the real worker processes it', async () => {
@@ -59,26 +70,14 @@ describe(`GET ${SERVICE_USER_ASSIGNMENT_ENDPOINTS.FIND_BY_SERVICE}`, () => {
     ]);
   });
 
-  it('returns an empty array for a service with no assigned users', async () => {
-    const { id: businessId } = await createBusiness(ctx);
-    const { id: serviceId } = await registerService(ctx, businessId);
-
-    const response = await findUsersByService(
-      ctx,
-      serviceId,
-      tokenForRole(ctx, 'Admin', businessId),
-    );
-
-    expect(response.status).toBe(200);
-    expect(successBody(response).data).toEqual([]);
-  });
-
   it('stops returning a user once removed via the direct remove endpoint', async () => {
     const { id: businessId } = await createBusiness(ctx);
-    const { id: serviceId } = await registerService(ctx, businessId);
     const { id: userId } = await createStaffUser(ctx, businessId, 'Standard');
+    const { id: serviceId } = await registerService(ctx, businessId, {
+      associatedUsers: [userId],
+    });
+    await waitForActiveAssignmentCountByService(ctx, serviceId, 1);
     const token = tokenForRole(ctx, 'Admin', businessId);
-    await createAssignment(ctx, { serviceId, userId, businessId }, token);
 
     await removeUserFromService(ctx, serviceId, userId, token).then((res) =>
       expect(res.status).toBe(200),
@@ -90,24 +89,28 @@ describe(`GET ${SERVICE_USER_ASSIGNMENT_ENDPOINTS.FIND_BY_SERVICE}`, () => {
     expect(successBody(response).data).toEqual([]);
   });
 
-  it('stops returning a user once removed via editing the service (empty associatedUsers)', async () => {
+  it('stops returning a user once removed via editing the service', async () => {
     const { id: businessId } = await createBusiness(ctx);
     const { id: userId } = await createStaffUser(ctx, businessId, 'Standard');
+    const { id: keptUserId } = await createStaffUser(
+      ctx,
+      businessId,
+      'Standard',
+    );
     const { id: serviceId, title } = await registerService(ctx, businessId, {
-      associatedUsers: [userId],
+      associatedUsers: [userId, keptUserId],
+    });
+
+    await waitForActiveAssignmentCountByService(ctx, serviceId, 2);
+
+    // The edit use case always re-fires the sync event, so dropping a user
+    // from associatedUsers processes the removal.
+    await editService(ctx, serviceId, businessId, {
+      title,
+      associatedUsers: [keptUserId],
     });
 
     await waitForActiveAssignmentCountByService(ctx, serviceId, 1);
-
-    // Editing the service with an empty associatedUsers list drops the
-    // assignment -- the edit use case always re-fires the sync event so
-    // removals process, unlike register which only fires when non-empty.
-    await editService(ctx, serviceId, businessId, {
-      title,
-      associatedUsers: [],
-    });
-
-    await waitForActiveAssignmentCountByService(ctx, serviceId, 0);
 
     const response = await findUsersByService(
       ctx,
@@ -116,7 +119,9 @@ describe(`GET ${SERVICE_USER_ASSIGNMENT_ENDPOINTS.FIND_BY_SERVICE}`, () => {
     );
 
     expect(response.status).toBe(200);
-    expect(successBody(response).data).toEqual([]);
+    expect(successBody(response).data).toEqual([
+      expect.objectContaining({ id: keptUserId }),
+    ]);
   });
 
   it('returns 401 when no auth token is provided', async () => {

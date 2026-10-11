@@ -41,7 +41,7 @@ export interface BookingItemResponse {
   bookingDate: string;
   bookingStartTime: string;
   bookingEndTime: string;
-  userId: string;
+  userId: string | null;
   serviceSnapshot: ServiceSnapshotResponse;
   serviceId: string;
   customerId: string;
@@ -61,7 +61,7 @@ export interface FindBookingByIdResponse {
   serviceSnapshot: ServiceSnapshotResponse;
   serviceId: string;
   customerId: string;
-  userId: string;
+  userId: string | null;
   label: string | null;
   notes: string | null;
   createdAt: string;

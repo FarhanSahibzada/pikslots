@@ -218,4 +218,24 @@ export class CustomerRepositoryTestImpl implements CustomerRepository {
 
     return ok(exists);
   }
+
+  async findByEmailOrName(
+    email: string | null,
+    fullName: { firstName: string; lastName: string },
+    businessId: string,
+  ): Promise<Result<Customer | null, InfrastructureError>> {
+    await Promise.resolve();
+
+    const customer =
+      CUSTOMER_TEST_DATA.find(
+        (item) =>
+          item.name.firstName === fullName.firstName &&
+          item.name.lastName === fullName.lastName &&
+          item.businessId === businessId &&
+          item.isDeleted === false &&
+          (email ? item.email === email : true),
+      ) ?? null;
+
+    return ok(customer);
+  }
 }

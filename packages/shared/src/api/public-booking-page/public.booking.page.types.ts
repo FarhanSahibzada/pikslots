@@ -67,3 +67,30 @@ export interface PublicBookingPageDetails {
   services: ServicesDetails;
   teamMembers: TeamMemberDetails[];
 }
+
+// --- Public booking (unauthenticated guest) ---
+
+export interface PublicBookingContact {
+  firstName: string;
+  lastName: string;
+  email?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  customFields?: Record<string, string>;
+}
+
+export interface RegisterPublicBookingRequest {
+  businessId: string;
+  serviceId: string;
+  userId: string;
+  bookingDate: string; // 'YYYY-MM-DD'
+  bookingStartTime: string; // ISO 8601 UTC
+  bookingEndTime: string; // ISO 8601 UTC
+  contact: PublicBookingContact;
+  termsAccepted?: boolean;
+}
+
+export interface RegisterPublicBookingResponse {
+  message: 'success';
+  bookingId: string; // human-readable reference e.g. "BK3KX9M2P"
+}

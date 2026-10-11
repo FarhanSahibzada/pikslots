@@ -30,6 +30,11 @@ export interface CustomerRepository {
   update(customer: Customer): Promise<Result<void, CustomerNotFoundError | InfrastructureError>>;
   delete(id: string): Promise<Result<void, CustomerNotFoundError | InfrastructureError>>;
   existsByEmail(email: string, businessId: string): Promise<Result<boolean, InfrastructureError>>;
+  findByEmailOrName(
+    email: string | null,
+    fullname: { firstName: string; lastName: string },
+    businessId: string,
+  ): Promise<Result<Customer | null, InfrastructureError>>;
 }
 
 export const ICustomerRepository = Symbol('ICustomerRepository');

@@ -289,4 +289,56 @@ export class CustomerRepositoryImpl implements CustomerRepository {
       });
     }
   }
+
+  async findByEmailOrName(
+    email: string | null,
+    fullName: { firstName: string; lastName: string },
+    businessId: string,
+  ): Promise<Result<Customer | null, InfrastructureError>> {
+    try {
+      const firstName = fullName.firstName;
+      const lastName = fullName.lastName;
+      const emailExist = email ? true : false;
+
+      if (emailExist) {
+        const row = await this.db
+          .selectFrom('customers')
+          .selectAll()
+          .where((eb) =>
+            eb.and([
+              eb('email', '=', email),
+              eb('first_name', '=', firstName),
+              eb('last_name', '=', lastName),
+            ]),
+          )
+          .where('business_id', '=', businessId)
+          .where('is_deleted', '=', false)
+          .executeTakeFirst();
+
+        return ok(row ? this.mapper.persistenceToDomain(row) : null);
+      } else {
+        const row = await this.db
+          .selectFrom('customers')
+          .selectAll()
+          .where((eb) =>
+            eb.and([
+              eb('first_name', '=', firstName),
+              eb('last_name', '=', lastName),
+            ]),
+          )
+          .where('business_id', '=', businessId)
+          .where('is_deleted', '=', false)
+          .executeTakeFirst();
+
+        return ok(row ? this.mapper.persistenceToDomain(row) : null);
+      }
+    } catch (cause) {
+      return err<InfrastructureError>({
+        kind: 'infrastructure',
+        message: 'Failed to find customer by email',
+        timestamp: new Date(),
+        cause,
+      });
+    }
+  }
 }

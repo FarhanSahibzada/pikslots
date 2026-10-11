@@ -34,7 +34,7 @@ function buildCommand(
     businessId: 'business-1',
     createdBy: 'user-business-owner-1',
     associatedServiceGroups: [],
-    associatedUsers: [],
+    associatedUsers: ['user-standard-1'],
     ...overrides,
   } as RegisterServiceCommand;
 }
@@ -297,16 +297,26 @@ describe('RegisterServiceUseCaseImpl', () => {
       expect(persisted).toBeDefined();
     });
 
-    it('enqueues neither sync job when both association lists are empty', async () => {
-      await useCase.execute(
+    it('rejects registration when no team member is assigned', async () => {
+      const saveSpy = jest.spyOn(repository, 'save');
+
+      const result = await useCase.execute(
         buildCommand({ associatedServiceGroups: [], associatedUsers: [] }),
       );
 
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error.kind).toBe('validation');
+        expect(result.error.message).toMatch(/team member/i);
+      }
+      expect(saveSpy).not.toHaveBeenCalled();
       expect(groupAddSpy).not.toHaveBeenCalled();
       expect(userAddSpy).not.toHaveBeenCalled();
     });
 
-    it('enqueues only the service-group sync job when only service groups are provided', async () => {
+    it('rejects registration with an empty associatedUsers list even when service groups are provided', async () => {
+      const saveSpy = jest.spyOn(repository, 'save');
+
       const command = buildCommand({
         businessId: 'business-1',
         createdBy: 'user-business-owner-1',
@@ -314,18 +324,14 @@ describe('RegisterServiceUseCaseImpl', () => {
         associatedUsers: [],
       });
 
-      await useCase.execute(command);
+      const result = await useCase.execute(command);
 
-      expect(groupAddSpy).toHaveBeenCalledTimes(1);
-      expect(groupAddSpy).toHaveBeenCalledWith(
-        PIKSLOT_EVENTS.SERVICE_GROUP_ASSIGNMENT.SYNC_SERVICE_SERVICE_GROUPS,
-        {
-          serviceId: 'mock-generated-id',
-          serviceGroupIds: command.associatedServiceGroups,
-          businessId: command.businessId,
-          assignedBy: command.createdBy,
-        },
-      );
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error.kind).toBe('validation');
+      }
+      expect(saveSpy).not.toHaveBeenCalled();
+      expect(groupAddSpy).not.toHaveBeenCalled();
       expect(userAddSpy).not.toHaveBeenCalled();
     });
 
@@ -363,7 +369,25 @@ describe('RegisterServiceUseCaseImpl', () => {
       await useCase.execute(command);
 
       expect(groupAddSpy).toHaveBeenCalledTimes(1);
+      expect(groupAddSpy).toHaveBeenCalledWith(
+        PIKSLOT_EVENTS.SERVICE_GROUP_ASSIGNMENT.SYNC_SERVICE_SERVICE_GROUPS,
+        {
+          serviceId: 'mock-generated-id',
+          serviceGroupIds: command.associatedServiceGroups,
+          businessId: command.businessId,
+          assignedBy: command.createdBy,
+        },
+      );
       expect(userAddSpy).toHaveBeenCalledTimes(1);
+      expect(userAddSpy).toHaveBeenCalledWith(
+        PIKSLOT_EVENTS.SERVICE_USER_ASSIGNMENT.SYNC_SERVICE_TO_USERS,
+        {
+          serviceId: 'mock-generated-id',
+          userIds: command.associatedUsers,
+          businessId: command.businessId,
+          assignedBy: command.createdBy,
+        },
+      );
     });
   });
 });

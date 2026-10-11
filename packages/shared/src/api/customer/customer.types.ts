@@ -20,6 +20,7 @@ export interface RegisterCustomerInput {
   zipCode: string | null;
   notes: string | null;
   customerSocialLinks: CustomerSocialLinks;
+  additionalFields?: Record<string, string> | null;
   businessId: string;
 }
 
@@ -73,6 +74,7 @@ export interface FullCustomerResponse {
   zipCode: string | null;
   notes: string | null;
   customerSocialLinks: CustomerSocialLinks;
+  additionalFields: Record<string, string> | null;
   businessId: string;
 }
 

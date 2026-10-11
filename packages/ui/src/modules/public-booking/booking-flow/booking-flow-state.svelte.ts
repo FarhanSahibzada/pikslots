@@ -9,7 +9,8 @@ export type BookingStep =
 	| 'confirmation';
 
 export interface ContactDetails {
-	name: string;
+	firstName: string;
+	lastName: string;
 	email: string;
 	phone: string;
 	address: string;
@@ -24,7 +25,8 @@ export function createBookingFlowState() {
 	let selectedDate = $state<string | null>(null); // 'YYYY-MM-DD'
 	let selectedSlot = $state<PublicSlot | null>(null);
 	let contact = $state<ContactDetails>({
-		name: '',
+		firstName: '',
+		lastName: '',
 		email: '',
 		phone: '',
 		address: '',
@@ -39,7 +41,14 @@ export function createBookingFlowState() {
 		selectedTeamMember = null;
 		selectedDate = null;
 		selectedSlot = null;
-		contact = { name: '', email: '', phone: '', address: '', customFields: {} };
+		contact = {
+			firstName: '',
+			lastName: '',
+			email: '',
+			phone: '',
+			address: '',
+			customFields: {}
+		};
 		bookingReference = null;
 		history.length = 0;
 	}

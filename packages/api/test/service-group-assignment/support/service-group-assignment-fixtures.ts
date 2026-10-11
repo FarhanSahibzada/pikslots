@@ -33,6 +33,22 @@ const DEFAULT_WORKING_HOURS: UserWorkingHours = {
 async function createOwnerUser(
   ctx: ServiceGroupAssignmentTestContext,
 ): Promise<string> {
+  return insertTestUser(ctx, null, 'Business Owner', 'Owner');
+}
+
+async function createTeamMember(
+  ctx: ServiceGroupAssignmentTestContext,
+  businessId: string,
+): Promise<string> {
+  return insertTestUser(ctx, businessId, 'Standard', 'Member');
+}
+
+async function insertTestUser(
+  ctx: ServiceGroupAssignmentTestContext,
+  businessId: string | null,
+  role: UserRole,
+  lastName: string,
+): Promise<string> {
   const id = randomUUID();
   const suffix = randomUUID().replace(/-/g, '').slice(0, 16);
 
@@ -40,14 +56,14 @@ async function createOwnerUser(
     .insertInto('users')
     .values({
       id,
-      business_id: null,
+      business_id: businessId,
       username: `e2e${suffix}`,
       password: 'e2e-unused-password-hash',
       first_name: 'E2E',
-      last_name: 'Owner',
+      last_name: lastName,
       email: `${suffix}@example.com`,
       phone: null,
-      role: 'Business Owner',
+      role,
       status: 'active',
       avatar_url: null,
       email_verified: true,
@@ -129,7 +145,7 @@ export async function registerService(
       durationInMins: 30,
       bufferTimeInMins: 10,
       cost: 2500,
-      associatedUsers: [],
+      associatedUsers: [await createTeamMember(ctx, businessId)],
       associatedServiceGroups: overrides.associatedServiceGroups ?? [],
       businessId,
       isHiddenFromBookingPage: false,
@@ -169,7 +185,7 @@ export async function editService(
       durationInMins: 30,
       bufferTimeInMins: 10,
       cost: 2500,
-      associatedUsers: [],
+      associatedUsers: [await createTeamMember(ctx, businessId)],
       associatedServiceGroups: overrides.associatedServiceGroups,
       businessId,
       isHiddenFromBookingPage: false,

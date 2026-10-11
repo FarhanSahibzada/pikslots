@@ -13,5 +13,6 @@ import { ICustomerRepository } from '@pikslots/domain';
     ...CUSTOMER_USECASES,
     { useClass: CustomerRepositoryImpl, provide: ICustomerRepository },
   ],
+  exports: [ICustomerRepository],
 })
 export class CustomerModule {}

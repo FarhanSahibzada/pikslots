@@ -5,7 +5,6 @@
 	import listPlugin from '@fullcalendar/list';
 	import interactionPlugin from '@fullcalendar/interaction';
 	import Plus from '@tabler/icons-svelte/icons/plus';
-	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Avatar from '$lib/components/ui/avatar/index.js';
 	import { createQuery, useQueryClient } from '@tanstack/svelte-query';
 	import { getUsersInsideBusinessQueryOptions } from '../api/user/get.users.inside.business.query';
@@ -53,12 +52,6 @@
 	const effectiveUserId = $derived(selectedUserId || jwtPayload?.userId || '');
 	const effectiveUserRole = $derived(selectedUserRole || jwtPayload?.role);
 
-	// const isElevatedRole = $derived(
-	// 	effectiveUserRole === 'Platform Owner' || effectiveUserRole === 'Business Owner'
-	// );
-
-	// selected user data
-	// const selectedUser = $derived(users.find((u) => u.id === effectiveUserId));
 	const businessTimezone = $derived(
 		businessStore.selectedBusiness?.locationDetails.timeZone ||
 			Intl.DateTimeFormat().resolvedOptions().timeZone

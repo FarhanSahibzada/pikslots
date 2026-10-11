@@ -84,6 +84,7 @@ export class CustomerController {
         zipCode: dto.zipCode,
         notes: dto.notes,
         customerSocialLinks: dto.customerSocialLinks,
+        additionalFields: dto.additionalFields ?? null,
         businessId: dto.businessId,
         createdBy: this.securityContext.userId,
       });
@@ -222,6 +223,7 @@ export class CustomerController {
         zipCode: c.zipCode,
         notes: c.notes,
         customerSocialLinks: c.customerSocialLinks,
+        additionalFields: c.additionalFields,
         businessId: c.businessId,
       },
       HttpStatus.OK,

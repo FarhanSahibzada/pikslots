@@ -155,7 +155,10 @@
 					</div>
 
 					<!-- Details tab -->
-					<Tabs.Content value="details" class="-mt-10 min-h-0 flex-1 overflow-y-auto px-0">
+					<Tabs.Content
+						value="details"
+						class="scrollbar -mt-10 min-h-0 flex-1 scrollbar-auto scrollbar-thumb-gray-500   scrollbar-track-transparent overflow-y-auto px-0"
+					>
 						<div class="flex flex-col gap-4 py-4">
 							<!-- Service -->
 							<div class="flex items-start gap-3">

@@ -19,6 +19,7 @@ export interface CustomerTable extends AuditFields {
   zip_code: string | null;
   notes: string | null;
   customer_social_links: CustomerLinks; // jsonb
+  additional_fields: Record<string, string> | null; // jsonb — public-booking custom-field answers
   business_id: string; // fk → businesses.id
 }
 

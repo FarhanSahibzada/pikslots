@@ -5,6 +5,7 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import Plus from '@tabler/icons-svelte/icons/plus';
 	import CalendarPlus from '@tabler/icons-svelte/icons/calendar-plus';
 	import UsersPlus from '@tabler/icons-svelte/icons/users-plus';
@@ -26,7 +27,7 @@
 		{
 			label: 'Add team member',
 			icon: UsersPlus,
-			href: '/home/settings/team/invite',
+			href: '/home/settings/team?invite=true',
 			roles: privilegedRoles
 		},
 		{
@@ -35,7 +36,7 @@
 			href: '/home/services/new',
 			roles: privilegedRoles
 		},
-		{ label: 'Add customer', icon: UserPlus, href: '/home/customers/new', roles: privilegedRoles },
+		{ label: 'Add customer', icon: UserPlus, href: '/home/customers?add=true', roles: privilegedRoles },
 		{
 			label: 'Create class',
 			icon: School,

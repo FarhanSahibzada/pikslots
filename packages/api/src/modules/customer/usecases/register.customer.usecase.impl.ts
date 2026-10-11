@@ -60,6 +60,7 @@ export class RegisterCustomerUseCaseImpl implements RegisterCustomerUseCase {
       zipCode: command.zipCode,
       notes: command.notes,
       customerSocialLinks: command.customerSocialLinks,
+      additionalFields: command.additionalFields,
       businessId: command.businessId,
       createdBy: command.createdBy,
     });

@@ -5,17 +5,21 @@
 	import { z } from 'zod';
 	import type { BookingContactFields, StandardContactField } from '@pikslots/shared';
 	import type { ContactDetails } from '../booking-flow-state.svelte';
-	import type { PublicBusiness } from '../../types';
+	import type { PublicBusiness, PublicService, PublicSlot, PublicTeamMember } from '../../types';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 	import { Label } from 'bits-ui';
+	import { toast } from 'svelte-sonner';
+	import { createMutation, useQueryClient } from '@tanstack/svelte-query';
+	import { registerPublicBookingMutationOptions } from '../../../api/public-booking-page/register.public.booking.mutation';
 
-	type StandardFieldKey = 'name' | 'email' | 'phone' | 'address';
+	type StandardFieldKey = 'firstName' | 'lastName' | 'email' | 'phone' | 'address';
 
 	const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 	const PHONE_REGEX = /^[+\d][\d\s().-]*$/;
 
 	const MESSAGES: Record<StandardFieldKey, string> = {
-		name: 'Full name is required',
+		firstName: 'First name is required',
+		lastName: 'Last name is required',
 		email: 'Email is required',
 		phone: 'Phone is required',
 		address: 'Address is required'
@@ -27,6 +31,10 @@
 		fields,
 		brandColor,
 		buttonShape,
+		service,
+		slot,
+		bookingDate,
+		teamMember,
 		onSubmit
 	}: {
 		contact: ContactDetails;
@@ -34,17 +42,30 @@
 		fields: BookingContactFields;
 		brandColor: string;
 		buttonShape: string;
-		onSubmit: () => void;
+		service: PublicService;
+		slot: PublicSlot;
+		bookingDate: string;
+		teamMember: PublicTeamMember;
+		onSubmit: (bookingReference: string) => void;
 	} = $props();
 
 	let isChecked = $state<boolean>(false);
+	const queryClient = useQueryClient();
+	const registerMutation = createMutation(() => registerPublicBookingMutationOptions());
 
 	const standardFields = $derived([
 		{
-			key: 'name' as const,
-			label: 'Full name',
+			key: 'firstName' as const,
+			label: 'First name',
 			type: 'text',
-			placeholder: 'Jane Doe',
+			placeholder: 'Jane',
+			...fields.name
+		},
+		{
+			key: 'lastName' as const,
+			label: 'Last name',
+			type: 'text',
+			placeholder: 'Doe',
 			...fields.name
 		},
 		{
@@ -108,7 +129,8 @@
 
 	const schema = $derived(
 		z.object({
-			name: fieldSchema('name', fields.name),
+			firstName: fieldSchema('firstName', fields.name),
+			lastName: fieldSchema('lastName', fields.name),
 			email: fieldSchema('email', fields.email),
 			phone: fieldSchema('phone', fields.phone),
 			address: fieldSchema('address', fields.address),
@@ -124,7 +146,8 @@
 	);
 
 	const payload = $derived.by(() => ({
-		name: contact.name ?? '',
+		firstName: contact.firstName ?? '',
+		lastName: contact.lastName ?? '',
 		email: contact.email ?? '',
 		phone: contact.phone ?? '',
 		address: contact.address ?? '',
@@ -154,6 +177,42 @@
 	});
 
 	const isValid = $derived(validation.valid);
+	const termsRequired = $derived(businessTermsAndCondition.requireTermsAcceptance);
+	const canSubmit = $derived(isValid && !termsRequired ? true : isValid && isChecked);
+	const isPending = $derived(registerMutation.isPending);
+
+	async function handleSubmit() {
+		if (!canSubmit || isPending) return;
+
+		try {
+			const result = await registerMutation.mutateAsync({
+				businessId: business.id,
+				serviceId: service.id,
+				userId: teamMember?.id,
+				bookingDate,
+				bookingStartTime: slot.startTime,
+				bookingEndTime: slot.endTime,
+				contact: {
+					firstName: contact.firstName.trim(),
+					lastName: contact.lastName.trim(),
+					email: contact.email?.trim() || null,
+					phone: contact.phone?.trim() || null,
+					address: contact.address?.trim() || null,
+					customFields: { ...contact.customFields }
+				},
+				termsAccepted: termsRequired ? isChecked : undefined
+			});
+
+			toast.success('Booking confirmed successfully!');
+			await queryClient.invalidateQueries({ queryKey: ['booking-page-details'] });
+			onSubmit(result.bookingId);
+		} catch (error) {
+			const message =
+				(error as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+				'Failed to confirm booking. Please try again.';
+			toast.error(message);
+		}
+	}
 </script>
 
 <div class="flex flex-col gap-4">
@@ -224,7 +283,7 @@
 				? 'rounded-xl'
 				: 'rounded-none'} w-fit text-white"
 		style="background-color:{brandColor}"
-		disabled={!isValid || (businessTermsAndCondition.requireTermsAcceptance ? !isChecked : false)}
-		onclick={onSubmit}>Confirm booking</Button
+		disabled={!canSubmit || isPending}
+		onclick={handleSubmit}>{isPending ? 'Confirming…' : 'Confirm booking'}</Button
 	>
 </div>

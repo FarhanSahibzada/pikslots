@@ -24,7 +24,7 @@ export interface BookingProps {
   //relations
   readonly customerId: string;
   readonly serviceId: string;
-  readonly userId: string;
+  readonly userId: string | null;
 
   // audit
   readonly createdAt: Date;
@@ -46,7 +46,7 @@ export interface CreateBookingInput {
   bookingEndTime: string /** ISO 8601 UTC datetime string, e.g. "2025-06-16T10:00:00.000Z" */;
   businessId: string;
   serviceId: string;
-  userId: string;
+  userId: string | null;
   serviceSnapshot: ServiceSnapshot;
   customerId: string;
   createdBy: string;
@@ -262,7 +262,7 @@ export class Booking {
     return false;
   }
 
-  public isBookedForUser(userId: string) {
+  public isBookedForUser(userId: string | null) {
     return this.userId === userId;
   }
 
@@ -292,7 +292,7 @@ export class Booking {
   get serviceSnapshot(): ServiceSnapshot {
     return this.props.serviceSnapshot;
   }
-  get userId(): string {
+  get userId(): string | null {
     return this.props.userId;
   }
   get label(): string | null {

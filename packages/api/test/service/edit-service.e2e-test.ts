@@ -18,7 +18,7 @@ describe(`PATCH ${SERVICE_ENDPOINTS.UPDATE}`, () => {
     const businessId = await createBusiness(ctx);
     const serviceId = await createService(ctx, { businessId });
 
-    const payload = editServicePayload(businessId, {
+    const payload = await editServicePayload(ctx, businessId, {
       title: 'Updated Service Title',
       cost: 750,
       durationInMins: 55,
@@ -58,7 +58,7 @@ describe(`PATCH ${SERVICE_ENDPOINTS.UPDATE}`, () => {
       .set(
         authHeader(tokenFor(ctx.jwtLoginService, 'Business Owner', businessId)),
       )
-      .send(editServicePayload(businessId))
+      .send(await editServicePayload(ctx, businessId))
       .expect(404);
   });
 
@@ -70,7 +70,7 @@ describe(`PATCH ${SERVICE_ENDPOINTS.UPDATE}`, () => {
 
     await request(ctx.app.getHttpServer())
       .patch(url)
-      .send(editServicePayload(businessId))
+      .send(await editServicePayload(ctx, businessId))
       .expect(401);
   });
 
@@ -83,7 +83,7 @@ describe(`PATCH ${SERVICE_ENDPOINTS.UPDATE}`, () => {
     await request(ctx.app.getHttpServer())
       .patch(url)
       .set(authHeader(tokenFor(ctx.jwtLoginService, 'Enhanced', businessId)))
-      .send(editServicePayload(businessId))
+      .send(await editServicePayload(ctx, businessId))
       .expect(403);
   });
 
@@ -101,8 +101,32 @@ describe(`PATCH ${SERVICE_ENDPOINTS.UPDATE}`, () => {
           tokenFor(ctx.jwtLoginService, 'Business Owner', otherBusinessId),
         ),
       )
-      .send(editServicePayload(ownBusinessId))
+      .send(await editServicePayload(ctx, ownBusinessId))
       .expect(401);
+  });
+
+  it('returns 400 when the edit would remove every assigned team member', async () => {
+    const businessId = await createBusiness(ctx);
+    const serviceId = await createService(ctx, { businessId });
+
+    const url = SERVICE_ENDPOINTS.UPDATE.replace(':serviceId', serviceId);
+    const payload = await editServicePayload(ctx, businessId, {
+      associatedUsers: [],
+    });
+
+    const response = await request(ctx.app.getHttpServer())
+      .patch(url)
+      .set(
+        authHeader(tokenFor(ctx.jwtLoginService, 'Business Owner', businessId)),
+      )
+      .send(payload)
+      .expect(400);
+
+    expect(errorBody(response).statusCode).toBe(400);
+    expect(errorBody(response).message).toContain('associatedUsers');
+
+    const row = await findServiceById(ctx, serviceId);
+    expect(row.title).not.toBe(payload.title);
   });
 
   it('returns 400 for an invalid payload', async () => {

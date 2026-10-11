@@ -130,6 +130,9 @@ export async function registerService(
   colorCode: string;
 }> {
   const title = overrides.title ?? unique('E2E Service');
+  const associatedUsers = overrides.associatedUsers ?? [
+    (await createStaffUser(ctx, businessId, 'Standard')).id,
+  ];
 
   await request(ctx.app.getHttpServer())
     .post(SERVICE_ENDPOINTS.REGISTER)
@@ -141,7 +144,7 @@ export async function registerService(
       durationInMins: 30,
       bufferTimeInMins: 10,
       cost: 2500,
-      associatedUsers: overrides.associatedUsers ?? [],
+      associatedUsers,
       associatedServiceGroups: [],
       businessId,
       isHiddenFromBookingPage: false,

@@ -35,6 +35,7 @@ export class CustomerResponseMapper {
       zipCode: customer.zipCode,
       notes: customer.notes,
       customerSocialLinks: customer.customerSocialLinks,
+      additionalFields: customer.additionalFields,
       profileImageUrl: profile.profileImageUrl,
       businessId: customer.businessId,
     };

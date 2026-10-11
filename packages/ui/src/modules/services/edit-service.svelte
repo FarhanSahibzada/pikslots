@@ -111,6 +111,10 @@
 			onUpdate: async ({ form }) => {
 				let avatarKey = '';
 				if (form.valid && serviceId && businessStore.selectedBusiness?.id) {
+					if (selectedMemberIds.size === 0) {
+						teamError = true;
+						return;
+					}
 					if (imageFile && imageFile.size > 0) {
 						avatarKey = await uploadMutation.mutateAsync({
 							folder: 'service',
@@ -201,6 +205,7 @@
 	let imageFile = $state<File | null>(null);
 	let imagePreview = $state<string | null>(null);
 	let teamSearch = $state('');
+	let teamError = $state(false);
 	let DialogOpen = $state<boolean>(false);
 	let fileInput: HTMLInputElement | undefined = $state();
 
@@ -221,6 +226,10 @@
 			imageFile ||
 			hasTeamChanges
 	);
+
+	const showTeamRequired = $derived(selectedMemberIds.size === 0 && (teamError || hasTeamChanges));
+
+	const canSaveWithTeam = $derived(canSave && selectedMemberIds.size > 0);
 
 	const isSaving = $derived(
 		uploadMutation.isPending || updateMutation.isPending || updateServiceAvatarMutation.isPending
@@ -248,6 +257,7 @@
 	function toggleMember(id: string) {
 		if (selectedMemberIds.has(id)) selectedMemberIds.delete(id);
 		else selectedMemberIds.add(id);
+		teamError = false;
 	}
 
 	function toggleAll() {
@@ -256,6 +266,7 @@
 		} else {
 			for (const m of teamMembers) selectedMemberIds.add(m.id);
 		}
+		teamError = false;
 	}
 
 	function HandleOnSave(file: File | null) {
@@ -318,7 +329,7 @@
 				</button>
 				<span class="text-base font-semibold">Edit service</span>
 			</div>
-			<Button type="submit" size="sm" disabled={!canSave || isSaving}>
+			<Button type="submit" size="sm" disabled={!canSaveWithTeam || isSaving}>
 				{updateMutation.isPending ? 'Saving...' : 'Save'}
 			</Button>
 		</div>
@@ -567,6 +578,9 @@
 						Team <span class="text-destructive">*</span>
 					</h3>
 					<p class="mt-0.5 text-xs text-muted-foreground">Who will provide this service?</p>
+					{#if showTeamRequired}
+						<FieldError errors={[{ message: 'Select at least one team member' }]} />
+					{/if}
 				</div>
 
 				<!-- Team search -->
