@@ -36,7 +36,12 @@
 			href: '/home/services/new',
 			roles: privilegedRoles
 		},
-		{ label: 'Add customer', icon: UserPlus, href: '/home/customers?add=true', roles: privilegedRoles },
+		{
+			label: 'Add customer',
+			icon: UserPlus,
+			href: '/home/customers?add=true',
+			roles: privilegedRoles
+		},
 		{
 			label: 'Create class',
 			icon: School,
