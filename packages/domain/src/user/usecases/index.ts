@@ -11,4 +11,5 @@ export * from './accept.invite.usecase.ts';
 export * from './find.all.users.inside.business.usecase.ts';
 export * from './get.free.slots.for.user.ts';
 export * from './update.user.avatar.usecase.ts';
+export * from './update.user.profile.usecase.ts';
 export * from './get.available.dates.for.booking.usecase.ts';

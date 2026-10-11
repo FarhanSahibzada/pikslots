@@ -3,13 +3,15 @@ import type {
   InfrastructureError,
   ServiceNotFoundError,
   UnauthorizedError,
+  ValidationError,
 } from '@pikslots/domain';
 import { PikslotsBaseErrorResponse } from 'src/shared/types/base.error.response';
 
 type ServiceError =
   | ServiceNotFoundError
   | UnauthorizedError
-  | InfrastructureError;
+  | InfrastructureError
+  | ValidationError;
 
 const serviceErrorMap: Record<
   ServiceError['kind'],
@@ -19,6 +21,8 @@ const serviceErrorMap: Record<
     new PikslotsBaseErrorResponse(error.message, HttpStatus.NOT_FOUND),
   unauthorized: (error) =>
     new PikslotsBaseErrorResponse(error.message, HttpStatus.UNAUTHORIZED),
+  validation: (error) =>
+    new PikslotsBaseErrorResponse(error.message, HttpStatus.BAD_REQUEST),
   infrastructure: () =>
     new PikslotsBaseErrorResponse(
       'Something went wrong. Please try again later.',

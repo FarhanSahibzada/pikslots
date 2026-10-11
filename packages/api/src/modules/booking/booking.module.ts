@@ -13,5 +13,6 @@ import { BookingController } from './booking.controller';
     ...BOOKING_USECASES,
     { useClass: BookingRepositoryImpl, provide: IBookingRepository },
   ],
+  exports: [IBookingRepository],
 })
 export class BookingModule {}

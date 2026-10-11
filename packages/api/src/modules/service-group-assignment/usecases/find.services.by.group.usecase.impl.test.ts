@@ -44,9 +44,18 @@ describe('FindServicesByGroupUseCaseImpl', () => {
       if (result.ok) {
         expect(result.value).toEqual(
           expect.arrayContaining([
-            { id: 'service-haircut-1', title: 'Haircut' },
-            { id: 'service-color-1', title: 'Hair Coloring' },
-            { id: 'service-manicure-1', title: 'Manicure' },
+            expect.objectContaining({
+              id: 'service-haircut-1',
+              title: 'Haircut',
+            }),
+            expect.objectContaining({
+              id: 'service-color-1',
+              title: 'Hair Coloring',
+            }),
+            expect.objectContaining({
+              id: 'service-manicure-1',
+              title: 'Manicure',
+            }),
           ]),
         );
         expect(result.value).toHaveLength(3);

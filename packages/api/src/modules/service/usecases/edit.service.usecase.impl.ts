@@ -15,6 +15,7 @@ import type {
   ServiceRepository,
   ServiceNotFoundError,
   UnauthorizedError,
+  ValidationError,
 } from '@pikslots/domain';
 import { SecurityContext } from 'src/shared/security/context/security.context';
 import { InjectQueue } from '@nestjs/bullmq';
@@ -28,6 +29,13 @@ import {
 const UNAUTHORIZED_ERROR: UnauthorizedError = {
   kind: 'unauthorized',
   message: 'Can not edit service : unauthorized!!!',
+  timestamp: new Date(),
+};
+
+const NO_TEAM_MEMBER_ERROR: ValidationError = {
+  kind: 'validation',
+  message:
+    'A service must always have at least one assigned team member. Assign a team member before saving.',
   timestamp: new Date(),
 };
 
@@ -57,7 +65,13 @@ export class EditServiceUseCaseImpl implements EditServiceUseCase {
   async execute(
     command: EditServiceCommand,
   ): Promise<
-    Result<void, ServiceNotFoundError | UnauthorizedError | InfrastructureError>
+    Result<
+      void,
+      | ServiceNotFoundError
+      | UnauthorizedError
+      | InfrastructureError
+      | ValidationError
+    >
   > {
     const callerRole = this.securityContext.role;
     const callerBusinessId = this.securityContext.businessId;
@@ -79,6 +93,8 @@ export class EditServiceUseCaseImpl implements EditServiceUseCase {
         value: command.id,
       } satisfies ServiceNotFoundError);
     }
+
+    if (command.associatedUsers.length === 0) return err(NO_TEAM_MEMBER_ERROR);
 
     const updated = found.value.update({
       title: command.title,

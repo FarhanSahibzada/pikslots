@@ -20,6 +20,7 @@ export interface RegisterCustomerInput {
   zipCode: string | null;
   notes: string | null;
   customerSocialLinks: CustomerSocialLinks;
+  additionalFields?: Record<string, string> | null;
   businessId: string;
 }
 
@@ -43,11 +44,16 @@ export interface EditCustomerInput {
   businessId: string;
 }
 
+export interface DebounceCustomerSearchByBusinessRequest {
+  searchString: string;
+}
+
 // --- Responses ---
 export interface PartialCustomerResponse {
   id: string;
   firstName: string;
   lastName: string;
+  email: string | null;
   profileImageUrl: string | null;
 }
 
@@ -68,6 +74,7 @@ export interface FullCustomerResponse {
   zipCode: string | null;
   notes: string | null;
   customerSocialLinks: CustomerSocialLinks;
+  additionalFields: Record<string, string> | null;
   businessId: string;
 }
 
@@ -76,6 +83,8 @@ export interface RegisterCustomerResponse {
 }
 
 export type FindAllCustomersByBusinessResponse = PartialCustomerResponse[];
+
+export type DebounceCustomerSearchByBusinessResponse = PartialCustomerResponse[];
 
 export interface EditCustomerResponse {
   message: 'success';

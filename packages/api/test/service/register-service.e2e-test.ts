@@ -59,6 +59,34 @@ describe(`POST ${SERVICE_ENDPOINTS.REGISTER}`, () => {
       .expect(201);
   });
 
+  it('returns 400 when no team member is assigned', async () => {
+    const businessId = await createBusiness(ctx);
+    const payload = await registerPayload(ctx, {
+      businessId,
+      associatedUsers: [],
+    });
+
+    const response = await request(ctx.app.getHttpServer())
+      .post(SERVICE_ENDPOINTS.REGISTER)
+      .set(
+        authHeader(tokenFor(ctx.jwtLoginService, 'Business Owner', businessId)),
+      )
+      .send(payload)
+      .expect(400);
+
+    expect(errorBody(response).statusCode).toBe(400);
+    expect(errorBody(response).message).toContain('associatedUsers');
+
+    const row = await ctx.db
+      .selectFrom('services')
+      .select('id')
+      .where('business_id', '=', businessId)
+      .where('title', '=', payload.title)
+      .executeTakeFirst();
+
+    expect(row).toBeUndefined();
+  });
+
   it('returns 400 for an invalid payload', async () => {
     const businessId = await createBusiness(ctx);
 

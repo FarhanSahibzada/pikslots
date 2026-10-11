@@ -233,12 +233,28 @@ export class ServiceUserAssignmentRepositoryImpl implements ServiceUserAssignmen
       const rows = await this.db
         .selectFrom('service_user_assignments as sua')
         .innerJoin('services as s', 's.id', 'sua.service_id')
-        .select(['s.id', 's.title'])
+        .select([
+          's.id',
+          's.title',
+          's.duration_in_mins',
+          's.buffer_time_in_mins',
+          's.cost',
+          's.color_code',
+        ])
         .where('sua.user_id', '=', userId)
         .where('sua.is_deleted', '=', false)
         .execute();
 
-      return ok(rows.map((r) => ({ id: r.id, title: r.title })));
+      return ok(
+        rows.map((r) => ({
+          id: r.id,
+          title: r.title,
+          durationInMins: r.duration_in_mins,
+          bufferTimeInMins: r.buffer_time_in_mins,
+          cost: r.cost,
+          colorCode: r.color_code,
+        })),
+      );
     } catch (cause) {
       return err<InfrastructureError>({
         kind: 'infrastructure',

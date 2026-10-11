@@ -139,7 +139,9 @@ export async function registerService(
       cost: 2500,
       businessId,
       isHiddenFromBookingPage: overrides.isHiddenFromBookingPage ?? false,
-      associatedUsers: overrides.associatedUsers ?? [],
+      associatedUsers: overrides.associatedUsers ?? [
+        await createTeamMember(ctx, businessId),
+      ],
       associatedServiceGroups: overrides.associatedServiceGroups ?? [],
       colorCode: '#F54927',
     })

@@ -21,6 +21,8 @@ export class BookingPersistenceMapper {
       customerId: row.customer_id,
       userId: row.user_id,
       serviceSnapshot: row.service_snapshot,
+      label: row.label ?? null,
+      notes: row.notes ?? null,
       ...persistenceAuditToDomain(row),
     });
   }
@@ -37,6 +39,8 @@ export class BookingPersistenceMapper {
       customer_id: booking.customerId,
       user_id: booking.userId,
       service_snapshot: booking.serviceSnapshot,
+      label: booking.label,
+      notes: booking.notes,
       ...domainAuditToPersistence(booking),
     };
   }

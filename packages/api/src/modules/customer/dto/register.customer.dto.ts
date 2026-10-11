@@ -102,6 +102,16 @@ export class RegisterCustomerDto implements RegisterCustomerInput {
   @IsObject()
   customerSocialLinks: Record<SocialPlatforms, string>;
 
+  @ApiProperty({
+    example: { 'Preferred stylist': 'Bob' },
+    description: 'Public-booking custom-field answers keyed by field label',
+    nullable: true,
+    required: false,
+  })
+  @IsOptional()
+  @IsObject()
+  additionalFields?: Record<string, string> | null;
+
   @ApiProperty({ example: '01932b4a-5f3c-7e1d-b2a8-3c9d4e5f6a7b' })
   @IsUUID('7')
   businessId: string;

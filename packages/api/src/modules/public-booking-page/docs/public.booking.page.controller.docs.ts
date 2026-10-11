@@ -1,6 +1,7 @@
 import { HttpStatus, applyDecorators } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { PikslotsBaseErrorResponse } from 'src/shared/types/base.error.response';
+import { RegisterPublicBookingDto } from '../dto/register.public.booking.dto';
 
 export const GetPublicBookingPageDetailsDocs = () =>
   applyDecorators(
@@ -137,6 +138,46 @@ export const GetPublicBookingPageDetailsDocs = () =>
     ApiResponse({
       status: HttpStatus.NOT_FOUND,
       description: 'Public booking page not found',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.INTERNAL_SERVER_ERROR,
+      description: 'Infrastructure failure',
+      type: PikslotsBaseErrorResponse,
+    }),
+  );
+
+export const RegisterPublicBookingDocs = () =>
+  applyDecorators(
+    ApiOperation({
+      summary: 'Register a public (guest) booking from the booking page',
+    }),
+    ApiBody({ type: RegisterPublicBookingDto }),
+    ApiResponse({
+      status: HttpStatus.CREATED,
+      description: 'Public booking registered successfully',
+      schema: {
+        example: {
+          data: { message: 'success', bookingId: 'BK3KX9M2P' },
+          statusCode: 201,
+          timestamp: '2026-01-01T00:00:00.000Z',
+        },
+      },
+    }),
+    ApiResponse({
+      status: HttpStatus.NOT_FOUND,
+      description: 'Service or customer not found',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.CONFLICT,
+      description:
+        'A booking already exists for this time slot, or customer already exists',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.UNAUTHORIZED,
+      description: 'Assigned team member is not part of this business',
       type: PikslotsBaseErrorResponse,
     }),
     ApiResponse({

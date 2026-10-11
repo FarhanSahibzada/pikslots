@@ -122,6 +122,10 @@ export class ServiceUserAssignmentRepositoryTestImpl implements ServiceUserAssig
         .map((a) => ({
           id: a.serviceId,
           title: `Service ${a.serviceId}`,
+          durationInMins: 30,
+          bufferTimeInMins: 10,
+          cost: 2500,
+          colorCode: '#F54927',
         })),
     );
   }

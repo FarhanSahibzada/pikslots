@@ -52,6 +52,11 @@ describe(`GET ${BOOKING_ENDPOINTS.FIND_ALL_BY_BUSINESS_FOR_USER}`, () => {
       businessId,
       userId,
       token,
+      {
+        startDateTime: '2026-08-01',
+        endDateTime: '2026-08-31',
+        timezone: 'UTC',
+      },
     );
 
     expect(response.status).toBe(200);
@@ -59,7 +64,7 @@ describe(`GET ${BOOKING_ENDPOINTS.FIND_ALL_BY_BUSINESS_FOR_USER}`, () => {
     expect(data).toHaveLength(1);
   });
 
-  it('returns bookings for every user in the business when called by a Business Owner (elevated-role path)', async () => {
+  it('returns only the specified user bookings when called by a Business Owner', async () => {
     const businessId = await createOwningBusiness(ctx);
     const owner = await createStaffUser(ctx, businessId, 'Business Owner');
     const { id: userId } = await createStaffUser(ctx, businessId, 'Standard');
@@ -74,6 +79,7 @@ describe(`GET ${BOOKING_ENDPOINTS.FIND_ALL_BY_BUSINESS_FOR_USER}`, () => {
     await createBooking(
       ctx,
       registerBookingPayload(businessId, serviceId, userId, customerId, {
+        bookingDate: '2026-08-02',
         bookingStartTime: '2026-08-02T09:00:00.000Z',
         bookingEndTime: '2026-08-02T09:30:00.000Z',
       }),
@@ -82,6 +88,7 @@ describe(`GET ${BOOKING_ENDPOINTS.FIND_ALL_BY_BUSINESS_FOR_USER}`, () => {
     await createBooking(
       ctx,
       registerBookingPayload(businessId, serviceId, otherUserId, customerId, {
+        bookingDate: '2026-08-02',
         bookingStartTime: '2026-08-02T10:00:00.000Z',
         bookingEndTime: '2026-08-02T10:30:00.000Z',
       }),
@@ -91,14 +98,19 @@ describe(`GET ${BOOKING_ENDPOINTS.FIND_ALL_BY_BUSINESS_FOR_USER}`, () => {
     const response = await findAllBookingsByBusinessForUser(
       ctx,
       businessId,
-      userId, // scope param is ignored for elevated roles
+      userId,
       tokenForRole(ctx, 'Business Owner', businessId, owner.id),
+      {
+        startDateTime: '2026-08-01',
+        endDateTime: '2026-08-31',
+        timezone: 'UTC',
+      },
     );
 
     expect(response.status).toBe(200);
     const data = successBody<Record<string, unknown>[]>(response).data;
-    // active bookings from BOTH users, not just `userId`
-    expect(data).toHaveLength(2);
+    // only the userId's booking, not otherUserId's
+    expect(data).toHaveLength(1);
   });
 
   it('returns an empty array for a user with no bookings', async () => {
@@ -110,6 +122,11 @@ describe(`GET ${BOOKING_ENDPOINTS.FIND_ALL_BY_BUSINESS_FOR_USER}`, () => {
       businessId,
       userId,
       tokenForRole(ctx, 'Standard', businessId, userId),
+      {
+        startDateTime: '2026-08-01',
+        endDateTime: '2026-08-31',
+        timezone: 'UTC',
+      },
     );
 
     expect(response.status).toBe(200);
@@ -126,6 +143,11 @@ describe(`GET ${BOOKING_ENDPOINTS.FIND_ALL_BY_BUSINESS_FOR_USER}`, () => {
       businessId,
       userId,
       tokenForRole(ctx, 'Standard', businessId, otherUser.id),
+      {
+        startDateTime: '2026-08-01',
+        endDateTime: '2026-08-31',
+        timezone: 'UTC',
+      },
     );
 
     expect(response.status).toBe(401);
@@ -142,6 +164,11 @@ describe(`GET ${BOOKING_ENDPOINTS.FIND_ALL_BY_BUSINESS_FOR_USER}`, () => {
       businessId,
       userId,
       tokenForRole(ctx, 'Admin', otherBusinessId, randomUUID()),
+      {
+        startDateTime: '2026-08-01',
+        endDateTime: '2026-08-31',
+        timezone: 'UTC',
+      },
     );
 
     expect(response.status).toBe(401);
@@ -180,6 +207,11 @@ describe(`GET ${BOOKING_ENDPOINTS.FIND_ALL_BY_BUSINESS_FOR_USER}`, () => {
         businessId,
         userId,
         token,
+        {
+          startDateTime: '2026-06-01',
+          endDateTime: '2026-06-30',
+          timezone: 'UTC',
+        },
       );
 
       expect(response.status).toBe(200);

@@ -47,6 +47,25 @@ export interface EditPayloadOverrides {
 export async function createOwnerUser(
   ctx: ServiceTestContext,
 ): Promise<string> {
+  return insertTestUser(ctx, null, 'Business Owner', 'E2E', 'Owner');
+}
+
+// A real user row inside the business, required so a service can be
+// registered/edited with at least one assigned team member.
+export async function createTeamMember(
+  ctx: ServiceTestContext,
+  businessId: string,
+): Promise<string> {
+  return insertTestUser(ctx, businessId, 'Standard', 'E2E', 'Member');
+}
+
+async function insertTestUser(
+  ctx: ServiceTestContext,
+  businessId: string | null,
+  role: 'Business Owner' | 'Standard',
+  firstName: string,
+  lastName: string,
+): Promise<string> {
   const id = randomUUID();
   const suffix = randomUUID().replace(/-/g, '').slice(0, 16);
 
@@ -54,14 +73,14 @@ export async function createOwnerUser(
     .insertInto('users')
     .values({
       id,
-      business_id: null,
+      business_id: businessId,
       username: `e2e${suffix}`,
       password: 'e2e-unused-password-hash',
-      first_name: 'E2E',
-      last_name: 'Owner',
+      first_name: firstName,
+      last_name: lastName,
       email: `${suffix}@example.com`,
       phone: null,
-      role: 'Business Owner',
+      role,
       status: 'active',
       avatar_url: null,
       email_verified: true,
@@ -121,8 +140,13 @@ export async function registerPayload(
   ctx: ServiceTestContext,
   overrides: RegisterPayloadOverrides = {},
 ) {
+  const businessId = overrides.businessId ?? (await createBusiness(ctx));
+  const associatedUsers = overrides.associatedUsers ?? [
+    await createTeamMember(ctx, businessId),
+  ];
+
   return {
-    businessId: overrides.businessId ?? (await createBusiness(ctx)),
+    businessId,
     title: overrides.title ?? 'Afaq Dentists',
     bufferTimeInMins: overrides.bufferTimeInMins ?? 12,
     colorCode: overrides.colorCode ?? ' #b30000',
@@ -131,7 +155,7 @@ export async function registerPayload(
     durationInMins: overrides.durationInMins ?? 40,
     isHiddenFromBookingPage: overrides.isHiddenFromBookingPage ?? false,
     serviceAvatar: overrides.serviceAvatar ?? '',
-    associatedUsers: overrides.associatedUsers ?? [],
+    associatedUsers,
     associatedServiceGroups: overrides.associatedServiceGroups ?? [],
   };
 }
@@ -167,10 +191,15 @@ export async function createService(
 }
 
 // A full PATCH /services/:serviceId body
-export function editServicePayload(
+export async function editServicePayload(
+  ctx: ServiceTestContext,
   businessId: string,
   overrides: EditPayloadOverrides = {},
 ) {
+  const associatedUsers = overrides.associatedUsers ?? [
+    await createTeamMember(ctx, businessId),
+  ];
+
   return {
     businessId,
     title: overrides.title ?? 'Updated Service Title',
@@ -181,7 +210,7 @@ export function editServicePayload(
     durationInMins: overrides.durationInMins ?? 60,
     isHiddenFromBookingPage: overrides.isHiddenFromBookingPage ?? true,
     serviceAvatar: overrides.serviceAvatar ?? '',
-    associatedUsers: overrides.associatedUsers ?? [],
+    associatedUsers,
     associatedServiceGroups: overrides.associatedServiceGroups ?? [],
   };
 }

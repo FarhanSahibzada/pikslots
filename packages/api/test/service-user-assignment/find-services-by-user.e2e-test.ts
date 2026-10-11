@@ -20,7 +20,14 @@ describe(`GET ${SERVICE_USER_ASSIGNMENT_ENDPOINTS.FIND_SERVICES_BY_USER}`, () =>
 
   it('returns a service assigned via the direct assign endpoint', async () => {
     const { id: businessId } = await createBusiness(ctx);
-    const { id: serviceId, title } = await registerService(ctx, businessId);
+    const {
+      id: serviceId,
+      title,
+      durationInMins,
+      bufferTimeInMins,
+      cost,
+      colorCode,
+    } = await registerService(ctx, businessId);
     const { id: userId } = await createStaffUser(ctx, businessId, 'Standard');
     const token = tokenForRole(ctx, 'Admin', businessId);
     await createAssignment(ctx, { serviceId, userId, businessId }, token);
@@ -28,13 +35,29 @@ describe(`GET ${SERVICE_USER_ASSIGNMENT_ENDPOINTS.FIND_SERVICES_BY_USER}`, () =>
     const response = await findServicesByUser(ctx, userId, token);
 
     expect(response.status).toBe(200);
-    expect(successBody(response).data).toEqual([{ id: serviceId, title }]);
+    expect(successBody(response).data).toEqual([
+      {
+        id: serviceId,
+        title,
+        durationInMins,
+        bufferTimeInMins,
+        cost,
+        colorCode,
+      },
+    ]);
   });
 
   it('returns a service assigned via registering it with associatedUsers, once the real worker processes it', async () => {
     const { id: businessId } = await createBusiness(ctx);
     const { id: userId } = await createStaffUser(ctx, businessId, 'Standard');
-    const { id: serviceId, title } = await registerService(ctx, businessId, {
+    const {
+      id: serviceId,
+      title,
+      durationInMins,
+      bufferTimeInMins,
+      cost,
+      colorCode,
+    } = await registerService(ctx, businessId, {
       associatedUsers: [userId],
     });
 
@@ -47,7 +70,16 @@ describe(`GET ${SERVICE_USER_ASSIGNMENT_ENDPOINTS.FIND_SERVICES_BY_USER}`, () =>
     );
 
     expect(response.status).toBe(200);
-    expect(successBody(response).data).toEqual([{ id: serviceId, title }]);
+    expect(successBody(response).data).toEqual([
+      {
+        id: serviceId,
+        title,
+        durationInMins,
+        bufferTimeInMins,
+        cost,
+        colorCode,
+      },
+    ]);
   });
 
   it('returns an empty array for a user with no assigned services', async () => {
@@ -86,8 +118,22 @@ describe(`GET ${SERVICE_USER_ASSIGNMENT_ENDPOINTS.FIND_SERVICES_BY_USER}`, () =>
     expect(response.status).toBe(200);
     expect(successBody(response).data).toEqual(
       expect.arrayContaining([
-        { id: serviceA.id, title: serviceA.title },
-        { id: serviceB.id, title: serviceB.title },
+        {
+          id: serviceA.id,
+          title: serviceA.title,
+          durationInMins: serviceA.durationInMins,
+          bufferTimeInMins: serviceA.bufferTimeInMins,
+          cost: serviceA.cost,
+          colorCode: serviceA.colorCode,
+        },
+        {
+          id: serviceB.id,
+          title: serviceB.title,
+          durationInMins: serviceB.durationInMins,
+          bufferTimeInMins: serviceB.bufferTimeInMins,
+          cost: serviceB.cost,
+          colorCode: serviceB.colorCode,
+        },
       ]),
     );
     expect(successBody(response).data).toHaveLength(2);
@@ -138,11 +184,16 @@ describe(`GET ${SERVICE_USER_ASSIGNMENT_ENDPOINTS.FIND_SERVICES_BY_USER}`, () =>
         businessB,
         'Standard',
       );
-      const { id: serviceIdInB, title } = await registerService(
-        ctx,
-        businessB,
-        { associatedUsers: [userIdInB] },
-      );
+      const {
+        id: serviceIdInB,
+        title,
+        durationInMins,
+        bufferTimeInMins,
+        cost,
+        colorCode,
+      } = await registerService(ctx, businessB, {
+        associatedUsers: [userIdInB],
+      });
       await waitForActiveAssignmentCountByUser(ctx, userIdInB, 1);
 
       // Caller is an Admin of business A, asking about a user who belongs
@@ -155,7 +206,16 @@ describe(`GET ${SERVICE_USER_ASSIGNMENT_ENDPOINTS.FIND_SERVICES_BY_USER}`, () =>
 
       expect(response.status).toBe(200);
       // Documents the leak: business A's Admin sees business B's service.
-      expect(successBody(response).data).toEqual([{ id: serviceIdInB, title }]);
+      expect(successBody(response).data).toEqual([
+        {
+          id: serviceIdInB,
+          title,
+          durationInMins,
+          bufferTimeInMins,
+          cost,
+          colorCode,
+        },
+      ]);
     });
   });
 });

@@ -121,8 +121,18 @@ export async function registerService(
   ctx: ServiceUserAssignmentTestContext,
   businessId: string,
   overrides: RegisterServiceOverrides = {},
-): Promise<{ id: string; title: string }> {
+): Promise<{
+  id: string;
+  title: string;
+  durationInMins: number;
+  bufferTimeInMins: number;
+  cost: number;
+  colorCode: string;
+}> {
   const title = overrides.title ?? unique('E2E Service');
+  const associatedUsers = overrides.associatedUsers ?? [
+    (await createStaffUser(ctx, businessId, 'Standard')).id,
+  ];
 
   await request(ctx.app.getHttpServer())
     .post(SERVICE_ENDPOINTS.REGISTER)
@@ -134,7 +144,7 @@ export async function registerService(
       durationInMins: 30,
       bufferTimeInMins: 10,
       cost: 2500,
-      associatedUsers: overrides.associatedUsers ?? [],
+      associatedUsers,
       associatedServiceGroups: [],
       businessId,
       isHiddenFromBookingPage: false,
@@ -144,12 +154,25 @@ export async function registerService(
 
   const row = await ctx.db
     .selectFrom('services')
-    .select('id')
+    .select([
+      'id',
+      'duration_in_mins',
+      'buffer_time_in_mins',
+      'cost',
+      'color_code',
+    ])
     .where('title', '=', title)
     .where('business_id', '=', businessId)
     .executeTakeFirstOrThrow();
 
-  return { id: row.id, title };
+  return {
+    id: row.id,
+    title,
+    durationInMins: row.duration_in_mins,
+    bufferTimeInMins: row.buffer_time_in_mins,
+    cost: row.cost,
+    colorCode: row.color_code,
+  };
 }
 
 export interface EditServiceOverrides {

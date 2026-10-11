@@ -77,6 +77,8 @@ export class RegisterBookingUseCaseImpl implements RegisterBookingUseCase {
       serviceSnapshot: command.serviceSnapshot,
       customerId: command.customerId,
       createdBy: command.createdBy,
+      label: command.label ?? null,
+      notes: command.notes ?? null,
     });
 
     const saved = await this.bookingRepository.save(booking);

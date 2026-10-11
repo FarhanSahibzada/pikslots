@@ -109,6 +109,21 @@ export interface UpdateUserAvatarResponse {
   message: 'success';
 }
 
+// --- Update Profile ---
+
+export interface UpdateUserProfileInput {
+  userId?: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
+  email: string;
+  role?: UserRole;
+}
+
+export interface UpdateUserProfileResponse {
+  message: 'success';
+}
+
 // --- Working Hours ---
 
 export interface UserDayHours {

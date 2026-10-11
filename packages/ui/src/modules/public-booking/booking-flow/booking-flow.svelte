@@ -16,6 +16,7 @@
 		PublicSlot,
 		PublicTeamMember
 	} from '../types';
+	import FlowerFilled from '@tabler/icons-svelte/icons/flower-filled';
 
 	let {
 		flow,
@@ -33,7 +34,7 @@
 		onClose: () => void;
 	} = $props();
 
-	const teamStep = $derived(resolveTeamStep(business, teamMembers));
+	const teamStep = $derived(resolveTeamStep(business, teamMembers, flow.selectedService));
 
 	// Both entry points (picking a service directly, or picking a team member
 	// first) route through the 'team-member' step — auto-advance past it here
@@ -52,6 +53,7 @@
 			: serviceGroups
 	);
 
+	/** filter ungroupedServices */
 	const filterUngroupedServices = $derived(
 		flow.selectedTeamMember?.serviceIds && flow.selectedTeamMember.serviceIds.length > 0
 			? ungroupedService.filter((service) =>
@@ -60,13 +62,24 @@
 			: ungroupedService
 	);
 
+	/**
+	 * filter unrealted team member with selected service
+	 */
+	const filterTeamMember = $derived(
+		flow.selectedService && flow.selectedService.id
+			? teamMembers.filter((member) => member.serviceIds?.includes(flow.selectedService!.id))
+			: null
+	);
+
 	const selectedMemberName = $derived(
 		flow.selectedTeamMember
 			? `${flow.selectedTeamMember.name.firstName} ${flow.selectedTeamMember.name.lastName}`
 			: ''
 	);
 
-	const memberHasNoServices = $derived(!flow.selectedTeamMember?.serviceIds?.length);
+	const memberHasNoServices = $derived(
+		!!flow.selectedTeamMember && !flow.selectedTeamMember?.serviceIds?.length
+	);
 
 	function handleServiceSelected(service: PublicService) {
 		flow.selectedService = service;
@@ -83,6 +96,11 @@
 			flow.goTo('datetime');
 		}
 	}
+
+	$effect(() => {
+		console.log('selected team member', flow.selectedTeamMember);
+		console.log('selected service ', flow.selectedService);
+	});
 
 	/** parse user (team member) services */
 	function handleTeamMemberServices(
@@ -104,8 +122,8 @@
 		flow.goTo('contact');
 	}
 
-	function handleContactSubmit() {
-		flow.bookingReference = `BK${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+	function handleContactSubmit(bookingReference: string) {
+		flow.bookingReference = bookingReference;
 		flow.goTo('confirmation');
 	}
 
@@ -175,7 +193,7 @@
 		{/if}
 	{:else if flow.step === 'team-member'}
 		<SelectTeamMemberStep
-			{teamMembers}
+			teamMembers={filterTeamMember ? filterTeamMember : teamMembers}
 			{business}
 			label={business.bookingLabelOverrides.teamMember}
 			unavailable={!business.bookingSetup.bookAppointmentSectionVisible}
@@ -192,7 +210,7 @@
 			{business}
 			onSelect={handleDatetimeSelected}
 		/>
-	{:else if flow.step === 'contact'}
+	{:else if flow.step === 'contact' && flow.selectedService && flow.selectedSlot && flow.selectedDate && flow.selectedTeamMember}
 		<ContactDetailsStep
 			contact={flow.contact}
 			{business}
@@ -200,6 +218,10 @@
 			onSubmit={handleContactSubmit}
 			brandColor={business.brandApperanceDetails.brandColor}
 			buttonShape={business.brandApperanceDetails.brandButtonShape}
+			service={flow.selectedService}
+			slot={flow.selectedSlot}
+			bookingDate={flow.selectedDate}
+			teamMember={flow.selectedTeamMember}
 		/>
 	{:else if flow.step === 'confirmation' && flow.selectedService && flow.selectedSlot && flow.bookingReference}
 		<ConfirmationStep

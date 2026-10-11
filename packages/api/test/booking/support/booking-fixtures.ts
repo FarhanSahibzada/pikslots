@@ -134,6 +134,7 @@ export interface ServiceSnapshotOverrides {
   title?: string;
   durationInMins?: number;
   cost?: number;
+  colorCode?: string;
 }
 
 export function serviceSnapshotPayload(
@@ -143,6 +144,7 @@ export function serviceSnapshotPayload(
     title: overrides.title ?? 'Haircut',
     durationInMins: overrides.durationInMins ?? 30,
     cost: overrides.cost ?? 2500,
+    colorCode: overrides.colorCode ?? '#0d9488',
   };
 }
 
@@ -151,6 +153,8 @@ export interface BookingPayloadOverrides {
   bookingStartTime?: string;
   bookingEndTime?: string;
   serviceSnapshot?: ServiceSnapshotOverrides;
+  label?: string;
+  notes?: string;
 }
 
 /**
@@ -179,6 +183,8 @@ export function registerBookingPayload(
     userId,
     customerId,
     serviceSnapshot: serviceSnapshotPayload(overrides.serviceSnapshot),
+    ...(overrides.label ? { label: overrides.label } : {}),
+    ...(overrides.notes ? { notes: overrides.notes } : {}),
   };
 }
 
@@ -244,14 +250,21 @@ export async function findAllBookingsByBusinessForUser(
   businessId: string,
   userId: string,
   actorToken: string,
+  query?: { startDateTime?: string; endDateTime?: string; timezone?: string },
 ): Promise<SupertestResponse> {
+  const qs = new URLSearchParams();
+  if (query?.startDateTime) qs.set('startDateTime', query.startDateTime);
+  if (query?.endDateTime) qs.set('endDateTime', query.endDateTime);
+  if (query?.timezone) qs.set('timezone', query.timezone);
+
+  const queryString = qs.toString();
+  const path = endpointFor(BOOKING_ENDPOINTS.FIND_ALL_BY_BUSINESS_FOR_USER, {
+    businessId,
+    userId,
+  });
+
   return request(ctx.app.getHttpServer())
-    .get(
-      endpointFor(BOOKING_ENDPOINTS.FIND_ALL_BY_BUSINESS_FOR_USER, {
-        businessId,
-        userId,
-      }),
-    )
+    .get(queryString ? `${path}?${queryString}` : path)
     .set(authHeader(actorToken));
 }
 
@@ -262,6 +275,8 @@ export interface EditBookingPayloadOverrides {
   serviceId?: string;
   customerId?: string;
   userId?: string;
+  label?: string;
+  notes?: string;
 }
 
 export function editBookingPayload(
@@ -282,6 +297,8 @@ export function editBookingPayload(
     serviceId: overrides.serviceId ?? base.serviceId,
     customerId: overrides.customerId ?? base.customerId,
     userId: overrides.userId ?? base.userId,
+    ...(overrides.label ? { label: overrides.label } : {}),
+    ...(overrides.notes ? { notes: overrides.notes } : {}),
   };
 }
 

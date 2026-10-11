@@ -125,6 +125,10 @@ export class ServiceGroupAssignmentRepositoryTestImpl implements ServiceGroupAss
     ).map((a) => ({
       id: a.serviceId,
       title: SERVICE_TITLE_LOOKUP[a.serviceId] ?? '',
+      durationInMins: 30,
+      bufferTimeInMins: 10,
+      cost: 2500,
+      colorCode: '#F54927',
     }));
     return ok(services);
   }

@@ -11,8 +11,10 @@ export interface BookingTable extends AuditFields {
   business_id: string; // fk → businesses.id
   service_id: string; // fk → services.id
   customer_id: string; // fk → customers.id
-  user_id: string; // fk → users.id
+  user_id: string | null; // fk → users.id (null = unassigned public booking)
   service_snapshot: ServiceSnapshot; // jsonb — frozen copy at booking time
+  label: string | null; // booking label (e.g. Confirmed, Pending)
+  notes: string | null; // optional notes for the booking
 }
 
 export type BookingTableSelect = Selectable<BookingTable>;

@@ -89,6 +89,8 @@ export class EditBookingUseCaseImpl implements EditBookingUseCase {
       customerId: command.customerId,
       userId: command.userId,
       updatedBy: command.updatedBy,
+      label: command.label ?? null,
+      notes: command.notes ?? null,
     });
 
     const saved = await this.bookingRepository.update(updated);

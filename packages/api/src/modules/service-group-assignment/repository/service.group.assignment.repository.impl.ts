@@ -29,12 +29,28 @@ export class ServiceGroupAssignmentRepositoryImpl implements ServiceGroupAssignm
       const rows = await this.db
         .selectFrom('service_group_assignments as sga')
         .innerJoin('services as s', 's.id', 'sga.service_id')
-        .select(['s.id', 's.title'])
+        .select([
+          's.id',
+          's.title',
+          's.duration_in_mins',
+          's.buffer_time_in_mins',
+          's.cost',
+          's.color_code',
+        ])
         .where('sga.service_group_id', '=', serviceGroupId)
         .where('sga.is_deleted', '=', false)
         .execute();
 
-      return ok(rows.map((r) => ({ id: r.id, title: r.title })));
+      return ok(
+        rows.map((r) => ({
+          id: r.id,
+          title: r.title,
+          durationInMins: r.duration_in_mins,
+          bufferTimeInMins: r.buffer_time_in_mins,
+          cost: r.cost,
+          colorCode: r.color_code,
+        })),
+      );
     } catch (cause) {
       return err<InfrastructureError>({
         kind: 'infrastructure',

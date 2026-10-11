@@ -4,6 +4,7 @@ export interface ServiceSnapshotResponse {
   title: string;
   durationInMins: number;
   cost: number;
+  colorCode: string;
 }
 
 // --- Request types ---
@@ -12,6 +13,7 @@ export interface ServiceSnapshotRequest {
   title: string;
   durationInMins: number;
   cost: number;
+  colorCode: string;
 }
 
 export interface RegisterBookingRequest {
@@ -23,6 +25,8 @@ export interface RegisterBookingRequest {
   userId: string;
   customerId: string;
   serviceSnapshot: ServiceSnapshotRequest;
+  label?: string;
+  notes?: string;
 }
 
 // --- Response types ---
@@ -37,9 +41,12 @@ export interface BookingItemResponse {
   bookingDate: string;
   bookingStartTime: string;
   bookingEndTime: string;
+  userId: string | null;
   serviceSnapshot: ServiceSnapshotResponse;
   serviceId: string;
   customerId: string;
+  label: string | null;
+  notes: string | null;
 }
 
 export type FindAllBookingsByBusinessForUserResponse = BookingItemResponse[];
@@ -54,7 +61,9 @@ export interface FindBookingByIdResponse {
   serviceSnapshot: ServiceSnapshotResponse;
   serviceId: string;
   customerId: string;
-  userId: string;
+  userId: string | null;
+  label: string | null;
+  notes: string | null;
   createdAt: string;
   createdBy: string;
   updatedAt: string;
@@ -71,6 +80,8 @@ export interface EditBookingRequest {
   serviceId: string;
   customerId: string;
   userId: string;
+  label?: string;
+  notes?: string;
 }
 
 export interface EditBookingResponse {

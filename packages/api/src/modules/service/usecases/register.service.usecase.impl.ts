@@ -14,6 +14,7 @@ import type {
   SyncServiceToUsersEvent,
   ServiceRepository,
   UnauthorizedError,
+  ValidationError,
 } from '@pikslots/domain';
 import { SecurityContext } from 'src/shared/security/context/security.context';
 import { v7 as uuidv7 } from 'uuid';
@@ -24,6 +25,13 @@ import { PIKSLOT_EVENTS } from 'src/shared/queue/jobs/pikslot.events';
 const UNAUTHORIZED_ERROR: UnauthorizedError = {
   kind: 'unauthorized',
   message: 'Can not register service : unauthorized!!!',
+  timestamp: new Date(),
+};
+
+const NO_TEAM_MEMBER_ERROR: ValidationError = {
+  kind: 'validation',
+  message:
+    'At least one team member must be assigned to the service before it can be created',
   timestamp: new Date(),
 };
 
@@ -51,13 +59,17 @@ export class RegisterServiceUseCaseImpl implements RegisterServiceUseCase {
 
   async execute(
     command: RegisterServiceCommand,
-  ): Promise<Result<Service, UnauthorizedError | InfrastructureError>> {
+  ): Promise<
+    Result<Service, UnauthorizedError | InfrastructureError | ValidationError>
+  > {
     const callerRole = this.securityContext.role;
     const callerBusinessId = this.securityContext.businessId;
     const isPartOfSameBusiness = callerBusinessId === command.businessId;
 
     if (!Service.canRegisterService(callerRole, isPartOfSameBusiness))
       return err(UNAUTHORIZED_ERROR);
+
+    if (command.associatedUsers.length === 0) return err(NO_TEAM_MEMBER_ERROR);
 
     const service = Service.create({
       id: uuidv7(),

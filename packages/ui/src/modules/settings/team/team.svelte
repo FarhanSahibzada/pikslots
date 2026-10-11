@@ -8,7 +8,7 @@
 	import Plus from '@tabler/icons-svelte/icons/plus';
 	import Search from '@tabler/icons-svelte/icons/search';
 	import InviteTeamMemberDialog from './dialog/invite-team-member-dialog.svelte';
-	import EditProfileImageDialog from './dialog/edit-profile-image-dialog.svelte';
+	import EditTeamMemberDialog from './dialog/edit-team-member-dialog.svelte';
 	import { createQuery } from '@tanstack/svelte-query';
 	import { getUsersInsideBusinessQueryOptions } from '../../api/user/get.users.inside.business.query';
 	import { authStore } from '$stores/auth.svelte';
@@ -20,9 +20,19 @@
 	import BreaksTab from './tabs/breaks.svelte';
 	import TimeOffTab from './tabs/timeoff.svelte';
 	import UpdatesTab from './tabs/updates.svelte';
+	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	let inviteOpen = $state(false);
-	let editImageOpen = $state(false);
+	let editMemberOpen = $state(false);
+
+	$effect(() => {
+		if ($page.url.searchParams.get('invite') === 'true') {
+			inviteOpen = true;
+			goto(resolve('/home/settings/team'), { replaceState: true, keepFocus: true });
+		}
+	});
 
 	const usersQuery = createQuery(() => ({
 		...getUsersInsideBusinessQueryOptions(businessStore.selectedBusiness?.id ?? ''),
@@ -54,12 +64,16 @@
 
 <InviteTeamMemberDialog bind:open={inviteOpen} />
 {#if selected}
-	<EditProfileImageDialog bind:open={editImageOpen} userId={selected.id} />
+	<EditTeamMemberDialog
+		bind:open={editMemberOpen}
+		user={selected}
+		businessId={businessStore.selectedBusiness?.id ?? ''}
+	/>
 {/if}
 
-<div class="flex h-full min-h-0 flex-1">
+<div class="flex h-full min-h-0 flex-1 overflow-hidden">
 	<!-- Left: team list -->
-	<div class="flex w-64 shrink-0 flex-col border-r">
+	<div class="flex w-64 shrink-0 flex-col overflow-hidden border-r">
 		<div class="flex items-center justify-between border-b px-4 py-3">
 			<span class="text-sm font-semibold">Your team</span>
 			<Button
@@ -83,7 +97,7 @@
 		</div>
 
 		<!-- Members -->
-		<div class="flex flex-col">
+		<div class="flex min-h-0 flex-1 flex-col overflow-y-auto">
 			{#if usersQuery.isPending}
 				<p class="px-4 py-3 text-xs text-muted-foreground">Loading...</p>
 			{:else}
@@ -127,7 +141,7 @@
 	</div>
 
 	<!-- Right: member detail -->
-	<div class="flex flex-1 flex-col">
+	<div class="flex min-h-0 flex-1 flex-col overflow-hidden">
 		{#if selected}
 			<div class="relative flex items-center gap-4 px-6 py-5">
 				<Avatar.Root class="size-16 text-lg">
@@ -152,7 +166,7 @@
 					variant="ghost"
 					size="icon-sm"
 					class="absolute top-4 right-4"
-					onclick={() => (editImageOpen = true)}
+					onclick={() => (editMemberOpen = true)}
 				>
 					<Pencil size={16} />
 				</Button>

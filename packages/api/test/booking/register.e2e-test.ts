@@ -65,6 +65,7 @@ describe(`POST ${BOOKING_ENDPOINTS.REGISTER}`, () => {
             title: 'Deep Tissue Massage',
             durationInMins: 60,
             cost: 9000,
+            colorCode: '#0d9488',
           },
         },
       );
@@ -85,6 +86,7 @@ describe(`POST ${BOOKING_ENDPOINTS.REGISTER}`, () => {
         title: 'Deep Tissue Massage',
         durationInMins: 60,
         cost: 9000,
+        colorCode: '#0d9488',
       });
     });
   });

@@ -16,6 +16,9 @@
 
 	let { customer }: { customer: FullCustomerModel } = $props();
 
+	$effect(() => {
+		console.log('what is the customer details', customer);
+	});
 	const SOCIAL_ICONS: Record<string, typeof World> = {
 		website: World,
 		instagram: BrandInstagram,
@@ -82,17 +85,19 @@
 
 	<!-- Social links -->
 	{#each Object.entries(customer.customerSocialLinks ?? {}) as [key, value] (key)}
-		{@const Icon = SOCIAL_ICONS[key] ?? World}
-		<div class="group flex items-center justify-start gap-3 py-2.5">
-			<Icon class="size-4 shrink-0 text-muted-foreground" />
-			<button
-				class="truncate text-left text-sm underline underline-offset-2"
-				onclick={() => copyToClipboard(value as string)}
-				type="button">{value}</button
-			>
-			<Copy
-				class="size-3.5 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
-			/>
-		</div>
+		{#if value.length > 0}
+			{@const Icon = SOCIAL_ICONS[key] ?? World}
+			<div class="group flex items-center justify-start gap-3 py-2.5">
+				<Icon class="size-4 shrink-0 text-muted-foreground" />
+				<button
+					class="truncate text-left text-sm underline underline-offset-2"
+					onclick={() => copyToClipboard(value as string)}
+					type="button">{value}</button
+				>
+				<Copy
+					class="size-3.5 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
+				/>
+			</div>
+		{/if}
 	{/each}
 </div>

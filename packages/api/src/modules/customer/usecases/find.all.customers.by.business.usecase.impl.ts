@@ -26,11 +26,14 @@ export class FindAllCustomersByBusinessUseCaseImpl implements FindAllCustomersBy
     private readonly securityContext: SecurityContext,
   ) {}
 
-  async execute(
-    businessId: string,
-  ): Promise<
+  async execute(businessId: string): Promise<
     Result<
-      { id: string; fullName: FullName; profileImageUrl: string | null }[],
+      {
+        id: string;
+        fullName: FullName;
+        profileImageUrl: string | null;
+        email: string | null;
+      }[],
       InfrastructureError | UnauthorizedError
     >
   > {

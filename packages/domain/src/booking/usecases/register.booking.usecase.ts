@@ -12,6 +12,8 @@ export interface RegisterBookingCommand {
   serviceSnapshot: ServiceSnapshot;
   customerId: string;
   createdBy: string;
+  label?: string | null;
+  notes?: string | null;
 }
 
 export const IRegisterBookingUseCase = Symbol('IRegisterBookingUseCase');

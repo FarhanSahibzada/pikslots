@@ -1,8 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { formatIsoInTimezone } from '@pikslots/datetime';
 import {
   Booking,
   type BookingRepository,
   err,
+  ok,
   FindAllBookingsByBusinessForUserUseCase,
   IBookingRepository,
   InfrastructureError,
@@ -29,6 +31,9 @@ export class FindAllBookingsByBusinessForUserUseCaseImpl implements FindAllBooki
   async execute(
     businessId: string,
     userId: string,
+    startDateTime: string,
+    endDateTime: string,
+    timezone: string,
   ): Promise<
     Result<
       Pick<
@@ -38,9 +43,12 @@ export class FindAllBookingsByBusinessForUserUseCaseImpl implements FindAllBooki
         | 'bookingDate'
         | 'bookingStartTime'
         | 'bookingEndTime'
+        | 'userId'
         | 'serviceSnapshot'
         | 'serviceId'
         | 'customerId'
+        | 'label'
+        | 'notes'
       >[],
       UnauthorizedError | InfrastructureError
     >
@@ -52,14 +60,44 @@ export class FindAllBookingsByBusinessForUserUseCaseImpl implements FindAllBooki
     if (!Booking.canViewBookings(callerRole, isPartOfSameBusiness, isSelf))
       return err(UNAUTHORIZED_ERROR);
 
-    // only return bookings booked of self user with role (Standard)
-    if (Booking.canViewSelfBookings(callerRole, isPartOfSameBusiness, isSelf)) {
-      return this.bookingRepository.findAllByBusinessForUser(
-        businessId,
-        userId,
-      );
-    }
+    const bookingFound = await this.bookingRepository.findAllByBusinessForUser(
+      businessId,
+      userId,
+    );
 
-    return this.bookingRepository.findAllByBusiness(businessId);
+    if (!bookingFound.ok) return err(bookingFound.error);
+
+    const startDate = `${startDateTime.slice(0, 10)}T00:00:00.000Z`;
+    const endDate = `${endDateTime.slice(0, 10)}T00:00:00.000Z`;
+
+    const givenStartDate = formatIsoInTimezone(
+      startDate,
+      timezone,
+      'yyyy-MM-dd',
+    );
+
+    const givenEndDate = formatIsoInTimezone(endDate, timezone, 'yyyy-MM-dd');
+
+    const filtered = bookingFound.value.filter(
+      (b) =>
+        b.bookingStartTime >= givenStartDate &&
+        b.bookingEndTime <= givenEndDate,
+    );
+
+    return ok(
+      filtered.map((b) => ({
+        id: b.id,
+        bookingId: b.bookingId,
+        bookingDate: b.bookingDate,
+        bookingStartTime: b.bookingStartTime,
+        bookingEndTime: b.bookingEndTime,
+        userId: b.userId,
+        serviceSnapshot: b.serviceSnapshot,
+        serviceId: b.serviceId,
+        customerId: b.customerId,
+        label: b.label,
+        notes: b.notes,
+      })),
+    );
   }
 }

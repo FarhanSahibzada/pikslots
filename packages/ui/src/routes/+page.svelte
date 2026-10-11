@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { getBusinessSlugFromHost, isAppHost } from '$utils/tenant-host';
+	import Login from '../modules/login/login.svelte';
 	import PublicBookingPage from '../modules/public-booking/public-booking-page.svelte';
 
 	const host = browser ? window.location.hostname : '';
@@ -19,7 +20,5 @@
 {#if businessSlug}
 	<PublicBookingPage slug={businessSlug} />
 {:else if browser && !appHost}
-	<div class="flex min-h-screen items-center justify-center text-sm text-muted-foreground">
-		No business found at this address.
-	</div>
+	<Login />
 {/if}

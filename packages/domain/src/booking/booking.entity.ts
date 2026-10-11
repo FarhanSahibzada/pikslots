@@ -5,6 +5,7 @@ export interface ServiceSnapshot {
   readonly title: string;
   readonly durationInMins: number;
   readonly cost: number;
+  readonly colorCode: string;
 }
 
 // ── Props ─────────────────────────────────────────────────────────────────────
@@ -17,11 +18,13 @@ export interface BookingProps {
   readonly bookingEndTime: string /** ISO 8601 UTC datetime string, e.g. "2025-06-16T10:00:00.000Z" */;
   readonly businessId: string;
   readonly serviceSnapshot: ServiceSnapshot;
+  readonly label: string | null;
+  readonly notes: string | null;
 
   //relations
   readonly customerId: string;
   readonly serviceId: string;
-  readonly userId: string;
+  readonly userId: string | null;
 
   // audit
   readonly createdAt: Date;
@@ -43,10 +46,12 @@ export interface CreateBookingInput {
   bookingEndTime: string /** ISO 8601 UTC datetime string, e.g. "2025-06-16T10:00:00.000Z" */;
   businessId: string;
   serviceId: string;
-  userId: string;
+  userId: string | null;
   serviceSnapshot: ServiceSnapshot;
   customerId: string;
   createdBy: string;
+  label?: string | null;
+  notes?: string | null;
 }
 
 // ── Entity ────────────────────────────────────────────────────────────────────
@@ -86,6 +91,8 @@ export class Booking {
       userId: input.userId,
       serviceSnapshot: input.serviceSnapshot,
       customerId: input.customerId,
+      label: input.label ?? null,
+      notes: input.notes ?? null,
       createdAt: now,
       createdBy: input.createdBy,
       updatedAt: now,
@@ -121,6 +128,8 @@ export class Booking {
     customerId: string;
     userId: string;
     updatedBy: string;
+    label?: string | null;
+    notes?: string | null;
   }): Booking {
     Booking.assertUtcDatetime(input.bookingStartTime, 'bookingStartTime');
     Booking.assertUtcDatetime(input.bookingEndTime, 'bookingEndTime');
@@ -132,6 +141,8 @@ export class Booking {
       serviceId: input.serviceId,
       customerId: input.customerId,
       userId: input.userId,
+      label: input.label !== undefined ? input.label : this.props.label,
+      notes: input.notes !== undefined ? input.notes : this.props.notes,
       updatedAt: new Date(),
       updatedBy: input.updatedBy,
     });
@@ -251,7 +262,7 @@ export class Booking {
     return false;
   }
 
-  public isBookedForUser(userId: string) {
+  public isBookedForUser(userId: string | null) {
     return this.userId === userId;
   }
 
@@ -281,8 +292,14 @@ export class Booking {
   get serviceSnapshot(): ServiceSnapshot {
     return this.props.serviceSnapshot;
   }
-  get userId(): string {
+  get userId(): string | null {
     return this.props.userId;
+  }
+  get label(): string | null {
+    return this.props.label;
+  }
+  get notes(): string | null {
+    return this.props.notes;
   }
   // ── Audit fields ─────────────────────────────────────────────────────────────
 

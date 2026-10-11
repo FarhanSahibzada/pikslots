@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { RegisterServiceInput } from '@pikslots/shared';
 import {
+  ArrayNotEmpty,
   IsArray,
   IsNumber,
   IsString,
@@ -60,9 +61,11 @@ export class RegisterServiceDto implements RegisterServiceInput {
   @ApiProperty({
     type: [String],
     example: ['019f3a2c-8b1e-7d4f-9a3b-c5e7f2814d60'],
-    description: 'User IDs of team members who will provide this service',
+    description:
+      'User IDs of team members who will provide this service. At least one is required.',
   })
   @IsArray()
+  @ArrayNotEmpty()
   @IsUUID('all', { each: true })
   associatedUsers: string[];
 

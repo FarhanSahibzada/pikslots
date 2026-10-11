@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import type { EditBookingRequest } from '@pikslots/shared';
-import { IsDateString, IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import {
+  IsDateString,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 
 export class EditBookingDto implements EditBookingRequest {
   @ApiProperty({
@@ -39,4 +45,22 @@ export class EditBookingDto implements EditBookingRequest {
   })
   @IsUUID()
   userId: string;
+
+  @ApiProperty({
+    example: 'Confirmed',
+    description: 'Booking label',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  label?: string;
+
+  @ApiProperty({
+    example: 'Preferred morning slot',
+    description: 'Optional notes for the booking',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  notes?: string;
 }

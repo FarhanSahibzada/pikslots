@@ -4,6 +4,7 @@ import { PikslotsBaseErrorResponse } from 'src/shared/types/base.error.response'
 import { RegisterCustomerDto } from '../dto/register.customer.dto';
 import { EditCustomerDto } from '../dto/edit.customer.dto';
 import { UpdateCustomerProfileImageDto } from '../dto/update.customer.profile.image.dto';
+import { DebounceCustomerSearchDto } from '../dto/debounce.customer.search.dto';
 
 export const RegisterCustomerDocs = () =>
   applyDecorators(
@@ -248,6 +249,59 @@ export const UpdateCustomerProfileImageDocs = () =>
     ApiResponse({
       status: HttpStatus.UNAUTHORIZED,
       description: 'unauthorized',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.INTERNAL_SERVER_ERROR,
+      description: 'Infrastructure failure',
+      type: PikslotsBaseErrorResponse,
+    }),
+  );
+
+export const DebounceCustomerSearchDocs = () =>
+  applyDecorators(
+    ApiOperation({
+      summary: 'Debounce search customers by business',
+      description:
+        'Search customers for a business with debounced input. Returns matching customers or an empty array.',
+    }),
+    ApiParam({
+      name: 'businessId',
+      description: 'Business ID to search customers within',
+      example: 'biz_01j...',
+    }),
+    ApiBody({ type: DebounceCustomerSearchDto }),
+    ApiResponse({
+      status: HttpStatus.OK,
+      description: 'Customers found successfully',
+      schema: {
+        example: {
+          data: [
+            {
+              id: 'cus_01j...',
+              firstName: 'John',
+              lastName: 'Doe',
+              profileImageUrl: null,
+            },
+          ],
+          statusCode: 200,
+          timestamp: '2026-01-01T00:00:00.000Z',
+        },
+      },
+    }),
+    ApiResponse({
+      status: HttpStatus.NOT_FOUND,
+      description: 'Customer not found',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.UNAUTHORIZED,
+      description: 'Caller is not authorized to search customers',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.BAD_REQUEST,
+      description: 'Validation error',
       type: PikslotsBaseErrorResponse,
     }),
     ApiResponse({

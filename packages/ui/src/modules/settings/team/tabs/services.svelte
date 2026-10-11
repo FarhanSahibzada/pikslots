@@ -11,6 +11,8 @@
 	import { getServicesByBusinessQueryOptions } from '../../../api/service/get.services.by.business.query';
 	import { assignServiceMutationOptions } from '../../../api/service-user-assignment/assign.service.mutation';
 	import { removeServiceMutationOptions } from '../../../api/service-user-assignment/remove.service.mutation';
+	import { businessStore } from '$stores/business.svelte';
+	import { formatCost } from '../../../services/utils/service-format';
 
 	let { userId, businessId }: { userId: string; businessId: string } = $props();
 
@@ -25,8 +27,16 @@
 	let dialogOpen = $state(false);
 	let dialogSearch = $state('');
 
-	// Set of selected service IDs in dialog (initialized when dialog opens)
 	let selectedIds = $state(new Set<string>());
+
+	const business = $derived(businessStore.selectedBusiness ?? null);
+
+	function formatDuration(mins: number): string {
+		if (mins < 60) return `${mins} mins`;
+		const h = Math.floor(mins / 60);
+		const m = mins % 60;
+		return m > 0 ? `${h} hr ${m} mins` : `${h} hr`;
+	}
 
 	function openDialog() {
 		selectedIds = new Set((userServicesQuery.data ?? []).map((s) => s.id));
@@ -93,20 +103,31 @@
 	}
 </script>
 
-<div class="px-6 pt-4">
-	<Button variant="outline" size="sm" class="cursor-pointer" onclick={openDialog}>
+<div class="flex flex-col px-6 pt-4">
+	<Button variant="outline" size="sm" class="w-fit cursor-pointer" onclick={openDialog}>
 		Manage services
 	</Button>
 
-	<div class="mt-4 flex flex-col gap-2">
+	<div class="mt-4 flex flex-col">
 		{#if userServicesQuery.isPending}
-			<p class="text-xs text-muted-foreground">Loading...</p>
+			<p class="py-3 text-xs text-muted-foreground">Loading...</p>
 		{:else if (userServicesQuery.data ?? []).length === 0}
-			<p class="text-xs text-muted-foreground">No services configured.</p>
+			<p class="py-3 text-xs text-muted-foreground">No services configured.</p>
 		{:else}
 			{#each userServicesQuery.data ?? [] as service (service.id)}
-				<div class="flex items-center gap-3 rounded-lg border px-4 py-3">
-					<span class="text-sm">{service.title}</span>
+				<div
+					class="flex items-center gap-4 border-b border-l-4 px-5 py-3.5 hover:bg-accent/40"
+					style:border-left-color={service.colorCode}
+				>
+					<div class="flex flex-1 flex-col">
+						<span class="text-sm font-medium">{service.title}</span>
+						<span class="text-xs text-muted-foreground">
+							{formatDuration(service.durationInMins)} · {formatCost(
+								service.cost / 100,
+								business?.locationDetails?.currency ?? ''
+							)}
+						</span>
+					</div>
 				</div>
 			{/each}
 		{/if}
@@ -120,7 +141,6 @@
 		</Dialog.Header>
 
 		<div class="flex flex-col gap-3">
-			<!-- Search -->
 			<div class="relative">
 				<Search
 					size={14}
@@ -129,7 +149,6 @@
 				<Input bind:value={dialogSearch} placeholder="Search" class="pl-8 text-xs" />
 			</div>
 
-			<!-- Select all row -->
 			<div class="flex items-center justify-between">
 				<div class="flex items-center gap-2">
 					<Checkbox checked={allSelected} onCheckedChange={toggleSelectAll} id="select-all" />
@@ -140,7 +159,6 @@
 				</span>
 			</div>
 
-			<!-- Service list -->
 			<div class="flex max-h-72 flex-col gap-2 overflow-y-auto">
 				{#if allServicesQuery.isPending}
 					<p class="text-xs text-muted-foreground">Loading...</p>
@@ -158,7 +176,10 @@
 							<div class="flex flex-col">
 								<span class="text-sm font-medium">{service.title}</span>
 								<span class="text-xs text-muted-foreground">
-									{service.durationInMins} mins · {service.cost === 0 ? 'Free' : `$${service.cost}`}
+									{formatDuration(service.durationInMins)} · {formatCost(
+										service.cost / 100,
+										business?.locationDetails?.currency ?? ''
+									)}
 								</span>
 							</div>
 						</div>

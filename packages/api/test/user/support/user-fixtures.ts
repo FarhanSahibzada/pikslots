@@ -451,6 +451,7 @@ export async function registerServiceForBusiness(
   businessId: string,
 ): Promise<{ id: string }> {
   const title = unique('E2E Service');
+  const { id: memberId } = await createStaffUser(ctx, businessId, 'Standard');
   await request(ctx.app.getHttpServer())
     .post(SERVICE_ENDPOINTS.REGISTER)
     .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin', businessId)))
@@ -461,7 +462,7 @@ export async function registerServiceForBusiness(
       durationInMins: 30,
       bufferTimeInMins: 10,
       cost: 2500,
-      associatedUsers: [],
+      associatedUsers: [memberId],
       associatedServiceGroups: [],
       businessId,
       isHiddenFromBookingPage: false,

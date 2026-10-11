@@ -32,6 +32,7 @@ function buildCommand(
       title: 'Haircut',
       durationInMins: 30,
       cost: 25,
+      colorCode: '#F54927',
     },
     createdBy: 'customer-1',
     ...overrides,
@@ -416,7 +417,12 @@ describe('RegisterBookingUseCaseImpl', () => {
         bookingDate: '2024-09-07',
         bookingStartTime: '2024-09-07T09:00:00.000Z',
         bookingEndTime: '2024-09-07T09:30:00.000Z',
-        serviceSnapshot: { title: 'Haircut', durationInMins: 30, cost: 25 },
+        serviceSnapshot: {
+          title: 'Haircut',
+          durationInMins: 30,
+          cost: 25,
+          colorCode: '#F54927',
+        },
         createdBy: 'customer-1',
       });
 

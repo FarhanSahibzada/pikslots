@@ -315,10 +315,13 @@
 		"
 		>
 			<Dialog.Header>
-				<Dialog.Title class="text-lg font-bold text-white">Our Booking policy</Dialog.Title>
+				<Dialog.Title class="text-lg font-bold dark:text-white">Our Booking policy</Dialog.Title>
 			</Dialog.Header>
 			<p class="text-sm text-muted-foreground">{business.bookingPolicies.bookingPolicyText}</p>
-			<p class="rounded-xl p-4 text-base shadow-xl" style="background-color: #1a1a1a">
+			<p
+				class="rounded-xl p-4 text-base shadow-xl"
+				style="background-color: #1a1a1a ; color: white"
+			>
 				Cancellation policy You can cancel or reschedule
 				{business.bookingPolicies.cancellationPolicy?.unit
 					? `${business.bookingPolicies.cancellationPolicy?.value == 0 ? '' : business.bookingPolicies.cancellationPolicy?.value} ${business.bookingPolicies.cancellationPolicy?.unit}`

@@ -10,6 +10,7 @@
 	let {
 		ref = $bindable(null),
 		class: className,
+		viewportClass,
 		sideOffset = 4,
 		portalProps,
 		children,
@@ -17,6 +18,7 @@
 		...restProps
 	}: WithoutChild<SelectPrimitive.ContentProps> & {
 		portalProps?: WithoutChildrenOrChild<ComponentProps<typeof SelectPortal>>;
+		viewportClass?: string;
 	} = $props();
 </script>
 
@@ -35,7 +37,8 @@
 		<SelectScrollUpButton />
 		<SelectPrimitive.Viewport
 			class={cn(
-				'h-(--bits-select-anchor-height) w-full min-w-(--bits-select-anchor-width) scroll-my-1'
+				'h-(--bits-select-anchor-height) w-full min-w-(--bits-select-anchor-width) scroll-my-1',
+				viewportClass
 			)}
 		>
 			{@render children?.()}

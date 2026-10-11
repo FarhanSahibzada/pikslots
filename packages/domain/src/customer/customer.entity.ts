@@ -20,6 +20,7 @@ export interface CustomerProps {
   readonly zipCode: string | null;
   readonly notes: string | null;
   readonly customerSocialLinks: CustomerLinks;
+  readonly additionalFields: Record<string, string> | null;
   readonly businessId: string;
 
   // audit
@@ -49,6 +50,7 @@ export interface CreateCustomerInput {
   zipCode: string | null;
   notes: string | null;
   customerSocialLinks: CustomerLinks;
+  additionalFields: Record<string, string> | null;
   profileImageUrl: string | null;
   businessId: string;
   createdBy: string;
@@ -84,6 +86,7 @@ export class Customer {
       zipCode: input.zipCode,
       notes: input.notes,
       customerSocialLinks: input.customerSocialLinks,
+      additionalFields: input.additionalFields,
       profileImageUrl: input.profileImageUrl,
       businessId: input.businessId,
       createdAt: now,
@@ -169,6 +172,15 @@ export class Customer {
 
   updateProfileImageUrl(profileImageUrl: string) {
     return new Customer({ ...this.props, profileImageUrl });
+  }
+
+  withAdditionalFields(fields: Record<string, string> | null, updatedBy: string): Customer {
+    return new Customer({
+      ...this.props,
+      additionalFields: fields,
+      updatedAt: new Date(),
+      updatedBy,
+    });
   }
 
   update(input: {
@@ -273,6 +285,9 @@ export class Customer {
   }
   get customerSocialLinks(): CustomerLinks {
     return this.props.customerSocialLinks;
+  }
+  get additionalFields(): Record<string, string> | null {
+    return this.props.additionalFields;
   }
   get profileImageUrl(): string | null {
     return this.props.profileImageUrl;

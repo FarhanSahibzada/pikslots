@@ -8,6 +8,7 @@ import {
   IsNotEmpty,
   IsNumber,
   IsObject,
+  IsOptional,
   IsString,
   IsUUID,
   Min,
@@ -33,6 +34,14 @@ export class ServiceSnapshotDto implements ServiceSnapshotRequest {
   @IsNumber()
   @Min(0)
   cost: number;
+
+  @ApiProperty({
+    example: '#0d9488',
+    description: 'Service color code',
+  })
+  @IsString()
+  @IsNotEmpty()
+  colorCode: string;
 }
 
 export class RegisterBookingDto implements RegisterBookingRequest {
@@ -82,4 +91,22 @@ export class RegisterBookingDto implements RegisterBookingRequest {
   @ValidateNested()
   @Type(() => ServiceSnapshotDto)
   serviceSnapshot: ServiceSnapshotDto;
+
+  @ApiProperty({
+    example: 'Confirmed',
+    description: 'Booking label',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  label?: string;
+
+  @ApiProperty({
+    example: 'Preferred morning slot',
+    description: 'Optional notes for the booking',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  notes?: string;
 }

@@ -24,4 +24,8 @@ export interface UserNameResponse {
 export interface ServiceTitleResponse {
   id: string;
   title: string;
+  durationInMins: number;
+  bufferTimeInMins: number;
+  cost: number;
+  colorCode: string;
 }

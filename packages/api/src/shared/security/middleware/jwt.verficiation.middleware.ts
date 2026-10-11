@@ -17,6 +17,7 @@ const PUBLIC_ROUTES: string[] = [
   '/users/free-slots/*', // get free slots for the user
   '/users/available-dates/*', // get available dates
   '/public-booking-page/*/booking-details',
+  '/public-booking/register',
   '/onboarding/complete',
   '/onboarding/status',
   '/health',

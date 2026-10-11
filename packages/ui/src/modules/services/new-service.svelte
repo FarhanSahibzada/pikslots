@@ -83,6 +83,10 @@
 			resetForm: false,
 			onUpdate: async ({ form }) => {
 				if (form.valid) {
+					if (selectedMemberIds.size === 0) {
+						teamError = true;
+						return;
+					}
 					let avatarKey = '';
 					if (imagePreview) {
 						URL.revokeObjectURL(imagePreview);
@@ -152,12 +156,20 @@
 	let imageFile = $state<File | null>(null);
 	let imagePreview = $state<string | null>(null);
 	let teamSearch = $state('');
+	let teamError = $state(false);
 	let DialogOpen = $state<boolean>(false);
 	let fileInput: HTMLInputElement;
 
 	// ── Derived ──────────────────────────────────────────────────────────────────
 
-	const canCreate = $derived($form.title.trim().length > 0 && Number($form.durationInMins) >= 1);
+	const canCreate = $derived(
+		$form.title.trim().length > 0 && Number($form.durationInMins) >= 1 && selectedMemberIds.size > 0
+	);
+
+	const showTeamRequired = $derived(
+		selectedMemberIds.size === 0 &&
+			(teamError || ($form.title.trim().length > 0 && Number($form.durationInMins) >= 1))
+	);
 	const isSaving = $derived(uploadMutation.isPending || registerMutation.isPending);
 
 	const filteredTeam = $derived(
@@ -187,6 +199,7 @@
 	function toggleMember(id: string) {
 		if (selectedMemberIds.has(id)) selectedMemberIds.delete(id);
 		else selectedMemberIds.add(id);
+		teamError = false;
 	}
 
 	function toggleAll() {
@@ -195,6 +208,7 @@
 		} else {
 			for (const m of teamMembers) selectedMemberIds.add(m.id);
 		}
+		teamError = false;
 	}
 
 	function handleImageChange(e: Event) {
@@ -485,6 +499,9 @@
 					Team <span class="text-destructive">*</span>
 				</h3>
 				<p class="mt-0.5 text-xs text-muted-foreground">Who will provide this service?</p>
+				{#if showTeamRequired}
+					<FieldError errors={[{ message: 'Select at least one team member' }]} />
+				{/if}
 			</div>
 
 			<!-- Team search -->

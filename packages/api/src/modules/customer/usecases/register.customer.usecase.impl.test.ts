@@ -46,6 +46,7 @@ function buildCommand(
     zipCode: null,
     notes: null,
     customerSocialLinks: SOCIAL_LINKS,
+    additionalFields: null,
     businessId: 'business-1',
     createdBy: 'user-business-owner-1',
     ...overrides,

@@ -1,5 +1,11 @@
 import { HttpStatus, applyDecorators } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { PikslotsBaseErrorResponse } from 'src/shared/types/base.error.response';
 import { RegisterBookingDto } from '../dto/register.booking.dto';
 import { EditBookingDto } from '../dto/edit.booking.dto';
@@ -51,6 +57,24 @@ export const FindAllBookingsByBusinessForUserDocs = () =>
       description: 'User ID',
       example: '01932b4a-5f3c-7e1d-b2a8-3c9d4e5f6a7c',
     }),
+    ApiQuery({
+      name: 'startDateTime',
+      required: true,
+      description: 'Start date-time in ISO 8601 format',
+      example: '2025-06-01',
+    }),
+    ApiQuery({
+      name: 'endDateTime',
+      required: true,
+      description: 'End date-time in ISO 8601 format',
+      example: '2025-06-30',
+    }),
+    ApiQuery({
+      name: 'timezone',
+      required: true,
+      description: 'IANA timezone of the caller',
+      example: 'Asia/Karachi',
+    }),
     ApiResponse({
       status: HttpStatus.OK,
       description: 'Bookings retrieved successfully',
@@ -63,6 +87,7 @@ export const FindAllBookingsByBusinessForUserDocs = () =>
               bookingDate: '2025-06-16',
               bookingStartTime: '2025-06-16T09:00:00.000Z',
               bookingEndTime: '2025-06-16T10:00:00.000Z',
+              userId: '01932b4a-5f3c-7e1d-b2a8-3c9d4e5f6a7e',
               serviceSnapshot: {
                 title: 'Haircut',
                 durationInMins: 30,

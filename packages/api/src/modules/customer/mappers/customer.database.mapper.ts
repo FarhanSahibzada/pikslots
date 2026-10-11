@@ -26,6 +26,7 @@ export class CustomerPersistenceMapper {
       zipCode: row.zip_code,
       notes: row.notes,
       customerSocialLinks: row.customer_social_links,
+      additionalFields: row.additional_fields,
       businessId: row.business_id,
       ...persistenceAuditToDomain(row),
     });
@@ -49,6 +50,7 @@ export class CustomerPersistenceMapper {
       zip_code: customer.zipCode,
       notes: customer.notes,
       customer_social_links: customer.customerSocialLinks,
+      additional_fields: customer.additionalFields,
       business_id: customer.businessId,
       ...domainAuditToPersistence(customer),
     };

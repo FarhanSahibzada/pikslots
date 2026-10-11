@@ -18,6 +18,7 @@ export interface RegisterCustomerCommand {
   zipCode: string | null;
   notes: string | null;
   customerSocialLinks: CustomerLinks;
+  additionalFields: Record<string, string> | null;
   profileImageUrl: string | null;
   businessId: string;
   createdBy: string;

@@ -157,7 +157,14 @@ export class ServiceUserAssignmentController {
 
     res.status(HttpStatus.OK);
     return new PikslotsBaseResponse<ServiceTitleResponse[]>(
-      result.value.map((s) => ({ id: s.id, title: s.title })),
+      result.value.map((s) => ({
+        id: s.id,
+        title: s.title,
+        durationInMins: s.durationInMins,
+        bufferTimeInMins: s.bufferTimeInMins,
+        cost: s.cost,
+        colorCode: s.colorCode,
+      })),
       HttpStatus.OK,
     );
   }

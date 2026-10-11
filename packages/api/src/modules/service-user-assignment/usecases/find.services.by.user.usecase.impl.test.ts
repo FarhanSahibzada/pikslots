@@ -32,10 +32,18 @@ describe('FindServicesByUserUseCaseImpl', () => {
           {
             id: 'service-1',
             title: 'Service service-1',
+            durationInMins: 30,
+            bufferTimeInMins: 10,
+            cost: 2500,
+            colorCode: '#F54927',
           },
           {
             id: 'service-2',
             title: 'Service service-2',
+            durationInMins: 30,
+            bufferTimeInMins: 10,
+            cost: 2500,
+            colorCode: '#F54927',
           },
         ]);
       }

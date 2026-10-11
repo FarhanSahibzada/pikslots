@@ -3,14 +3,25 @@
 	import dayGridPlugin from '@fullcalendar/daygrid';
 	import timeGridPlugin from '@fullcalendar/timegrid';
 	import listPlugin from '@fullcalendar/list';
+	import interactionPlugin from '@fullcalendar/interaction';
 	import Plus from '@tabler/icons-svelte/icons/plus';
 	import * as Avatar from '$lib/components/ui/avatar/index.js';
-	import { createQuery } from '@tanstack/svelte-query';
+	import { createQuery, useQueryClient } from '@tanstack/svelte-query';
 	import { getUsersInsideBusinessQueryOptions } from '../api/user/get.users.inside.business.query';
+	import { getCustomersByBusinessQueryOptions } from '../api/customer/get.customers.by.business.query';
+	import { getBookingsByBusinessForUserQueryOptions } from '../api/booking/get.bookings.by.business.for.user.query';
 	import { businessStore } from '$stores/business.svelte';
 	import { authStore } from '$stores/auth.svelte';
 	import ViewBookingDialog from './dialogs/view.booking.svelte';
+	import CreateBookingDialog from './dialogs/create.booking.svelte';
 	import type { BookingEvent } from './dialogs/view.booking.svelte';
+	import type { BookingItemResponse } from '@pikslots/shared';
+	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
+	import { type DateValue, parseDate } from '@internationalized/date';
+	import { untrack } from 'svelte';
+	import { formatIsoInTimezone } from '@pikslots/datetime';
 
 	// ── State ───────────────────────────────────────────────────────────────────
 
@@ -18,8 +29,9 @@
 	let fullCalendar: Calendar | null = null;
 
 	const jwtPayload = $derived(authStore.getPayloadData());
+	const queryClient = useQueryClient();
 
-	// ── Queries ──────────────────────────────────────────────────────────────────
+	// ── user Query ──────────────────────────────────────────────────────────────────
 
 	const usersQuery = createQuery(() => ({
 		...getUsersInsideBusinessQueryOptions(businessStore.selectedBusiness?.id ?? ''),
@@ -28,119 +40,286 @@
 
 	const users = $derived(usersQuery.data ?? []);
 	const currentUser = $derived(users.find((u) => u.id === jwtPayload?.userId));
-	const teamMembers = $derived(users.filter((u) => u.id !== jwtPayload?.userId));
+	const currentUserRole = $derived(jwtPayload?.role);
+	const teamMembers = $derived(
+		currentUserRole !== 'Standard' ? users.filter((u) => u.id !== jwtPayload?.userId) : []
+	);
+
+	// ── Selected calendar owner ─────────────────────────────────────────────────
+
+	let selectedUserId = $state<string>('');
+	let selectedUserRole = $state<string>('');
+	const effectiveUserId = $derived(selectedUserId || jwtPayload?.userId || '');
+	const effectiveUserRole = $derived(selectedUserRole || jwtPayload?.role);
+
+	const businessTimezone = $derived(
+		businessStore.selectedBusiness?.locationDetails.timeZone ||
+			Intl.DateTimeFormat().resolvedOptions().timeZone
+	);
+
+	// ── Bookings Query ───────────────────────────────────────────────────────────
+
+	let calendarStartDateTime = $state<string>('');
+	let calendarEndDateTime = $state<string>('');
+
+	const bookingsQuery = createQuery(() => ({
+		...getBookingsByBusinessForUserQueryOptions(
+			businessStore.selectedBusiness?.id ?? '',
+			effectiveUserId,
+			calendarStartDateTime,
+			calendarEndDateTime,
+			businessTimezone
+		),
+		enabled:
+			!!businessStore.selectedBusiness?.id &&
+			!!effectiveUserId &&
+			!!calendarStartDateTime &&
+			!!calendarEndDateTime
+	}));
+
+	// ── Customers Query  ──────────────────────────────────────────────────────────
+
+	const hasBookings = $derived((bookingsQuery.data?.length ?? 0) > 0);
+
+	const customersQuery = createQuery(() => ({
+		...getCustomersByBusinessQueryOptions(businessStore.selectedBusiness?.id ?? ''),
+		enabled: !!businessStore.selectedBusiness?.id && hasBookings
+	}));
+
+	const customers = $derived(customersQuery.data ?? []);
+
+	// ── Events transformation ────────────────────────────────────────────────────
+	const bookingData = $derived(bookingsQuery.data ?? []);
+
+	const bookingEvents = $derived(
+		bookingData.map((booking: BookingItemResponse) => {
+			const start = new Date(booking.bookingStartTime);
+			const end = new Date(booking.bookingEndTime);
+			const currentMember = users.find((user) => user.id === booking.userId);
+			const durationMins = (end.getTime() - start.getTime()) / (1000 * 60);
+			const customer = customers.find((c) => c.id === booking.customerId);
+			return {
+				id: booking.id,
+				title: booking.serviceSnapshot.title,
+				start,
+				end,
+				extendedProps: {
+					durationMins,
+					host: currentMember
+						? `${currentMember.name.firstName} ${currentMember.name.lastName}`
+						: 'Unknown',
+					guests: customer
+						? [{ name: `${customer.firstName} ${customer.lastName}` }]
+						: [{ name: 'Customer' }],
+					bookingId: booking.bookingId,
+					source: 'Booked from Web App',
+					label: booking.label ?? undefined,
+					notes: booking.notes ?? undefined,
+					serviceColor: booking.serviceSnapshot.colorCode || '#0d9488',
+					serviceId: booking.serviceId,
+					customerId: booking.customerId,
+					userId: booking.userId,
+					bookingDate: booking.bookingDate,
+					serviceSnapshot: booking.serviceSnapshot
+				}
+			};
+		})
+	);
 
 	// ── Dialog state ─────────────────────────────────────────────────────────────
 
 	let dialogOpen = $state(false);
 	let selectedBooking = $state<BookingEvent | null>(null);
+	let createDialogOpen = $state(false);
+	let initialBookingDate = $state<DateValue | undefined>(undefined);
 
-	// ── Test events ──────────────────────────────────────────────────────────────
-
-	const now = new Date();
-	const testEvents = [
-		{
-			id: '1',
-			title: '15 Minutes Meeting',
-			start: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 10, 0),
-			end: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 10, 15),
-			color: '#0d9488',
-			extendedProps: {
-				durationMins: 15,
-				host: 'Afaq Javed',
-				guests: [{ name: 'Guest', deleted: true }],
-				bookingId: 'ECRMWYEE',
-				source: 'Booked from Web App'
-			}
-		},
-		{
-			id: '2',
-			title: 'Strategy Call',
-			start: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 14, 0),
-			end: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 15, 0),
-			color: '#6366f1',
-			extendedProps: {
-				durationMins: 60,
-				host: 'Afaq Javed',
-				guests: [{ name: 'Sarah Connor' }, { name: 'John Doe' }],
-				bookingId: 'STRGY001',
-				source: 'Booked from Web App'
-			}
-		},
-		{
-			id: '3',
-			title: 'Onboarding Session',
-			start: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 3, 9, 30),
-			end: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 3, 10, 0),
-			color: '#f59e0b',
-			extendedProps: {
-				durationMins: 30,
-				host: 'Afaq Javed',
-				guests: [{ name: 'Alex Smith' }],
-				bookingId: 'ONBRD002',
-				source: 'Booked from Web App'
-			}
-		}
-	];
+	const allEvents = $derived(bookingEvents);
 
 	// ── Calendar ─────────────────────────────────────────────────────────────────
 
 	$effect(() => {
-		calendarEl = document.getElementById('calendar');
+		untrack(() => {
+			calendarEl = document.getElementById('calendar');
 
-		fullCalendar = new Calendar(calendarEl!, {
-			plugins: [dayGridPlugin, timeGridPlugin, listPlugin],
-			initialView: 'dayGridMonth',
-			headerToolbar: {
-				left: 'prev,next today',
-				center: 'title',
-				right: 'dayGridMonth,timeGridWeek,listWeek'
-			},
-			buttonText: {
-				today: 'Today',
-				month: 'Month',
-				week: 'Week',
-				list: 'List'
-			},
-			noEventsText: 'No bookings for this period',
-			events: testEvents,
-			eventClick: (info) => {
-				const p = info.event.extendedProps;
-				selectedBooking = {
-					id: info.event.id,
-					title: info.event.title,
-					start: info.event.start!,
-					end: info.event.end!,
-					durationMins: p.durationMins,
-					host: p.host,
-					guests: p.guests,
-					bookingId: p.bookingId,
-					source: p.source,
-					color: info.event.backgroundColor
-				};
-				dialogOpen = true;
-			},
-			height: '100%',
-			expandRows: true,
-			handleWindowResize: true
+			fullCalendar = new Calendar(calendarEl!, {
+				plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
+				initialView: 'dayGridMonth',
+				headerToolbar: {
+					left: 'prev,next today',
+					center: 'title',
+					right: 'dayGridMonth,timeGridWeek,listWeek'
+				},
+				buttonText: {
+					today: 'Today',
+					month: 'Month',
+					week: 'Week',
+					list: 'List'
+				},
+				noEventsText: 'No bookings for this period',
+				events: allEvents,
+				datesSet: (info) => {
+					calendarStartDateTime = info.startStr;
+					calendarEndDateTime = info.endStr;
+				},
+				eventContent: (info) => {
+					const start = info.event.start;
+					const fmt = (d: Date | null) =>
+						d ? formatIsoInTimezone(d.toISOString(), businessTimezone, 'h:mm a') : '';
+
+					const color = (info.event.extendedProps as Record<string, unknown>)
+						.serviceColor as string;
+					const label = (info.event.extendedProps as Record<string, unknown>).label as
+						| string
+						| undefined;
+
+					const LABEL_COLORS: Record<string, string> = {
+						Confirmed: '#22c55e',
+						Pending: '#f59e0b',
+						Cancelled: '#ef4444',
+						Completed: '#3b82f6',
+						'No Show': '#a855f7'
+					};
+
+					const seg = (el: string, cls: string, text: string): HTMLElement => {
+						const node = document.createElement(el);
+						node.className = cls;
+						node.textContent = text;
+						return node;
+					};
+
+					const dot = seg('span', 'fc-booking-dot', '');
+					dot.style.backgroundColor = color;
+
+					const nodes = [
+						dot,
+						seg('span', 'fc-booking-time', fmt(start)),
+						seg('span', 'fc-booking-title', info.event.title)
+					];
+
+					if (info.view.type === 'listWeek' && label) {
+						const badge = seg('span', 'fc-booking-label', label);
+						badge.style.backgroundColor = LABEL_COLORS[label] ?? 'var(--primary)';
+						nodes.push(badge);
+					}
+
+					return {
+						domNodes: nodes
+					};
+				},
+				dateClick: (info) => {
+					const clicked = info.date;
+					const y = clicked.getFullYear();
+					const m = (clicked.getMonth() + 1).toString().padStart(2, '0');
+					const d = clicked.getDate().toString().padStart(2, '0');
+					initialBookingDate = parseDate(`${y}-${m}-${d}`);
+					createDialogOpen = true;
+				},
+
+				eventClick: (info) => {
+					const p = info.event.extendedProps;
+
+					selectedBooking = {
+						id: info.event.id,
+						title: info.event.title,
+						start: info.event.start!,
+						end: info.event.end!,
+						durationMins: p.durationMins,
+						host: p.host,
+						guests: p.guests,
+						bookingId: p.bookingId,
+						source: p.source,
+						color: p.serviceColor as string,
+						label: p.label as string | undefined,
+						notes: p.notes as string | undefined,
+						serviceId: p.serviceId as string,
+						customerId: p.customerId as string,
+						userId: p.userId as string,
+						bookingDate: p.bookingDate as string,
+						serviceSnapshot: p.serviceSnapshot as {
+							title: string;
+							durationInMins: number;
+							cost: number;
+							colorCode: string;
+						}
+					};
+					dialogOpen = true;
+				},
+				height: '100%',
+				expandRows: true,
+				handleWindowResize: true
+			});
+			fullCalendar.render();
 		});
-		fullCalendar.render();
 	});
+
+	// Update calendar events when they change
+	$effect(() => {
+		if (fullCalendar) {
+			fullCalendar.setOption('events', allEvents);
+		}
+	});
+
+	$effect(() => {
+		if ($page.url.searchParams.get('create') === 'true') {
+			initialBookingDate = undefined;
+			createDialogOpen = true;
+			goto(resolve('/home/bookings'), { replaceState: true, keepFocus: true });
+		}
+	});
+
+	// ___ helpers_________________
+
+	function handleSelectedUserChange(userId: string, role: string) {
+		if (!userId) return;
+		selectedUserId = userId;
+		selectedUserRole = role;
+		queryClient.invalidateQueries({
+			queryKey: ['bookings-by-business-for-user']
+		});
+	}
 </script>
 
-<ViewBookingDialog bind:open={dialogOpen} booking={selectedBooking} />
+<ViewBookingDialog
+	bind:open={dialogOpen}
+	booking={selectedBooking}
+	selectedUserRole={effectiveUserRole as string}
+	selectedUserId={effectiveUserId}
+/>
+<CreateBookingDialog
+	bind:open={createDialogOpen}
+	{initialBookingDate}
+	selectedUserRole={effectiveUserRole as string}
+	selectedUserId={effectiveUserId}
+/>
 
 <div class="flex h-full min-h-0 flex-1">
 	<!-- ── Left: sidebar ──────────────────────────────────────────────────── -->
-	<div class=" flex w-56 shrink-0 flex-col gap-5 px-3 py-4">
+	<div class=" flex w-56 shrink-0 flex-col gap-5 px-3 pb-4">
+		<!-- <div class="-mb-2 flex items-center justify-end">
+			<Button
+				class="rounded-full px-2 py-3"
+				size="sm"
+				onclick={() => {
+					initialBookingDate = undefined;
+					createDialogOpen = true;
+				}}
+			>
+				<Plus size={16} />
+			</Button>
+		</div> -->
 		<!-- Your calendars -->
 		<div class="flex flex-col gap-1">
 			<span class="px-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase"
 				>Your calendars</span
 			>
 			{#if currentUser}
-				<div
-					class="flex cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5 hover:bg-accent"
+				<button
+					type="button"
+					onclick={() => handleSelectedUserChange(currentUser.id, currentUser.role)}
+					class="flex w-full cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5 text-left {effectiveUserId ===
+					currentUser.id
+						? 'bg-accent '
+						: 'hover:bg-accent'}"
 				>
 					<Avatar.Root class="size-6 text-[10px]">
 						{#if currentUser.avatarUrl}
@@ -156,7 +335,7 @@
 					<span class="truncate text-sm"
 						>{currentUser.name.firstName} {currentUser.name.lastName}</span
 					>
-				</div>
+				</button>
 			{/if}
 			<button
 				type="button"
@@ -174,8 +353,13 @@
 					>Team</span
 				>
 				{#each teamMembers as user (user.id)}
-					<div
-						class="flex cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5 hover:bg-accent"
+					<button
+						type="button"
+						onclick={() => handleSelectedUserChange(user.id, user.role)}
+						class="flex w-full cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5 text-left {effectiveUserId ===
+						user.id
+							? 'bg-accent'
+							: 'hover:bg-accent'}"
 					>
 						<Avatar.Root class="size-6 text-[10px]">
 							{#if user.avatarUrl}
@@ -192,7 +376,7 @@
 							<span class="truncate text-sm">{user.name.firstName} {user.name.lastName}</span>
 							<span class="truncate text-xs text-muted-foreground">{user.role}</span>
 						</div>
-					</div>
+					</button>
 				{/each}
 			</div>
 		{/if}
@@ -200,6 +384,26 @@
 
 	<!-- ── Right: calendar ───────────────────────────────────────────────── -->
 	<div class="flex flex-1 flex-col overflow-hidden">
+		<!-- <div class="min-w-0">
+				<h2 class="truncate text-sm font-medium">
+					{#if selectedUser?.id === currentUser?.id}
+						Your Calendar
+					{:else if selectedUser}
+						{selectedUser.name.firstName} {selectedUser.name.lastName}'s Calendar
+					{:else}
+						Calendar
+					{/if}
+				</h2>
+				<p class="truncate text-xs text-muted-foreground">
+					{#if effectiveUserId !== jwtPayload?.userId}
+						Team member calendar
+					{:else if isElevatedRole}
+						{businessStore.selectedBusiness?.name ?? 'Calendar'}
+					{:else}
+						Your calendar
+					{/if}
+				</p>
+			</div> -->
 		<div id="calendar" class="calendar-wrapper"></div>
 	</div>
 </div>
@@ -292,11 +496,18 @@
 
 	/* Event time */
 	:global(.calendar-wrapper .fc-list-event-time) {
-		color: var(--muted-foreground) !important;
+		display: none;
 	}
 
 	/* Event title */
+	:global(.calendar-wrapper .fc-list-event-title) {
+		display: flex;
+		align-items: center;
+	}
+
 	:global(.calendar-wrapper .fc-list-event-title a) {
+		display: flex;
+		align-items: center;
 		color: var(--foreground) !important;
 		text-decoration: none !important;
 	}
@@ -354,5 +565,70 @@
 	:global(.calendar-wrapper .fc-button-primary:not(:disabled).fc-button-active:focus) {
 		box-shadow: none !important;
 		outline: none !important;
+	}
+
+	/* ── Booking event content ── */
+	:global(.calendar-wrapper .fc-event) {
+		background-color: transparent !important;
+		border: none !important;
+		border-radius: 4px !important;
+	}
+
+	:global(.calendar-wrapper .fc-booking-dot) {
+		display: inline-block;
+		width: 8px;
+		height: 8px;
+		min-width: 8px;
+		border-radius: 50%;
+		flex-shrink: 0;
+		margin-right: 6px;
+	}
+
+	:global(.calendar-wrapper .fc-booking-time) {
+		display: inline-block;
+		font-size: 0.7rem;
+		font-weight: 700;
+		white-space: nowrap;
+		color: var(--foreground);
+		margin-right: 6px;
+	}
+
+	:global(.calendar-wrapper .fc-booking-title) {
+		display: inline-block;
+		font-size: 0.75rem;
+		font-weight: 500;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		color: var(--foreground);
+	}
+
+	/* single-line row layout for both month & timeGrid */
+	:global(.calendar-wrapper .fc-event .fc-event-main) {
+		padding: 1px 5px 1px 4px !important;
+		display: flex;
+		align-items: center;
+		min-width: 0;
+	}
+
+	:global(.calendar-wrapper .fc-event-main > .fc-booking-time) {
+		flex-shrink: 0;
+	}
+
+	:global(.calendar-wrapper .fc-event-main > .fc-booking-title) {
+		flex: 1 1 auto;
+		min-width: 0;
+	}
+
+	:global(.calendar-wrapper .fc-booking-label) {
+		display: inline-block;
+		font-size: 0.6rem;
+		font-weight: 600;
+		padding: 1px 6px;
+		border-radius: 9999px;
+		color: white;
+		margin-left: 8px;
+		white-space: nowrap;
+		line-height: 1.4;
 	}
 </style>

@@ -12,11 +12,14 @@ import {
 import { CUSTOMER_TEST_DATA } from './customer.test.data';
 
 export class CustomerRepositoryTestImpl implements CustomerRepository {
-  async findCustomerListByBusiness(
-    businessId: string,
-  ): Promise<
+  async findCustomerListByBusiness(businessId: string): Promise<
     Result<
-      { id: string; fullName: FullName; profileImageUrl: string | null }[],
+      {
+        id: string;
+        fullName: FullName;
+        profileImageUrl: string | null;
+        email: string | null;
+      }[],
       InfrastructureError
     >
   > {
@@ -33,6 +36,7 @@ export class CustomerRepositoryTestImpl implements CustomerRepository {
             firstName: customer.name.firstName,
             lastName: customer.name.lastName,
           },
+          email: customer.email,
           profileImageUrl: customer.profileImageUrl,
         })),
       );
@@ -146,6 +150,59 @@ export class CustomerRepositoryTestImpl implements CustomerRepository {
 
     return ok(undefined);
   }
+  async debounceCustomerSearchByBusiness(
+    businessId: string,
+    searchString: string,
+  ): Promise<
+    Result<
+      | {
+          id: string;
+          fullName: FullName;
+          profileImageUrl: string | null;
+          email: string | null;
+        }[]
+      | null,
+      InfrastructureError
+    >
+  > {
+    try {
+      await Promise.resolve('');
+
+      const customersFound = CUSTOMER_TEST_DATA.filter(
+        (item) =>
+          item.businessId === businessId &&
+          item.isDeleted === false &&
+          (item.name.firstName
+            .toLowerCase()
+            .includes(searchString.toLowerCase()) ||
+            item.name.lastName
+              .toLowerCase()
+              .includes(searchString.toLowerCase())),
+      );
+
+      if (customersFound.length === 0) return ok(null);
+
+      return ok(
+        customersFound.map((customer) => ({
+          id: customer.id,
+          fullName: {
+            firstName: customer.name.firstName,
+            lastName: customer.name.lastName,
+          },
+          email: customer.email,
+          profileImageUrl: customer.profileImageUrl,
+        })),
+      );
+    } catch (cause) {
+      return err<InfrastructureError>({
+        kind: 'infrastructure',
+        message: 'Failed to search customers by business',
+        timestamp: new Date(),
+        cause,
+      });
+    }
+  }
+
   async existsByEmail(
     email: string,
     businessId: string,
@@ -160,5 +217,25 @@ export class CustomerRepositoryTestImpl implements CustomerRepository {
     );
 
     return ok(exists);
+  }
+
+  async findByEmailOrName(
+    email: string | null,
+    fullName: { firstName: string; lastName: string },
+    businessId: string,
+  ): Promise<Result<Customer | null, InfrastructureError>> {
+    await Promise.resolve();
+
+    const customer =
+      CUSTOMER_TEST_DATA.find(
+        (item) =>
+          item.name.firstName === fullName.firstName &&
+          item.name.lastName === fullName.lastName &&
+          item.businessId === businessId &&
+          item.isDeleted === false &&
+          (email ? item.email === email : true),
+      ) ?? null;
+
+    return ok(customer);
   }
 }

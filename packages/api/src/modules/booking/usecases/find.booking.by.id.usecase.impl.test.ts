@@ -281,6 +281,7 @@ describe('FindBookingByIdUseCaseImpl', () => {
           title: 'Haircut',
           durationInMins: 30,
           cost: 25,
+          colorCode: '#F54927',
         });
       }
     });

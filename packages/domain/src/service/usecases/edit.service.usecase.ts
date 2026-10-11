@@ -1,4 +1,4 @@
-import type { InfrastructureError, Result, UnauthorizedError } from '../../shared';
+import type { InfrastructureError, Result, UnauthorizedError, ValidationError } from '../../shared';
 import type { ServiceNotFoundError } from '../errors';
 
 export interface EditServiceCommand {
@@ -22,5 +22,7 @@ export const IEditServiceUseCase = Symbol('IEditServiceUseCase');
 export interface EditServiceUseCase {
   execute(
     command: EditServiceCommand,
-  ): Promise<Result<void, ServiceNotFoundError | UnauthorizedError | InfrastructureError>>;
+  ): Promise<
+    Result<void, ServiceNotFoundError | UnauthorizedError | InfrastructureError | ValidationError>
+  >;
 }

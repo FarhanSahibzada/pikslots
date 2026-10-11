@@ -11,6 +11,8 @@ export interface EditBookingUseCaseCommand {
   customerId: string;
   userId: string;
   updatedBy: string;
+  label?: string | null;
+  notes?: string | null;
 }
 
 export const IEditBookingUseCase = Symbol('IEditBookingUseCase');

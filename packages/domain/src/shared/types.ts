@@ -48,6 +48,10 @@ export type SocialPlatforms =
 export interface ServiceSummary {
   id: string;
   title: string;
+  durationInMins: number;
+  bufferTimeInMins: number;
+  cost: number;
+  colorCode: string;
 }
 
 export interface ClassSummary {
