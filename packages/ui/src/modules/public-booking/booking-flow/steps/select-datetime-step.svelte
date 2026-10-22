@@ -76,7 +76,7 @@
 	}));
 
 	const slots = $derived(getFreeSlots.data ?? []);
-	
+
 	// ________
 
 	const brandColor = $derived(business.brandApperanceDetails.brandColor);

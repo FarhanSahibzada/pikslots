@@ -59,7 +59,7 @@
 			usersInitialized = true;
 		}
 	});
-	
+
 	const canToggleTeam = $derived(
 		currentUserRole === 'Business Owner' ||
 			currentUserRole === 'Admin' ||
@@ -95,9 +95,7 @@
 		let cancelled = false;
 
 		Promise.all(
-			enabledUsers.map((user) =>
-				getBookingsByBusinessForUser(businessId, user.id, start, end, tz)
-			)
+			enabledUsers.map((user) => getBookingsByBusinessForUser(businessId, user.id, start, end, tz))
 		)
 			.then((results) => {
 				if (!cancelled) {

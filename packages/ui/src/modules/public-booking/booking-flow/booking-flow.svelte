@@ -97,7 +97,6 @@
 		}
 	}
 
-
 	/** parse user (team member) services */
 	function handleTeamMemberServices(
 		serviceIds: string[],
