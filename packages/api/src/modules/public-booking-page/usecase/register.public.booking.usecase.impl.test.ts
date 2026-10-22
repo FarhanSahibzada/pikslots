@@ -371,7 +371,6 @@ describe('RegisterPublicBookingUseCaseImpl', () => {
       template: 'booking-confirmation',
       context: {
         firstName: 'Jane',
-        isTeamMember: false,
         businessName: "Alice's Salon & Spa",
         serviceName: 'Haircut & Style',
         bookingRef,
