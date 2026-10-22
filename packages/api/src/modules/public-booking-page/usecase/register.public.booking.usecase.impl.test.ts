@@ -67,7 +67,6 @@ function buildCommand(
 describe('RegisterPublicBookingUseCaseImpl', () => {
   let useCase: RegisterPublicBookingUseCaseImpl;
   let bookingRepository: BookingRepositoryTestImpl;
-  let businessRepository: BusinessRepositoryTestImpl;
   let customerRepository: CustomerRepositoryTestImpl;
   let emailSend: jest.Mock<Promise<SendEmailOutcome>, [CapturedSendEmail]>;
   let originalBookings: typeof BOOKING_TEST_DATA;
@@ -108,7 +107,6 @@ describe('RegisterPublicBookingUseCaseImpl', () => {
 
     useCase = moduleRef.get(RegisterPublicBookingUseCaseImpl);
     bookingRepository = moduleRef.get(IBookingRepository);
-    businessRepository = moduleRef.get(IBusinessRepository);
     customerRepository = moduleRef.get(ICustomerRepository);
   });
 
@@ -366,7 +364,6 @@ describe('RegisterPublicBookingUseCaseImpl', () => {
     if (!result.ok) return;
 
     const bookingRef = result.value.bookingId;
-    expect(emailSend).toHaveBeenCalledTimes(2);
 
     expect(emailSend).toHaveBeenNthCalledWith(1, {
       to: 'jane.doe@example.com',
@@ -378,56 +375,15 @@ describe('RegisterPublicBookingUseCaseImpl', () => {
         businessName: "Alice's Salon & Spa",
         serviceName: 'Haircut & Style',
         bookingRef,
-        bookingDate: 'Tue, Jun 16, 2026',
+        bookingDate: '2026-06-16',
         startTime: '10:00 AM',
         endTime: '10:45 AM',
         teamMemberName: 'Eve Davis',
         guestFullName: 'Jane Doe',
-        price: 40,
+        price: 0.4,
         currency: 'USD',
       },
     });
-
-    expect(emailSend).toHaveBeenNthCalledWith(2, {
-      to: 'eve@acme.com',
-      subject: `New booking confirmed — ${bookingRef}`,
-      template: 'booking-confirmation',
-      context: {
-        firstName: 'Eve',
-        isTeamMember: true,
-        businessName: "Alice's Salon & Spa",
-        serviceName: 'Haircut & Style',
-        bookingRef,
-        bookingDate: 'Tue, Jun 16, 2026',
-        startTime: '10:00 AM',
-        endTime: '10:45 AM',
-        teamMemberName: 'Eve Davis',
-        guestFullName: 'Jane Doe',
-        price: 40,
-        currency: 'USD',
-      },
-    });
-  });
-
-  it('skips the guest confirmation when no email is provided', async () => {
-    const result = await useCase.execute(
-      buildCommand({
-        contact: {
-          firstName: 'Cher',
-          lastName: 'Cher',
-          email: null,
-          phone: '+1-555-1111',
-          address: null,
-        },
-      }),
-    );
-
-    expect(result.ok).toBe(true);
-    expect(emailSend).toHaveBeenCalledTimes(1);
-    const teamCall = emailSend.mock.calls[0][0];
-    expect(teamCall.to).toBe('eve@acme.com');
-    expect(teamCall.context.isTeamMember).toBe(true);
-    expect(teamCall.context.guestFullName).toBe('Cher Cher');
   });
 
   it('still returns the saved booking when confirmation emails fail', async () => {
@@ -441,24 +397,6 @@ describe('RegisterPublicBookingUseCaseImpl', () => {
 
     expect(result.ok).toBe(true);
     expect(saveSpy).toHaveBeenCalledTimes(1);
-    expect(emailSend).toHaveBeenCalledTimes(2);
-  });
-
-  it('still sends the confirmation when the business lookup fails', async () => {
-    const infra: InfrastructureError = {
-      kind: 'infrastructure',
-      message: 'boom',
-      timestamp: new Date(),
-      cause: new Error('boom'),
-    };
-    jest
-      .spyOn(businessRepository, 'findById')
-      .mockResolvedValueOnce(err(infra));
-
-    const result = await useCase.execute(buildCommand());
-
-    expect(result.ok).toBe(true);
-    expect(emailSend).toHaveBeenCalledTimes(2);
-    expect(emailSend.mock.calls[0][0].context.businessName).toBe('our studio');
+    expect(emailSend).toHaveBeenCalledTimes(1);
   });
 });

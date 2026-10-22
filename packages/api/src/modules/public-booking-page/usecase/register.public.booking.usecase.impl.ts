@@ -189,7 +189,6 @@ export class RegisterPublicBookingUseCaseImpl implements RegisterPublicBookingUs
         template: 'booking-confirmation',
         context: {
           firstName: command.contact.firstName,
-          isTeamMember: false,
           ...shared,
         },
       });
