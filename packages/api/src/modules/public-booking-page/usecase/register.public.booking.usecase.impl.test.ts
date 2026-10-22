@@ -3,6 +3,7 @@ import {
   BookingConflictError,
   CustomerAlreadyExistsError,
   err,
+  IBusinessRepository,
   IBookingRepository,
   ICustomerRepository,
   InfrastructureError,
@@ -13,8 +14,10 @@ import {
   UnauthorizedError,
 } from '@pikslots/domain';
 import { RegisterPublicBookingUseCaseImpl } from './register.public.booking.usecase.impl';
+import { PikslotEmailService } from 'src/shared/email/pikslot.email.service';
 import { BookingRepositoryTestImpl } from '../../booking/repository/booking.repository.fake.impl';
 import { BOOKING_TEST_DATA } from '../../booking/repository/booking.test.data';
+import { BusinessRepositoryTestImpl } from '../../business/repository/business.repository.fake.impl';
 import { CustomerRepositoryTestImpl } from '../../customer/repository/customer.repository.fake.impl';
 import { CUSTOMER_TEST_DATA } from '../../customer/repository/customer.test.data';
 import { ServiceRepositoryTestImpl } from '../../service/repository/service.repository.fake.impl';
@@ -25,6 +28,18 @@ import { USER_TEST_DATA } from '../../user/repository/user.test.data';
 jest.mock('uuid', () => ({
   v7: () => 'mock-generated-id',
 }));
+
+interface CapturedSendEmail {
+  to: string;
+  subject: string;
+  template: string;
+  context: Record<string, unknown>;
+}
+
+interface SendEmailOutcome {
+  ok: boolean;
+  error?: { kind: string; message: string };
+}
 
 function buildCommand(
   overrides: Partial<RegisterPublicBookingCommand> = {},
@@ -52,7 +67,9 @@ function buildCommand(
 describe('RegisterPublicBookingUseCaseImpl', () => {
   let useCase: RegisterPublicBookingUseCaseImpl;
   let bookingRepository: BookingRepositoryTestImpl;
+  let businessRepository: BusinessRepositoryTestImpl;
   let customerRepository: CustomerRepositoryTestImpl;
+  let emailSend: jest.Mock<Promise<SendEmailOutcome>, [CapturedSendEmail]>;
   let originalBookings: typeof BOOKING_TEST_DATA;
   let originalCustomers: typeof CUSTOMER_TEST_DATA;
   let originalServices: typeof SERVICE_TEST_DATA;
@@ -73,6 +90,10 @@ describe('RegisterPublicBookingUseCaseImpl', () => {
     USER_TEST_DATA.length = 0;
     USER_TEST_DATA.push(...originalUsers);
 
+    emailSend = jest
+      .fn<Promise<SendEmailOutcome>, [CapturedSendEmail]>()
+      .mockResolvedValue({ ok: true });
+
     const moduleRef: TestingModule = await Test.createTestingModule({
       providers: [
         RegisterPublicBookingUseCaseImpl,
@@ -80,11 +101,14 @@ describe('RegisterPublicBookingUseCaseImpl', () => {
         { provide: ICustomerRepository, useClass: CustomerRepositoryTestImpl },
         { provide: IServiceRepository, useClass: ServiceRepositoryTestImpl },
         { provide: IUserRepository, useClass: UserRepositoryTestImpl },
+        { provide: IBusinessRepository, useClass: BusinessRepositoryTestImpl },
+        { provide: PikslotEmailService, useValue: { sendEmail: emailSend } },
       ],
     }).compile();
 
     useCase = moduleRef.get(RegisterPublicBookingUseCaseImpl);
     bookingRepository = moduleRef.get(IBookingRepository);
+    businessRepository = moduleRef.get(IBusinessRepository);
     customerRepository = moduleRef.get(ICustomerRepository);
   });
 
@@ -333,5 +357,108 @@ describe('RegisterPublicBookingUseCaseImpl', () => {
     if (!result.ok) {
       expect(result.error.kind).toBe('infrastructure');
     }
+  });
+
+  it('sends booking confirmation emails to the guest and the assigned team member', async () => {
+    const result = await useCase.execute(buildCommand());
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    const bookingRef = result.value.bookingId;
+    expect(emailSend).toHaveBeenCalledTimes(2);
+
+    expect(emailSend).toHaveBeenNthCalledWith(1, {
+      to: 'jane.doe@example.com',
+      subject: `Your booking is confirmed — ${bookingRef}`,
+      template: 'booking-confirmation',
+      context: {
+        firstName: 'Jane',
+        isTeamMember: false,
+        businessName: "Alice's Salon & Spa",
+        serviceName: 'Haircut & Style',
+        bookingRef,
+        bookingDate: 'Tue, Jun 16, 2026',
+        startTime: '10:00 AM',
+        endTime: '10:45 AM',
+        teamMemberName: 'Eve Davis',
+        guestFullName: 'Jane Doe',
+        price: 40,
+        currency: 'USD',
+      },
+    });
+
+    expect(emailSend).toHaveBeenNthCalledWith(2, {
+      to: 'eve@acme.com',
+      subject: `New booking confirmed — ${bookingRef}`,
+      template: 'booking-confirmation',
+      context: {
+        firstName: 'Eve',
+        isTeamMember: true,
+        businessName: "Alice's Salon & Spa",
+        serviceName: 'Haircut & Style',
+        bookingRef,
+        bookingDate: 'Tue, Jun 16, 2026',
+        startTime: '10:00 AM',
+        endTime: '10:45 AM',
+        teamMemberName: 'Eve Davis',
+        guestFullName: 'Jane Doe',
+        price: 40,
+        currency: 'USD',
+      },
+    });
+  });
+
+  it('skips the guest confirmation when no email is provided', async () => {
+    const result = await useCase.execute(
+      buildCommand({
+        contact: {
+          firstName: 'Cher',
+          lastName: 'Cher',
+          email: null,
+          phone: '+1-555-1111',
+          address: null,
+        },
+      }),
+    );
+
+    expect(result.ok).toBe(true);
+    expect(emailSend).toHaveBeenCalledTimes(1);
+    const teamCall = emailSend.mock.calls[0][0];
+    expect(teamCall.to).toBe('eve@acme.com');
+    expect(teamCall.context.isTeamMember).toBe(true);
+    expect(teamCall.context.guestFullName).toBe('Cher Cher');
+  });
+
+  it('still returns the saved booking when confirmation emails fail', async () => {
+    emailSend.mockResolvedValue({
+      ok: false,
+      error: { kind: 'email_sending_failed', message: 'smtp down' },
+    });
+
+    const saveSpy = jest.spyOn(bookingRepository, 'save');
+    const result = await useCase.execute(buildCommand());
+
+    expect(result.ok).toBe(true);
+    expect(saveSpy).toHaveBeenCalledTimes(1);
+    expect(emailSend).toHaveBeenCalledTimes(2);
+  });
+
+  it('still sends the confirmation when the business lookup fails', async () => {
+    const infra: InfrastructureError = {
+      kind: 'infrastructure',
+      message: 'boom',
+      timestamp: new Date(),
+      cause: new Error('boom'),
+    };
+    jest
+      .spyOn(businessRepository, 'findById')
+      .mockResolvedValueOnce(err(infra));
+
+    const result = await useCase.execute(buildCommand());
+
+    expect(result.ok).toBe(true);
+    expect(emailSend).toHaveBeenCalledTimes(2);
+    expect(emailSend.mock.calls[0][0].context.businessName).toBe('our studio');
   });
 });
