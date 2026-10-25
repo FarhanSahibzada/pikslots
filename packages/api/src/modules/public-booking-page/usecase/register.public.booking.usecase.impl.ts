@@ -27,7 +27,10 @@ import {
 } from '@pikslots/domain';
 import { formatIsoInTimezone } from '@pikslots/datetime';
 import { v7 as uuidv7 } from 'uuid';
-import { PikslotEmailService } from 'src/shared/email/pikslot.email.service';
+import {
+  PikslotEmailService,
+  type EmailTemplateContextMap,
+} from 'src/shared/email/pikslot.email.service';
 
 const EMPTY_SOCIAL_LINKS = {
   Website: '',
@@ -157,9 +160,10 @@ export class RegisterPublicBookingUseCaseImpl implements RegisterPublicBookingUs
     const saved = await this.bookingRepository.save(booking);
     if (!saved.ok) return err(saved.error);
 
-    // await this.sendBookingConfirmations(booking, command, service, user);
-
-    const shared = {
+    const shared: Omit<
+      EmailTemplateContextMap['booking-confirmation'],
+      'firstName' | 'isTeamMember'
+    > = {
       businessName: business.name,
       serviceName: service.title,
       bookingRef: booking.bookingId,
@@ -183,24 +187,56 @@ export class RegisterPublicBookingUseCaseImpl implements RegisterPublicBookingUs
 
     const customerEmail = command.contact.email;
     if (customerEmail) {
-      const result = await this.emailService.sendEmail({
-        to: customerEmail,
-        subject: `Your booking is confirmed — ${booking.bookingId}`,
-        template: 'booking-confirmation',
-        context: {
-          firstName: command.contact.firstName,
-          ...shared,
-        },
-      });
+      await this.sendBookingConfirmationEmail(
+        customerEmail,
+        command.contact.firstName,
+        false,
+        shared,
+        booking.bookingId,
+      );
+    }
 
-      if (!result.ok) {
-        this.logger.warn(`
-        failed email to sent ${shared.guestFullName} with booking id ${booking.bookingId} 
-        `);
-      }
+    if (user.email) {
+      await this.sendBookingConfirmationEmail(
+        user.email,
+        user.name.firstName,
+        true,
+        shared,
+        booking.bookingId,
+      );
     }
 
     return ok(booking);
+  }
+
+  private async sendBookingConfirmationEmail(
+    to: string,
+    firstName: string,
+    isTeamMember: boolean,
+    shared: Omit<
+      EmailTemplateContextMap['booking-confirmation'],
+      'firstName' | 'isTeamMember'
+    >,
+    bookingId: string,
+  ): Promise<void> {
+    const result = await this.emailService.sendEmail({
+      to,
+      subject: isTeamMember
+        ? `New booking confirmed — ${bookingId}`
+        : `Your booking is confirmed — ${bookingId}`,
+      template: 'booking-confirmation',
+      context: {
+        firstName,
+        isTeamMember,
+        ...shared,
+      },
+    });
+
+    if (!result.ok) {
+      this.logger.warn(
+        `failed to send booking confirmation email to ${to} for booking id ${bookingId}`,
+      );
+    }
   }
 
   private async findOrCreateCustomer(

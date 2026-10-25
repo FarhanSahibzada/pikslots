@@ -25,15 +25,25 @@ export class BookingRepositoryImpl implements BookingRepository {
   async findAllByBusinessForUser(
     businessId: string,
     userId: string,
+    startDateTime?: string,
+    endDateTime?: string,
   ): Promise<Result<Booking[], InfrastructureError>> {
     try {
-      const rows = await this.db
+      let query = this.db
         .selectFrom('bookings')
         .selectAll()
         .where('business_id', '=', businessId)
         .where('user_id', '=', userId)
-        .where('is_deleted', '=', false)
-        .execute();
+        .where('is_deleted', '=', false);
+
+      if (startDateTime) {
+        query = query.where('booking_end_time', '>', new Date(startDateTime));
+      }
+      if (endDateTime) {
+        query = query.where('booking_start_time', '<', new Date(endDateTime));
+      }
+
+      const rows = await query.execute();
 
       return ok(rows.map((row) => this.mapper.persistenceToDomain(row)));
     } catch (cause) {
@@ -91,14 +101,24 @@ export class BookingRepositoryImpl implements BookingRepository {
 
   async findAllByBusiness(
     businessId: string,
+    startDateTime?: string,
+    endDateTime?: string,
   ): Promise<Result<Booking[], InfrastructureError>> {
     try {
-      const rows = await this.db
+      let query = this.db
         .selectFrom('bookings')
         .selectAll()
         .where('business_id', '=', businessId)
-        .where('is_deleted', '=', false)
-        .execute();
+        .where('is_deleted', '=', false);
+
+      if (startDateTime) {
+        query = query.where('booking_end_time', '>', new Date(startDateTime));
+      }
+      if (endDateTime) {
+        query = query.where('booking_start_time', '<', new Date(endDateTime));
+      }
+
+      const rows = await query.execute();
 
       return ok(rows.map((row) => this.mapper.persistenceToDomain(row)));
     } catch (cause) {

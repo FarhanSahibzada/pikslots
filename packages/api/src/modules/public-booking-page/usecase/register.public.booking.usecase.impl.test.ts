@@ -364,6 +364,7 @@ describe('RegisterPublicBookingUseCaseImpl', () => {
     if (!result.ok) return;
 
     const bookingRef = result.value.bookingId;
+    expect(emailSend).toHaveBeenCalledTimes(2);
 
     expect(emailSend).toHaveBeenNthCalledWith(1, {
       to: 'jane.doe@example.com',
@@ -371,6 +372,27 @@ describe('RegisterPublicBookingUseCaseImpl', () => {
       template: 'booking-confirmation',
       context: {
         firstName: 'Jane',
+        isTeamMember: false,
+        businessName: "Alice's Salon & Spa",
+        serviceName: 'Haircut & Style',
+        bookingRef,
+        bookingDate: '2026-06-16',
+        startTime: '10:00 AM',
+        endTime: '10:45 AM',
+        teamMemberName: 'Eve Davis',
+        guestFullName: 'Jane Doe',
+        price: 0.4,
+        currency: 'USD',
+      },
+    });
+
+    expect(emailSend).toHaveBeenNthCalledWith(2, {
+      to: 'eve@acme.com',
+      subject: `New booking confirmed — ${bookingRef}`,
+      template: 'booking-confirmation',
+      context: {
+        firstName: 'Eve',
+        isTeamMember: true,
         businessName: "Alice's Salon & Spa",
         serviceName: 'Haircut & Style',
         bookingRef,
@@ -385,6 +407,28 @@ describe('RegisterPublicBookingUseCaseImpl', () => {
     });
   });
 
+  it('sends only the team member confirmation when the guest has no email', async () => {
+    const result = await useCase.execute(
+      buildCommand({
+        contact: {
+          firstName: 'Cher',
+          lastName: 'Cher',
+          email: null,
+          phone: '+1-555-1111',
+          address: null,
+        },
+      }),
+    );
+
+    expect(result.ok).toBe(true);
+    expect(emailSend).toHaveBeenCalledTimes(1);
+
+    const teamCall = emailSend.mock.calls[0][0];
+    expect(teamCall.to).toBe('eve@acme.com');
+    expect(teamCall.context.isTeamMember).toBe(true);
+    expect(teamCall.context.guestFullName).toBe('Cher Cher');
+  });
+
   it('still returns the saved booking when confirmation emails fail', async () => {
     emailSend.mockResolvedValue({
       ok: false,
@@ -396,6 +440,6 @@ describe('RegisterPublicBookingUseCaseImpl', () => {
 
     expect(result.ok).toBe(true);
     expect(saveSpy).toHaveBeenCalledTimes(1);
-    expect(emailSend).toHaveBeenCalledTimes(1);
+    expect(emailSend).toHaveBeenCalledTimes(2);
   });
 });

@@ -6,10 +6,12 @@
 	import NotificationIcon from '@tabler/icons-svelte/icons/notification';
 	import UserCircleIcon from '@tabler/icons-svelte/icons/user-circle';
 	import * as Avatar from '$lib/components/ui/avatar/index.js';
+	import { Badge } from '$lib/components/ui/badge/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
 	import { Switch } from '$lib/components/ui/switch/index.js';
+	import { notificationsStore } from '$stores/notifications.svelte';
 	import { themeStore } from '$stores/theme.svelte.js';
 	import { authStore } from '$stores/auth.svelte';
 	import { goto } from '$app/navigation';
@@ -104,9 +106,17 @@
 								Billing
 							</DropdownMenu.Item>
 						{/if}
-						<DropdownMenu.Item>
+						<DropdownMenu.Item onclick={() => goto(resolve('/home/notifications'))}>
 							<NotificationIcon />
 							Notifications
+							{#if notificationsStore.unreadCount > 0}
+								<Badge
+									aria-label="{notificationsStore.unreadCount} unread notifications"
+									class="ml-auto h-5 min-w-5 justify-center rounded-full bg-red-600 px-1.5 text-[10px] font-semibold text-white"
+								>
+									{notificationsStore.unreadCount}
+								</Badge>
+							{/if}
 						</DropdownMenu.Item>
 					</DropdownMenu.Group>
 					<DropdownMenu.Separator />

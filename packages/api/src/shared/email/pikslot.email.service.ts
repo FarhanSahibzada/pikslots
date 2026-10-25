@@ -22,6 +22,7 @@ export type EmailTemplateContextMap = {
   };
   'booking-confirmation': {
     firstName: string;
+    isTeamMember: boolean;
     guestFullName: string;
     businessName: string;
     serviceName: string;

@@ -5,7 +5,6 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { resolve } from '$app/paths';
 	import Plus from '@tabler/icons-svelte/icons/plus';
 	import CalendarPlus from '@tabler/icons-svelte/icons/calendar-plus';
 	import UsersPlus from '@tabler/icons-svelte/icons/users-plus';
@@ -15,9 +14,11 @@
 	import type { UserRole } from '@pikslots/shared';
 	import { authStore } from '$stores/auth.svelte';
 
-	const pageTitle = $derived(
-		$page.url.pathname.split('/').filter(Boolean).pop()?.replace(/-/g, ' ') ?? 'Home'
-	);
+	const pageTitle = $derived.by(() => {
+		const segments = $page.url.pathname.split('/').filter(Boolean);
+		if (segments[1] === 'notifications' && segments.length > 2) return 'Notification';
+		return segments.pop()?.replace(/-/g, ' ') ?? 'Home';
+	});
 
 	const privilegedRoles: UserRole[] = ['Platform Owner', 'Business Owner', 'Admin'];
 	const currentUserRole = $derived(authStore.getPayloadData());

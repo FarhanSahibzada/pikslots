@@ -44,12 +44,17 @@ export class BookingRepositoryTestImpl implements BookingRepository {
 
   async findAllByBusiness(
     businessId: string,
+    startDateTime?: string,
+    endDateTime?: string,
   ): Promise<Result<Booking[], InfrastructureError>> {
     await Promise.resolve('');
 
     return ok(
       BOOKING_TEST_DATA.filter(
-        (b) => b.businessId === businessId && !b.isDeleted,
+        (b) =>
+          b.businessId === businessId &&
+          !b.isDeleted &&
+          this.isWithinRange(b, startDateTime, endDateTime),
       ),
     );
   }
@@ -57,15 +62,44 @@ export class BookingRepositoryTestImpl implements BookingRepository {
   async findAllByBusinessForUser(
     businessId: string,
     userId: string,
+    startDateTime?: string,
+    endDateTime?: string,
   ): Promise<Result<Booking[], InfrastructureError>> {
     await Promise.resolve('');
 
     return ok(
       BOOKING_TEST_DATA.filter(
         (b) =>
-          b.businessId === businessId && b.userId === userId && !b.isDeleted,
+          b.businessId === businessId &&
+          b.userId === userId &&
+          !b.isDeleted &&
+          this.isWithinRange(b, startDateTime, endDateTime),
       ),
     );
+  }
+
+  private isWithinRange(
+    booking: Booking,
+    startDateTime?: string,
+    endDateTime?: string,
+  ): boolean {
+    if (
+      startDateTime &&
+      new Date(booking.bookingEndTime).getTime() <=
+        new Date(startDateTime).getTime()
+    ) {
+      return false;
+    }
+
+    if (
+      endDateTime &&
+      new Date(booking.bookingStartTime).getTime() >=
+        new Date(endDateTime).getTime()
+    ) {
+      return false;
+    }
+
+    return true;
   }
 
   async update(

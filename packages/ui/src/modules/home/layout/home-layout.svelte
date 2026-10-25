@@ -6,8 +6,10 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/stores';
+	import { slide } from 'svelte/transition';
 	import PikslotHeader from './header/pikslot-header.svelte';
 	import PikslotsSidebar from './sidebar/pikslots-sidebar.svelte';
+	import PageSearch from '../search/page-search.svelte';
 	import { getBusinessByIdQueryOptions } from '../../api/business/get.business.by.id.query';
 	import { createQuery } from '@tanstack/svelte-query';
 	import { businessStore } from '$stores/business.svelte';
@@ -30,10 +32,15 @@
 		if (businessFindByIdQuery.data) businessStore.setSelectedBusiness(businessFindByIdQuery.data);
 	});
 
+	let wasInSettings = false;
+
 	$effect(() => {
-		if ($page.url.pathname.startsWith('/home/settings')) {
-			settingsStore.makeOpen();
-		}
+		const inSettings = $page.url.pathname.startsWith('/home/settings');
+
+		if (inSettings && !wasInSettings) settingsStore.makeOpen();
+		if (!inSettings && wasInSettings) settingsStore.close();
+
+		wasInSettings = inSettings;
 	});
 </script>
 
@@ -46,7 +53,9 @@
 	>
 		<PikslotsSidebar variant="inset" />
 		{#if settingsStore.open}
-			<SettingsSidebar />
+			<div class="shrink-0" transition:slide={{ axis: 'x', duration: 200 }}>
+				<SettingsSidebar />
+			</div>
 		{/if}
 		<Sidebar.Inset>
 			<PikslotHeader />
@@ -59,4 +68,5 @@
 			</div>
 		</Sidebar.Inset>
 	</Sidebar.Provider>
+	<PageSearch />
 {/if}

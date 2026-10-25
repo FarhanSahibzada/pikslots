@@ -10,7 +10,7 @@
 	import { createQuery } from '@tanstack/svelte-query';
 	import { getUsersInsideBusinessQueryOptions } from '../api/user/get.users.inside.business.query';
 	import { getCustomersByBusinessQueryOptions } from '../api/customer/get.customers.by.business.query';
-	import { getBookingsByBusinessForUser } from '../api/booking/get.bookings.by.business.for.user.query';
+	import { getBookingsByBusinessForUserQueryOptions } from '../api/booking/get.bookings.by.business.for.user.query';
 	import { businessStore } from '$stores/business.svelte';
 	import { authStore } from '$stores/auth.svelte';
 	import ViewBookingDialog from './dialogs/view.booking.svelte';
@@ -67,51 +67,44 @@
 			currentUserRole === 'Enhanced'
 	);
 
+	// helper for find user role
 	const getUserRole = (userId: string) => users.find((u) => u.id === userId)?.role ?? '';
 
+	// find business timezone
 	const businessTimezone = $derived(
 		businessStore.selectedBusiness?.locationDetails.timeZone ||
 			Intl.DateTimeFormat().resolvedOptions().timeZone
 	);
 
-	// ── Bookings (manual parallel fetch per enabled user) ───────────────────────
+	// ── Bookings (single bulk fetch, filtered by enabled users) ─────────────────
 
 	let calendarStartDateTime = $state<string>('');
 	let calendarEndDateTime = $state<string>('');
-	let bookingData = $state<BookingItemResponse[]>([]);
 
-	$effect(() => {
-		const businessId = businessStore.selectedBusiness?.id ?? '';
-		const start = calendarStartDateTime;
-		const end = calendarEndDateTime;
-		const tz = businessTimezone;
-		const enabledUsers = users.filter((u) => enabledUserIds.has(u.id));
+	const bookingsQuery = createQuery(() => ({
+		...getBookingsByBusinessForUserQueryOptions(
+			businessStore.selectedBusiness?.id ?? '',
+			jwtPayload?.userId ?? '',
+			calendarStartDateTime,
+			calendarEndDateTime,
+			businessTimezone
+		),
+		enabled:
+			!!businessStore.selectedBusiness?.id &&
+			!!jwtPayload?.userId &&
+			!!calendarStartDateTime &&
+			!!calendarEndDateTime
+	}));
 
-		if (!businessId || !start || !end || enabledUsers.length === 0) {
-			bookingData = [];
-			return;
-		}
+	const allBookings = $derived(bookingsQuery.data ?? []);
 
-		let cancelled = false;
-
-		Promise.all(
-			enabledUsers.map((user) => getBookingsByBusinessForUser(businessId, user.id, start, end, tz))
-		)
-			.then((results) => {
-				if (!cancelled) {
-					bookingData = results.flat();
-				}
-			})
-			.catch(() => {
-				if (!cancelled) {
-					bookingData = [];
-				}
-			});
-
-		return () => {
-			cancelled = true;
-		};
-	});
+	const bookingData = $derived(
+		currentUserRole === 'Standard'
+			? allBookings
+			: allBookings.filter(
+					(booking) => booking.userId !== null && enabledUserIds.has(booking.userId)
+				)
+	);
 
 	const hasBookings = $derived(bookingData.length > 0);
 

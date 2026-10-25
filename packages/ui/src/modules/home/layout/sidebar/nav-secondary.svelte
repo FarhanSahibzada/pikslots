@@ -32,10 +32,10 @@
 									<span>{item.title}</span>
 								</a>
 							{:else}
-								<a href={'#'} {...props} onclick={item.onclick}>
+								<button type="button" {...props} onclick={item.onclick}>
 									<item.icon />
 									<span>{item.title}</span>
-								</a>
+								</button>
 							{/if}
 						{/snippet}
 					</Sidebar.MenuButton>

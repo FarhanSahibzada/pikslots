@@ -44,7 +44,7 @@
     "prepare": "husky || true",
     "docker:up": "docker compose --env-file .env -f docker/postgres.yml -f docker/redis.yml -f docker/mailpit.yml up -d",
     "docker:down": "docker compose --env-file .env -f docker/postgres.yml -f docker/redis.yml -f docker/mailpit.yml down ",
-    "docker:test-run": "docker compose --env-file .test.env -f docker/postgres.yml -f docker/redis.yml -f docker/mailpit.yml up -d "
+    "docker:test-up": "docker compose --env-file .test.env -f docker/postgres.yml -f docker/redis.yml -f docker/mailpit.yml up -d "
   },
   "workspaces": [
     "packages/*"

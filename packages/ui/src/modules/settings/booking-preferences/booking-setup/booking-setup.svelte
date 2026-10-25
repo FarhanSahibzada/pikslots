@@ -46,7 +46,7 @@
 	let contactFields = $state([
 		{ label: 'Name', enabled: true, required: true, locked: true },
 		{ label: 'Phone', enabled: false, required: false, locked: false },
-		{ label: 'Email', enabled: false, required: false, locked: false },
+		{ label: 'Email', enabled: true, required: true, locked: true },
 		{ label: 'Address', enabled: false, required: false, locked: false }
 	]);
 

@@ -250,7 +250,11 @@ export async function findAllBookingsByBusinessForUser(
   businessId: string,
   userId: string,
   actorToken: string,
-  query?: { startDateTime?: string; endDateTime?: string; timezone?: string },
+  query?: {
+    startDateTime?: string;
+    endDateTime?: string;
+    timezone?: string;
+  },
 ): Promise<SupertestResponse> {
   const qs = new URLSearchParams();
   if (query?.startDateTime) qs.set('startDateTime', query.startDateTime);

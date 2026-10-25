@@ -64,7 +64,7 @@ describe(`GET ${BOOKING_ENDPOINTS.FIND_ALL_BY_BUSINESS_FOR_USER}`, () => {
     expect(data).toHaveLength(1);
   });
 
-  it('returns only the specified user bookings when called by a Business Owner', async () => {
+  it('returns every business booking when called by a Business Owner', async () => {
     const businessId = await createOwningBusiness(ctx);
     const owner = await createStaffUser(ctx, businessId, 'Business Owner');
     const { id: userId } = await createStaffUser(ctx, businessId, 'Standard');
@@ -109,8 +109,7 @@ describe(`GET ${BOOKING_ENDPOINTS.FIND_ALL_BY_BUSINESS_FOR_USER}`, () => {
 
     expect(response.status).toBe(200);
     const data = successBody<Record<string, unknown>[]>(response).data;
-    // only the userId's booking, not otherUserId's
-    expect(data).toHaveLength(1);
+    expect(data).toHaveLength(2);
   });
 
   it('returns an empty array for a user with no bookings', async () => {

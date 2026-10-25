@@ -49,6 +49,7 @@
 	const businessId = $derived(businessStore.selectedBusiness?.id || '');
 	const businessCurrency = $derived(businessStore.selectedBusiness?.locationDetails.currency);
 	const assigneeUserId = $derived(selectedUserId || jwtPayload?.userId || '');
+	const timeformat = $derived(businessStore.selectedBusiness?.locationDetails.timeZone)
 
 	// ── Label ──────────────────────────────────────────────────────────────────
 	const PREDEFINED_LABELS = ['Confirmed', 'Pending', 'Cancelled', 'Completed', 'No Show'] as const;
@@ -323,11 +324,10 @@
 	function formatSlotTime(iso: string): string {
 		if (!iso) return '';
 		const d = new Date(iso);
-		if (isNaN(d.getTime())) return '';
 		return new Intl.DateTimeFormat('en-US', {
 			hour: 'numeric',
 			minute: '2-digit',
-			hour12: true,
+			hour12: timeformat === '12 hours',
 			timeZone: businessTimezone
 		}).format(d);
 	}
