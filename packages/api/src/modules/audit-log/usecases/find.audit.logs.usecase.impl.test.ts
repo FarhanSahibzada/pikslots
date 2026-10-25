@@ -98,7 +98,9 @@ describe('FindAuditLogsUseCaseImpl', () => {
       expect(result.ok).toBe(true);
       if (result.ok) {
         expect(result.value).toHaveLength(2);
-        expect(result.value.every((a) => a.userId === 'user-standard-1')).toBe(true);
+        expect(result.value.every((a) => a.userId === 'user-standard-1')).toBe(
+          true,
+        );
       }
     });
 

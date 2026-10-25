@@ -30,7 +30,8 @@ export class FindAuditLogsUseCaseImpl implements FindAuditLogsUseCase {
     command: FindAuditLogsCommand,
   ): Promise<Result<AuditLog[], UnauthorizedError | InfrastructureError>> {
     const callerRole = this.securityContext.role;
-    const isPartOfSameBusiness = this.securityContext.businessId === command.businessId;
+    const isPartOfSameBusiness =
+      this.securityContext.businessId === command.businessId;
 
     if (!AuditLog.canViewAuditLogs(callerRole, isPartOfSameBusiness))
       return err(UNAUTHORIZED_ERROR);

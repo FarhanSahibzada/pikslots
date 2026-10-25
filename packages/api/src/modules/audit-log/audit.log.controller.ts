@@ -1,6 +1,16 @@
-import { Controller, Get, HttpStatus, Query, Res, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpStatus,
+  Query,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { FindAllAuditLogsDocs } from './docs/audit.log.controller.docs';
-import { AUDIT_LOG_ENDPOINTS, FindAllAuditLogsResponse } from '@pikslots/shared';
+import {
+  AUDIT_LOG_ENDPOINTS,
+  FindAllAuditLogsResponse,
+} from '@pikslots/shared';
 import { RolesGuard } from 'src/shared/security/guards/roles.guard';
 import { Roles } from 'src/shared/security/guards/roles.decorator';
 import type { Response } from 'express';
@@ -12,7 +22,9 @@ import { mapAuditLogError } from './errors/audit.log.error.map';
 
 @Controller('')
 export class AuditLogController {
-  constructor(private readonly auditLogUsecasesFactory: AuditLogUsecasesFactory) {}
+  constructor(
+    private readonly auditLogUsecasesFactory: AuditLogUsecasesFactory,
+  ) {}
 
   @FindAllAuditLogsDocs()
   @UseGuards(RolesGuard)
@@ -21,14 +33,17 @@ export class AuditLogController {
   async findAll(
     @Res({ passthrough: true }) res: Response,
     @Query() query: FindAllAuditLogsDto,
-  ): Promise<PikslotsBaseErrorResponse | PikslotsBaseResponse<FindAllAuditLogsResponse>> {
-    const result = await this.auditLogUsecasesFactory.findAuditLogsUsecase.execute({
-      businessId: query.businessId,
-      entityType: query.entityType,
-      entityId: query.entityId,
-      userId: query.userId,
-      action: query.action,
-    });
+  ): Promise<
+    PikslotsBaseErrorResponse | PikslotsBaseResponse<FindAllAuditLogsResponse>
+  > {
+    const result =
+      await this.auditLogUsecasesFactory.findAuditLogsUsecase.execute({
+        businessId: query.businessId,
+        entityType: query.entityType,
+        entityId: query.entityId,
+        userId: query.userId,
+        action: query.action,
+      });
 
     if (!result.ok) {
       const errorResponse = mapAuditLogError(result.error);

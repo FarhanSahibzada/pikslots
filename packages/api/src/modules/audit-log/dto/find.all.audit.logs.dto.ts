@@ -12,7 +12,10 @@ export class FindAllAuditLogsDto implements FindAllAuditLogsQuery {
   @IsUUID()
   businessId?: string;
 
-  @ApiPropertyOptional({ description: 'Filter by entity type', example: 'user' })
+  @ApiPropertyOptional({
+    description: 'Filter by entity type',
+    example: 'user',
+  })
   @IsOptional()
   @IsString()
   entityType?: string;

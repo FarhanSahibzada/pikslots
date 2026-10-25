@@ -45,7 +45,8 @@ export class AuditLogRepositoryTestImpl implements AuditLogRepository {
     await Promise.resolve('');
     const rows = AUDIT_LOG_TEST_DATA.filter(
       (a) =>
-        (filter.businessId === undefined || a.businessId === filter.businessId) &&
+        (filter.businessId === undefined ||
+          a.businessId === filter.businessId) &&
         (!filter.entityType || a.entityType === filter.entityType) &&
         (!filter.entityId || a.entityId === filter.entityId) &&
         (!filter.userId || a.userId === filter.userId) &&

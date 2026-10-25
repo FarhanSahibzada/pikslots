@@ -1,5 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuditLogJobDataShape, err, IAuditLogRepository, InfrastructureError } from '@pikslots/domain';
+import {
+  AuditLogJobDataShape,
+  err,
+  IAuditLogRepository,
+  InfrastructureError,
+} from '@pikslots/domain';
 import { AUDIT_LOG_TEST_DATA } from '../repository/audit.log.test.data';
 import { AuditLogRepositoryTestImpl } from '../repository/audit.log.repository.fake.impl';
 import { UserLogoutAuditLogEventImpl } from './user.logout.audit.log.event.impl';
@@ -54,7 +59,9 @@ describe('UserLogoutAuditLogEventImpl', () => {
     await processor.process(job);
 
     expect(saveSpy).toHaveBeenCalledTimes(1);
-    const persisted = AUDIT_LOG_TEST_DATA.find((a) => a.id === 'mock-generated-id');
+    const persisted = AUDIT_LOG_TEST_DATA.find(
+      (a) => a.id === 'mock-generated-id',
+    );
     expect(persisted).toBeDefined();
     expect(persisted?.businessId).toBe(job.data.businessId);
     expect(persisted?.userId).toBe(job.data.userId);

@@ -1,5 +1,8 @@
 import { Provider } from '@nestjs/common';
-import { IFindAuditLogsUseCase, IRegisterAuditLogUseCase } from '@pikslots/domain';
+import {
+  IFindAuditLogsUseCase,
+  IRegisterAuditLogUseCase,
+} from '@pikslots/domain';
 import { RegisterAuditLogUseCaseImpl } from './register.audit.log.usecase.impl';
 import { FindAuditLogsUseCaseImpl } from './find.audit.logs.usecase.impl';
 
