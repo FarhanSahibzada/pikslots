@@ -47,7 +47,7 @@
 				<!-- 		align={sidebar.isMobile ? 'end' : 'start'} -->
 				<!-- 	> -->
 				<!-- 		<DropdownMenu.Item> -->
-							<!-- <FolderIcon /> -->
+				<!-- <FolderIcon /> -->
 				<!-- 			<span>Open</span> -->
 				<!-- 		</DropdownMenu.Item> -->
 				<!-- 		<DropdownMenu.Item> -->

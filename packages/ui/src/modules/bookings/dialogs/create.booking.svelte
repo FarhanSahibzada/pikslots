@@ -49,7 +49,7 @@
 	const businessId = $derived(businessStore.selectedBusiness?.id || '');
 	const businessCurrency = $derived(businessStore.selectedBusiness?.locationDetails.currency);
 	const assigneeUserId = $derived(selectedUserId || jwtPayload?.userId || '');
-	const timeformat = $derived(businessStore.selectedBusiness?.locationDetails.timeZone)
+	const timeformat = $derived(businessStore.selectedBusiness?.locationDetails.timeZone);
 
 	// ── Label ──────────────────────────────────────────────────────────────────
 	const PREDEFINED_LABELS = ['Confirmed', 'Pending', 'Cancelled', 'Completed', 'No Show'] as const;
