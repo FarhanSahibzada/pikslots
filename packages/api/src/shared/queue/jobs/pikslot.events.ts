@@ -18,4 +18,8 @@ export const PIKSLOT_EVENTS = {
     SYNC_CLASS_CLASS_GROUPS: 'sync.class.class.groups', // (single) class --> sync --> class groups (multiple)
     SYNC_CLASS_GROUP_CLASSES: 'sync.class.group.classes', // (single) class group --> sync --> classes (multiple)
   },
+  AUDIT_LOG: {
+    USER_LOGIN: 'audit.log.user.login',
+    USER_LOGOUT: 'audit.log.user.logout',
+  },
 } as const;

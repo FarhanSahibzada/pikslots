@@ -12,6 +12,7 @@ import { CustomerTable } from './customer.table';
 import { TimeOffTable } from './timeoff.table';
 import { BookingTable } from './booking.table';
 import { BreakTable } from './break.table';
+import { AuditLogTable } from './audit.log.table';
 
 export type { AuditFields };
 
@@ -29,4 +30,5 @@ export interface PikSlotsDatabase {
   timeoffs: TimeOffTable;
   bookings: BookingTable;
   breaks: BreakTable;
+  audit_logs: AuditLogTable;
 }

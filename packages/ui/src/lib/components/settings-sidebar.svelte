@@ -11,14 +11,10 @@
 	import Users from '@tabler/icons-svelte/icons/users';
 	import AdjustmentsHorizontal from '@tabler/icons-svelte/icons/adjustments-horizontal';
 	import CalendarCog from '@tabler/icons-svelte/icons/calendar-cog';
-	import Cash from '@tabler/icons-svelte/icons/cash';
-	import ChartBar from '@tabler/icons-svelte/icons/chart-bar';
-	import CreditCard from '@tabler/icons-svelte/icons/credit-card';
 	import Bell from '@tabler/icons-svelte/icons/bell';
-	import Star from '@tabler/icons-svelte/icons/star';
-	import Lock from '@tabler/icons-svelte/icons/lock';
 	import ChevronDown from '@tabler/icons-svelte/icons/chevron-down';
 	import LayoutSidebarLeftCollapse from '@tabler/icons-svelte/icons/layout-sidebar-left-collapse';
+	import Logs from '@tabler/icons-svelte/icons/logs';
 	import { settingsStore } from '$stores/settings.svelte.js';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 	import { authStore } from '$stores/auth.svelte';
@@ -161,13 +157,13 @@
 							href: resolve('/home/settings/notifications/customization')
 						}
 					]
+				},
+				{
+					label: 'Activity Logs',
+					icon: Logs,
+					href: resolve('/home/settings/logs'),
+					roles: privilegedRoles
 				}
-				// {
-				// 	label: 'Reviews',
-				// 	icon: Star,
-				// 	href: resolve('/home/settings/reviews'),
-				// 	roles: privilegedRoles
-				// },
 				// {
 				// 	label: 'Security',
 				// 	icon: Lock,

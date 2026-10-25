@@ -58,3 +58,16 @@ export interface ClassSummary {
   id: string;
   title: string;
 }
+
+export interface AuditLogJobDataShape {
+  businessId: string | null; // platform owner -> businessId is null
+  userId: string;
+  userType: 'user' | 'system';
+  action: string;
+  description: string;
+  entityType: string;
+  entityId: string;
+  occurredAt: string; // ISO 8601 UTC
+  ipAddress?: string;
+  metadata?: Record<string, unknown>;
+}

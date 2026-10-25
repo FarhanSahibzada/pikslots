@@ -41,4 +41,11 @@ export const REGISTERED_QUEUES = BullModule.registerQueue(
   {
     name: PIKSLOT_EVENTS.CLASS_GROUP_ASSIGNMENT.SYNC_CLASS_GROUP_CLASSES,
   },
+  // audit logs
+  {
+    name: PIKSLOT_EVENTS.AUDIT_LOG.USER_LOGIN,
+  },
+  {
+    name: PIKSLOT_EVENTS.AUDIT_LOG.USER_LOGOUT,
+  },
 );

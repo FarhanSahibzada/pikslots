@@ -23,6 +23,7 @@ import { PikslotS3Module } from './shared/s3/s3.module';
 import { PublicBookingPage } from './modules/public-booking-page/public.booking.page.module';
 import { OnboardingModule } from './modules/onboarding/onboarding.module';
 import { HealtController } from './health.controller';
+import { AuditLogModule } from './modules/audit-log/audit.log.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { HealtController } from './health.controller';
     BreakModule,
     PublicBookingPage,
     OnboardingModule,
+    AuditLogModule,
   ],
   controllers: [HealtController],
   providers: [],
