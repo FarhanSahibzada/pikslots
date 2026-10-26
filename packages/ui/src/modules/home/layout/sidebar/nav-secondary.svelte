@@ -62,4 +62,4 @@
 			{/each}
 		</Sidebar.Menu>
 	</Sidebar.GroupContent>
-</Sidebar.Group>	
+</Sidebar.Group>
