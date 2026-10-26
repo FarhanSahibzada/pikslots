@@ -20,6 +20,5 @@ const auditLogErrorMap: Record<
 export function mapAuditLogError(
   error: AuditLogError,
 ): PikslotsBaseErrorResponse {
-  console.log(error);
   return auditLogErrorMap[error.kind](error);
 }
