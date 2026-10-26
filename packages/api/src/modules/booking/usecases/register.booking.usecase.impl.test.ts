@@ -1,3 +1,4 @@
+import { getQueueToken } from '@nestjs/bullmq';
 import { Test, TestingModule } from '@nestjs/testing';
 import {
   BookingConflictError,
@@ -23,6 +24,7 @@ import { CustomerRepositoryTestImpl } from '../../customer/repository/customer.r
 import { CUSTOMER_TEST_DATA } from '../../customer/repository/customer.test.data';
 import { UserRepositoryTestImpl } from '../../user/repository/user.repository.fake.impl';
 import { USER_TEST_DATA } from '../../user/repository/user.test.data';
+import { AUDIT_LOG_QUEUE } from 'src/shared/queue/jobs/pikslot.events';
 
 jest.mock('uuid', () => ({
   v7: () => 'mock-generated-id',
@@ -107,6 +109,10 @@ describe('RegisterBookingUseCaseImpl', () => {
         { provide: IBusinessRepository, useClass: BusinessRepositoryTestImpl },
         { provide: SecurityContext, useValue: securityContext },
         { provide: PikslotEmailService, useValue: { sendEmail: emailSend } },
+        {
+          provide: getQueueToken(AUDIT_LOG_QUEUE),
+          useValue: { add: jest.fn().mockResolvedValue(undefined) },
+        },
       ],
     }).compile();
 

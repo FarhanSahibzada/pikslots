@@ -1,3 +1,4 @@
+import { InjectQueue } from '@nestjs/bullmq';
 import { Inject, Injectable } from '@nestjs/common';
 import {
   err,
@@ -6,13 +7,20 @@ import {
   CustomerAlreadyExistsError,
   RegisterCustomerCommand,
   RegisterCustomerUseCase,
+  type AuditLogJobDataShape,
   type CustomerRepository,
   ICustomerRepository,
   InfrastructureError,
   Result,
   UnauthorizedError,
 } from '@pikslots/domain';
+import { Queue } from 'bullmq';
 import { SecurityContext } from 'src/shared/security/context/security.context';
+import {
+  AUDIT_LOG_QUEUE,
+  PIKSLOT_EVENTS,
+} from 'src/shared/queue/jobs/pikslot.events';
+import type { AuditLogJobName } from 'src/shared/queue/jobs';
 import { v7 as uuidv7 } from 'uuid';
 
 const UNAUTHORIZED_ERROR: UnauthorizedError = {
@@ -27,6 +35,12 @@ export class RegisterCustomerUseCaseImpl implements RegisterCustomerUseCase {
     @Inject(ICustomerRepository)
     private readonly customerRepository: CustomerRepository,
     private readonly securityContext: SecurityContext,
+    @InjectQueue(AUDIT_LOG_QUEUE)
+    private readonly auditLogQueue: Queue<
+      AuditLogJobDataShape,
+      void,
+      AuditLogJobName
+    >,
   ) {}
 
   async execute(
@@ -69,6 +83,26 @@ export class RegisterCustomerUseCaseImpl implements RegisterCustomerUseCase {
 
     if (!saved.ok) return err(saved.error);
 
+    await this.logCustomerCreatedAudit(customer);
+
     return ok(customer);
+  }
+
+  private async logCustomerCreatedAudit(customer: Customer): Promise<void> {
+    const payload: AuditLogJobDataShape = {
+      businessId: customer.businessId,
+      userId: this.securityContext.userId,
+      userType: 'user',
+      action: PIKSLOT_EVENTS.AUDIT_LOG.CUSTOMER_CREATED,
+      description: `Customer '${customer.name.firstName} ${customer.name.lastName}' was created`,
+      entityType: 'customer',
+      entityId: customer.id,
+      occurredAt: new Date().toISOString(),
+    };
+
+    await this.auditLogQueue.add(
+      PIKSLOT_EVENTS.AUDIT_LOG.CUSTOMER_CREATED,
+      payload,
+    );
   }
 }

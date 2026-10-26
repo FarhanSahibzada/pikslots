@@ -12,12 +12,17 @@ import {
   Result,
 } from '@pikslots/domain';
 import type {
+  AuditLogJobDataShape,
   SyncClassClassGroupsEvent,
   UnauthorizedError,
 } from '@pikslots/domain';
 import { SecurityContext } from 'src/shared/security/context/security.context';
 import { Queue } from 'bullmq';
-import { PIKSLOT_EVENTS } from 'src/shared/queue/jobs/pikslot.events';
+import {
+  AUDIT_LOG_QUEUE,
+  PIKSLOT_EVENTS,
+} from 'src/shared/queue/jobs/pikslot.events';
+import type { AuditLogJobName } from 'src/shared/queue/jobs';
 
 import type { ClassRepository } from '@pikslots/domain';
 
@@ -38,6 +43,12 @@ export class EditClassUseCaseImpl implements EditClassUseCase {
       SyncClassClassGroupsEvent,
       void,
       typeof PIKSLOT_EVENTS.CLASS_GROUP_ASSIGNMENT.SYNC_CLASS_CLASS_GROUPS
+    >,
+    @InjectQueue(AUDIT_LOG_QUEUE)
+    private readonly auditLogQueue: Queue<
+      AuditLogJobDataShape,
+      void,
+      AuditLogJobName
     >,
   ) {}
 
@@ -93,6 +104,26 @@ export class EditClassUseCaseImpl implements EditClassUseCase {
       },
     );
 
+    await this.logClassUpdatedAudit(updated);
+
     return ok(undefined);
+  }
+
+  private async logClassUpdatedAudit(cls: Class): Promise<void> {
+    const payload: AuditLogJobDataShape = {
+      businessId: cls.businessId,
+      userId: this.securityContext.userId,
+      userType: 'user',
+      action: PIKSLOT_EVENTS.AUDIT_LOG.CLASS_UPDATED,
+      description: `Class '${cls.title}' was updated`,
+      entityType: 'class',
+      entityId: cls.id,
+      occurredAt: new Date().toISOString(),
+    };
+
+    await this.auditLogQueue.add(
+      PIKSLOT_EVENTS.AUDIT_LOG.CLASS_UPDATED,
+      payload,
+    );
   }
 }

@@ -1,3 +1,4 @@
+import { getQueueToken } from '@nestjs/bullmq';
 import { Test, TestingModule } from '@nestjs/testing';
 import {
   CreateTimeoffCommand,
@@ -10,6 +11,7 @@ import { TIMEOFF_TEST_DATA } from '../repository/timeoff.test.data';
 import { TimeOffRepositoryTestImpl } from '../repository/timeoff.repository.fake.impl';
 import { RegisterTimeOffUseCaseImpl } from './register.timeoff.usecase.impl';
 import { SecurityContext } from 'src/shared/security/context/security.context';
+import { AUDIT_LOG_QUEUE } from 'src/shared/queue/jobs/pikslot.events';
 
 jest.mock('uuid', () => ({
   v7: () => 'mock-generated-id',
@@ -53,6 +55,10 @@ describe('RegisterTimeOffUseCaseImpl', () => {
         RegisterTimeOffUseCaseImpl,
         { provide: ITimeoffRepository, useClass: TimeOffRepositoryTestImpl },
         { provide: SecurityContext, useValue: securityContext },
+        {
+          provide: getQueueToken(AUDIT_LOG_QUEUE),
+          useValue: { add: jest.fn().mockResolvedValue(undefined) },
+        },
       ],
     }).compile();
 

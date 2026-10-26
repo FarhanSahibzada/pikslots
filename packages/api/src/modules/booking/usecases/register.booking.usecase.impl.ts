@@ -1,7 +1,9 @@
+import { InjectQueue } from '@nestjs/bullmq';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
   Booking,
   BookingConflictError,
+  type AuditLogJobDataShape,
   type BookingRepository,
   type BusinessRepository,
   type CustomerRepository,
@@ -19,11 +21,17 @@ import {
   type UserRepository,
 } from '@pikslots/domain';
 import { formatIsoInTimezone } from '@pikslots/datetime';
+import { Queue } from 'bullmq';
 import { SecurityContext } from 'src/shared/security/context/security.context';
 import {
   PikslotEmailService,
   type EmailTemplateContextMap,
 } from 'src/shared/email/pikslot.email.service';
+import {
+  AUDIT_LOG_QUEUE,
+  PIKSLOT_EVENTS,
+} from 'src/shared/queue/jobs/pikslot.events';
+import type { AuditLogJobName } from 'src/shared/queue/jobs';
 import { v7 as uuidv7 } from 'uuid';
 
 const UNAUTHORIZED_ERROR: UnauthorizedError = {
@@ -47,6 +55,12 @@ export class RegisterBookingUseCaseImpl implements RegisterBookingUseCase {
     private readonly businessRepository: BusinessRepository,
     private readonly securityContext: SecurityContext,
     private readonly emailService: PikslotEmailService,
+    @InjectQueue(AUDIT_LOG_QUEUE)
+    private readonly auditLogQueue: Queue<
+      AuditLogJobDataShape,
+      void,
+      AuditLogJobName
+    >,
   ) {}
 
   async execute(
@@ -106,7 +120,27 @@ export class RegisterBookingUseCaseImpl implements RegisterBookingUseCase {
 
     await this.sendBookingConfirmationEmails(booking);
 
+    await this.logBookingCreatedAudit(booking);
+
     return ok(booking);
+  }
+
+  private async logBookingCreatedAudit(booking: Booking): Promise<void> {
+    const payload: AuditLogJobDataShape = {
+      businessId: booking.businessId,
+      userId: this.securityContext.userId,
+      userType: 'user',
+      action: PIKSLOT_EVENTS.AUDIT_LOG.BOOKING_CREATED,
+      description: `Booking ${booking.bookingId} was created`,
+      entityType: 'booking',
+      entityId: booking.id,
+      occurredAt: new Date().toISOString(),
+    };
+
+    await this.auditLogQueue.add(
+      PIKSLOT_EVENTS.AUDIT_LOG.BOOKING_CREATED,
+      payload,
+    );
   }
 
   private async sendBookingConfirmationEmails(booking: Booking): Promise<void> {

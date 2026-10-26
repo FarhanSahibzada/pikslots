@@ -1,3 +1,4 @@
+import { InjectQueue } from '@nestjs/bullmq';
 import { Inject } from '@nestjs/common';
 import {
   err,
@@ -10,8 +11,14 @@ import {
   UnauthorizedError,
   CreateTimeoffCommand,
 } from '@pikslots/domain';
-import type { TimeOffRepository } from '@pikslots/domain';
+import type { AuditLogJobDataShape, TimeOffRepository } from '@pikslots/domain';
+import { Queue } from 'bullmq';
 import { SecurityContext } from 'src/shared/security/context/security.context';
+import {
+  AUDIT_LOG_QUEUE,
+  PIKSLOT_EVENTS,
+} from 'src/shared/queue/jobs/pikslot.events';
+import type { AuditLogJobName } from 'src/shared/queue/jobs';
 import { v7 as uuidv7 } from 'uuid';
 
 const UNAUTHORIZED_ERROR: UnauthorizedError = {
@@ -24,6 +31,12 @@ export class RegisterTimeOffUseCaseImpl implements RegisterTimeOffUseCase {
     @Inject(ITimeoffRepository)
     private readonly timeoffRepository: TimeOffRepository,
     private readonly securityContext: SecurityContext,
+    @InjectQueue(AUDIT_LOG_QUEUE)
+    private readonly auditLogQueue: Queue<
+      AuditLogJobDataShape,
+      void,
+      AuditLogJobName
+    >,
   ) {}
   async execute(
     command: CreateTimeoffCommand,
@@ -54,6 +67,26 @@ export class RegisterTimeOffUseCaseImpl implements RegisterTimeOffUseCase {
 
     if (!saved.ok) return err(saved.error);
 
+    await this.logTimeoffCreatedAudit(timeoff);
+
     return ok(timeoff);
+  }
+
+  private async logTimeoffCreatedAudit(timeoff: Timeoff): Promise<void> {
+    const payload: AuditLogJobDataShape = {
+      businessId: timeoff.businessId,
+      userId: this.securityContext.userId,
+      userType: 'user',
+      action: PIKSLOT_EVENTS.AUDIT_LOG.TIMEOFF_CREATED,
+      description: `Timeoff '${timeoff.title}' was created`,
+      entityType: 'timeoff',
+      entityId: timeoff.id,
+      occurredAt: new Date().toISOString(),
+    };
+
+    await this.auditLogQueue.add(
+      PIKSLOT_EVENTS.AUDIT_LOG.TIMEOFF_CREATED,
+      payload,
+    );
   }
 }

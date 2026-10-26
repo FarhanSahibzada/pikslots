@@ -1,3 +1,4 @@
+import { InjectQueue } from '@nestjs/bullmq';
 import {
   Body,
   Controller,
@@ -16,6 +17,13 @@ import {
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { ApiTags } from '@nestjs/swagger';
+import { Queue } from 'bullmq';
+import type { AuditLogJobDataShape } from '@pikslots/domain';
+import {
+  AUDIT_LOG_QUEUE,
+  PIKSLOT_EVENTS,
+} from 'src/shared/queue/jobs/pikslot.events';
+import type { AuditLogJobName } from 'src/shared/queue/jobs';
 import { mapUserError } from './errors/user.errors.map';
 import { USER_ENDPOINTS } from '@pikslots/shared';
 import { LoginUserDto } from './dto/login.user.dto';
@@ -81,6 +89,12 @@ export class UserController {
     private readonly securityContext: SecurityContext,
     private readonly jwtInviteService: JwtInviteService,
     @Inject(IPikslotS3Service) private readonly s3Service: PikslotS3Service,
+    @InjectQueue(AUDIT_LOG_QUEUE)
+    private readonly auditLogQueue: Queue<
+      AuditLogJobDataShape,
+      void,
+      AuditLogJobName
+    >,
   ) {}
 
   @GetAllBusinessOwnersDocs()
@@ -513,13 +527,31 @@ export class UserController {
   @LogoutUserDocs()
   @HttpCode(HttpStatus.OK)
   @Post(USER_ENDPOINTS.LOGOUT)
-  logout(
+  async logout(
     @Res({ passthrough: true }) res: Response,
-  ): PikslotsBaseResponse<LogoutUserResponse> {
+  ): Promise<PikslotsBaseResponse<LogoutUserResponse>> {
     res.clearCookie('jid', { path: USER_ENDPOINTS.REFRESH });
+
+    await this.logUserLogoutAudit();
+
     return new PikslotsBaseResponse<LogoutUserResponse>(
       { message: 'success' },
       HttpStatus.OK,
     );
+  }
+
+  private async logUserLogoutAudit(): Promise<void> {
+    const payload: AuditLogJobDataShape = {
+      businessId: this.securityContext.businessId,
+      userId: this.securityContext.userId,
+      userType: 'user',
+      action: PIKSLOT_EVENTS.AUDIT_LOG.USER_LOGOUT,
+      description: `User ${this.securityContext.userId} logged out`,
+      entityType: 'user',
+      entityId: this.securityContext.userId,
+      occurredAt: new Date().toISOString(),
+    };
+
+    await this.auditLogQueue.add(PIKSLOT_EVENTS.AUDIT_LOG.USER_LOGOUT, payload);
   }
 }

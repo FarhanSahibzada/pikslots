@@ -14,7 +14,10 @@ import { SERVICE_TEST_DATA } from '../repository/service.test.data';
 import { EditServiceUseCaseImpl } from './edit.service.usecase.impl';
 import { ServiceRepositoryTestImpl } from '../repository/service.repository.fake.impl';
 import { SecurityContext } from 'src/shared/security/context/security.context';
-import { PIKSLOT_EVENTS } from 'src/shared/queue/jobs/pikslot.events';
+import {
+  AUDIT_LOG_QUEUE,
+  PIKSLOT_EVENTS,
+} from 'src/shared/queue/jobs/pikslot.events';
 import { IPikslotS3Service } from 'src/shared/s3/s3.service';
 
 function buildCommand(
@@ -81,6 +84,10 @@ describe('EditServiceUseCaseImpl', () => {
           useValue: {
             extractKeyFromUrl: jest.fn().mockResolvedValue('sample-image'),
           },
+        },
+        {
+          provide: getQueueToken(AUDIT_LOG_QUEUE),
+          useValue: { add: jest.fn().mockResolvedValue(undefined) },
         },
       ],
     }).compile();

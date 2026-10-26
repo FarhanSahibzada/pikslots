@@ -11,6 +11,7 @@ import {
   Result,
 } from '@pikslots/domain';
 import type {
+  AuditLogJobDataShape,
   SyncClassClassGroupsEvent,
   UnauthorizedError,
   ClassRepository,
@@ -18,7 +19,11 @@ import type {
 import { SecurityContext } from 'src/shared/security/context/security.context';
 import { v7 as uuidv7 } from 'uuid';
 import { Queue } from 'bullmq';
-import { PIKSLOT_EVENTS } from 'src/shared/queue/jobs/pikslot.events';
+import {
+  AUDIT_LOG_QUEUE,
+  PIKSLOT_EVENTS,
+} from 'src/shared/queue/jobs/pikslot.events';
+import type { AuditLogJobName } from 'src/shared/queue/jobs';
 
 const UNAUTHORIZED_ERROR: UnauthorizedError = {
   kind: 'unauthorized',
@@ -37,6 +42,12 @@ export class RegisterClassUseCaseImpl implements RegisterClassUseCase {
       SyncClassClassGroupsEvent,
       void,
       typeof PIKSLOT_EVENTS.CLASS_GROUP_ASSIGNMENT.SYNC_CLASS_CLASS_GROUPS
+    >,
+    @InjectQueue(AUDIT_LOG_QUEUE)
+    private readonly auditLogQueue: Queue<
+      AuditLogJobDataShape,
+      void,
+      AuditLogJobName
     >,
   ) {}
 
@@ -79,6 +90,26 @@ export class RegisterClassUseCaseImpl implements RegisterClassUseCase {
       );
     }
 
+    await this.logClassCreatedAudit(cls);
+
     return ok(cls);
+  }
+
+  private async logClassCreatedAudit(cls: Class): Promise<void> {
+    const payload: AuditLogJobDataShape = {
+      businessId: cls.businessId,
+      userId: this.securityContext.userId,
+      userType: 'user',
+      action: PIKSLOT_EVENTS.AUDIT_LOG.CLASS_CREATED,
+      description: `Class '${cls.title}' was created`,
+      entityType: 'class',
+      entityId: cls.id,
+      occurredAt: new Date().toISOString(),
+    };
+
+    await this.auditLogQueue.add(
+      PIKSLOT_EVENTS.AUDIT_LOG.CLASS_CREATED,
+      payload,
+    );
   }
 }

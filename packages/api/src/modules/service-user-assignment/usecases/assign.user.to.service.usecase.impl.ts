@@ -1,3 +1,4 @@
+import { InjectQueue } from '@nestjs/bullmq';
 import { Inject, Injectable } from '@nestjs/common';
 import {
   err,
@@ -10,7 +11,16 @@ import {
   AssignUserToServiceCommand,
   AssignUserToServiceUseCase,
 } from '@pikslots/domain';
-import type { ServiceUserAssignmentRepository } from '@pikslots/domain';
+import type {
+  AuditLogJobDataShape,
+  ServiceUserAssignmentRepository,
+} from '@pikslots/domain';
+import { Queue } from 'bullmq';
+import {
+  AUDIT_LOG_QUEUE,
+  PIKSLOT_EVENTS,
+} from 'src/shared/queue/jobs/pikslot.events';
+import type { AuditLogJobName } from 'src/shared/queue/jobs';
 import { v7 as uuidv7 } from 'uuid';
 
 @Injectable()
@@ -18,6 +28,12 @@ export class AssignUserToServiceUseCaseImpl implements AssignUserToServiceUseCas
   constructor(
     @Inject(IServiceUserAssignmentRepository)
     private readonly assignmentRepository: ServiceUserAssignmentRepository,
+    @InjectQueue(AUDIT_LOG_QUEUE)
+    private readonly auditLogQueue: Queue<
+      AuditLogJobDataShape,
+      void,
+      AuditLogJobName
+    >,
   ) {}
 
   async execute(
@@ -57,6 +73,28 @@ export class AssignUserToServiceUseCaseImpl implements AssignUserToServiceUseCas
 
     if (!saved.ok) return err(saved.error);
 
+    await this.logServiceUserAssignedAudit(assignment);
+
     return ok(assignment);
+  }
+
+  private async logServiceUserAssignedAudit(
+    assignment: ServiceUserAssignment,
+  ): Promise<void> {
+    const payload: AuditLogJobDataShape = {
+      businessId: assignment.businessId,
+      userId: assignment.createdBy,
+      userType: 'user',
+      action: PIKSLOT_EVENTS.AUDIT_LOG.SERVICE_USER_ASSIGNED,
+      description: `User '${assignment.userId}' was assigned to service '${assignment.serviceId}'`,
+      entityType: 'service_user_assignment',
+      entityId: assignment.id,
+      occurredAt: new Date().toISOString(),
+    };
+
+    await this.auditLogQueue.add(
+      PIKSLOT_EVENTS.AUDIT_LOG.SERVICE_USER_ASSIGNED,
+      payload,
+    );
   }
 }

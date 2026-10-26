@@ -5,7 +5,7 @@ export async function up(db: Kysely<PikSlotsDatabase>): Promise<void> {
   await db.schema
     .createTable('audit_logs')
     .addColumn('id', 'uuid', (col) => col.primaryKey().notNull())
-    .addColumn('business_id', 'uuid', (col) => col.references('businesses.id'))
+    .addColumn('business_id', 'uuid')
     .addColumn('user_id', 'uuid', (col) => col.notNull())
     .addColumn('user_type', 'varchar', (col) => col.notNull())
     .addColumn('action', 'varchar', (col) => col.notNull())

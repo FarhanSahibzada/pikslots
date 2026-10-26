@@ -10,6 +10,7 @@ import {
   Service,
 } from '@pikslots/domain';
 import type {
+  AuditLogJobDataShape,
   SyncServiceServiceGroupsEvent,
   SyncServiceToUsersEvent,
   ServiceRepository,
@@ -20,7 +21,11 @@ import { SecurityContext } from 'src/shared/security/context/security.context';
 import { v7 as uuidv7 } from 'uuid';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
-import { PIKSLOT_EVENTS } from 'src/shared/queue/jobs/pikslot.events';
+import {
+  AUDIT_LOG_QUEUE,
+  PIKSLOT_EVENTS,
+} from 'src/shared/queue/jobs/pikslot.events';
+import type { AuditLogJobName } from 'src/shared/queue/jobs';
 
 const UNAUTHORIZED_ERROR: UnauthorizedError = {
   kind: 'unauthorized',
@@ -54,6 +59,12 @@ export class RegisterServiceUseCaseImpl implements RegisterServiceUseCase {
       SyncServiceToUsersEvent,
       void,
       typeof PIKSLOT_EVENTS.SERVICE_USER_ASSIGNMENT.SYNC_SERVICE_TO_USERS
+    >,
+    @InjectQueue(AUDIT_LOG_QUEUE)
+    private readonly auditLogQueue: Queue<
+      AuditLogJobDataShape,
+      void,
+      AuditLogJobName
     >,
   ) {}
 
@@ -115,6 +126,26 @@ export class RegisterServiceUseCaseImpl implements RegisterServiceUseCase {
       );
     }
 
+    await this.logServiceCreatedAudit(service);
+
     return ok(service);
+  }
+
+  private async logServiceCreatedAudit(service: Service): Promise<void> {
+    const payload: AuditLogJobDataShape = {
+      businessId: service.businessId,
+      userId: this.securityContext.userId,
+      userType: 'user',
+      action: PIKSLOT_EVENTS.AUDIT_LOG.SERVICE_CREATED,
+      description: `Service '${service.title}' was created`,
+      entityType: 'service',
+      entityId: service.id,
+      occurredAt: new Date().toISOString(),
+    };
+
+    await this.auditLogQueue.add(
+      PIKSLOT_EVENTS.AUDIT_LOG.SERVICE_CREATED,
+      payload,
+    );
   }
 }

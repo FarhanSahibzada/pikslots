@@ -1,3 +1,4 @@
+import { getQueueToken } from '@nestjs/bullmq';
 import { Test, TestingModule } from '@nestjs/testing';
 import {
   BookingConflictError,
@@ -12,6 +13,7 @@ import { BOOKING_TEST_DATA } from '../repository/booking.test.data';
 import { BookingRepositoryTestImpl } from '../repository/booking.repository.fake.impl';
 import { EditBookingUseCaseImpl } from './edit.booking.usecase.impl';
 import { SecurityContext } from 'src/shared/security/context/security.context';
+import { AUDIT_LOG_QUEUE } from 'src/shared/queue/jobs/pikslot.events';
 
 function buildCommand(
   overrides: Partial<EditBookingUseCaseCommand> = {},
@@ -51,6 +53,10 @@ describe('EditBookingUseCaseImpl', () => {
         EditBookingUseCaseImpl,
         { provide: IBookingRepository, useClass: BookingRepositoryTestImpl },
         { provide: SecurityContext, useValue: securityContext },
+        {
+          provide: getQueueToken(AUDIT_LOG_QUEUE),
+          useValue: { add: jest.fn().mockResolvedValue(undefined) },
+        },
       ],
     }).compile();
 

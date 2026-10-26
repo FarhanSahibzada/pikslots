@@ -1,3 +1,4 @@
+import { getQueueToken } from '@nestjs/bullmq';
 import { Test, TestingModule } from '@nestjs/testing';
 import { IUserRepository, ok, err, UserNotFoundError } from '@pikslots/domain';
 import { InviteJwtPayload } from '@pikslots/shared';
@@ -6,6 +7,7 @@ import { RequestInviteOtpUseCaseImpl } from './request.invite.otp.usecase.impl';
 import { OtpService } from 'src/shared/cache/otp/otp.service';
 import { PikslotEmailService } from 'src/shared/email/pikslot.email.service';
 import { JwtInviteService } from 'src/shared/security/jwt/jwt.invite.service';
+import { AUDIT_LOG_QUEUE } from 'src/shared/queue/jobs/pikslot.events';
 
 describe('RequestInviteOtpUseCaseImpl', () => {
   let useCase: RequestInviteOtpUseCaseImpl;
@@ -24,6 +26,10 @@ describe('RequestInviteOtpUseCaseImpl', () => {
         {
           provide: JwtInviteService,
           useValue: { verifyInviteToken: jest.fn() },
+        },
+        {
+          provide: getQueueToken(AUDIT_LOG_QUEUE),
+          useValue: { add: jest.fn().mockResolvedValue(undefined) },
         },
       ],
     }).compile();

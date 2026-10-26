@@ -13,7 +13,10 @@ import { SERVICE_TEST_DATA } from '../repository/service.test.data';
 import { RegisterServiceUseCaseImpl } from './register.service.usecase.impl';
 import { ServiceRepositoryTestImpl } from '../repository/service.repository.fake.impl';
 import { SecurityContext } from 'src/shared/security/context/security.context';
-import { PIKSLOT_EVENTS } from 'src/shared/queue/jobs/pikslot.events';
+import {
+  AUDIT_LOG_QUEUE,
+  PIKSLOT_EVENTS,
+} from 'src/shared/queue/jobs/pikslot.events';
 
 jest.mock('uuid', () => ({
   v7: () => 'mock-generated-id',
@@ -75,6 +78,10 @@ describe('RegisterServiceUseCaseImpl', () => {
           provide: getQueueToken(
             PIKSLOT_EVENTS.SERVICE_USER_ASSIGNMENT.SYNC_SERVICE_TO_USERS,
           ),
+          useValue: { add: jest.fn().mockResolvedValue(undefined) },
+        },
+        {
+          provide: getQueueToken(AUDIT_LOG_QUEUE),
           useValue: { add: jest.fn().mockResolvedValue(undefined) },
         },
       ],

@@ -1,7 +1,9 @@
+import { InjectQueue } from '@nestjs/bullmq';
 import { Inject, Injectable } from '@nestjs/common';
 import {
   Booking,
   BookingNotFoundError,
+  type AuditLogJobDataShape,
   type BookingRepository,
   DeleteBookingCommand,
   DeleteBookingUseCase,
@@ -12,7 +14,13 @@ import {
   Result,
   UnauthorizedError,
 } from '@pikslots/domain';
+import { Queue } from 'bullmq';
 import { SecurityContext } from 'src/shared/security/context/security.context';
+import {
+  AUDIT_LOG_QUEUE,
+  PIKSLOT_EVENTS,
+} from 'src/shared/queue/jobs/pikslot.events';
+import type { AuditLogJobName } from 'src/shared/queue/jobs';
 
 const UNAUTHORIZED_ERROR: UnauthorizedError = {
   kind: 'unauthorized',
@@ -26,6 +34,12 @@ export class DeleteBookingUseCaseImpl implements DeleteBookingUseCase {
     @Inject(IBookingRepository)
     private readonly bookingRepository: BookingRepository,
     private readonly securityContext: SecurityContext,
+    @InjectQueue(AUDIT_LOG_QUEUE)
+    private readonly auditLogQueue: Queue<
+      AuditLogJobDataShape,
+      void,
+      AuditLogJobName
+    >,
   ) {}
 
   async execute(
@@ -58,6 +72,26 @@ export class DeleteBookingUseCaseImpl implements DeleteBookingUseCase {
     const saved = await this.bookingRepository.update(softDeleted);
     if (!saved.ok) return err(saved.error);
 
+    await this.logBookingDeletedAudit(softDeleted);
+
     return ok(undefined);
+  }
+
+  private async logBookingDeletedAudit(booking: Booking): Promise<void> {
+    const payload: AuditLogJobDataShape = {
+      businessId: booking.businessId,
+      userId: this.securityContext.userId,
+      userType: 'user',
+      action: PIKSLOT_EVENTS.AUDIT_LOG.BOOKING_DELETED,
+      description: `Booking ${booking.bookingId} was cancelled`,
+      entityType: 'booking',
+      entityId: booking.id,
+      occurredAt: new Date().toISOString(),
+    };
+
+    await this.auditLogQueue.add(
+      PIKSLOT_EVENTS.AUDIT_LOG.BOOKING_DELETED,
+      payload,
+    );
   }
 }

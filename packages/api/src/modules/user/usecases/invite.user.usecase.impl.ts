@@ -1,3 +1,4 @@
+import { InjectQueue } from '@nestjs/bullmq';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
@@ -12,12 +13,18 @@ import {
   User,
   UserAlreadyExistsError,
 } from '@pikslots/domain';
-import type { UserRepository } from '@pikslots/domain';
+import type { AuditLogJobDataShape, UserRepository } from '@pikslots/domain';
 import { InviteJwtPayload } from '@pikslots/shared';
+import { Queue } from 'bullmq';
 import { Env } from 'src/shared/config/env';
 import { PikslotEmailService } from 'src/shared/email/pikslot.email.service';
 import { SecurityContext } from 'src/shared/security/context/security.context';
 import { JwtInviteService } from 'src/shared/security/jwt/jwt.invite.service';
+import {
+  AUDIT_LOG_QUEUE,
+  PIKSLOT_EVENTS,
+} from 'src/shared/queue/jobs/pikslot.events';
+import type { AuditLogJobName } from 'src/shared/queue/jobs';
 import { v7 as uuidv7 } from 'uuid';
 
 @Injectable()
@@ -28,6 +35,12 @@ export class InviteUserUsecaseImpl implements InviteUserUseCase {
     private readonly emailService: PikslotEmailService,
     private readonly jwtInviteService: JwtInviteService,
     private readonly configService: ConfigService<Env, true>,
+    @InjectQueue(AUDIT_LOG_QUEUE)
+    private readonly auditLogQueue: Queue<
+      AuditLogJobDataShape,
+      void,
+      AuditLogJobName
+    >,
   ) {}
 
   async execute(
@@ -114,7 +127,27 @@ export class InviteUserUsecaseImpl implements InviteUserUseCase {
       if (!result.ok) throw new Error(result.error.message);
     }
 
+    await this.logUserInvitedAudit(user);
+
     return ok({ message: 'success' });
+  }
+
+  private async logUserInvitedAudit(user: User): Promise<void> {
+    const payload: AuditLogJobDataShape = {
+      businessId: user.businessId,
+      userId: this.securityContext.userId,
+      userType: 'user',
+      action: PIKSLOT_EVENTS.AUDIT_LOG.USER_INVITED,
+      description: `${user.name.firstName} ${user.name.lastName} (${user.email}) was invited`,
+      entityType: 'user',
+      entityId: user.id,
+      occurredAt: new Date().toISOString(),
+    };
+
+    await this.auditLogQueue.add(
+      PIKSLOT_EVENTS.AUDIT_LOG.USER_INVITED,
+      payload,
+    );
   }
 
   private buildInviteUrl(userId: string, businessId: string): string {

@@ -1,3 +1,4 @@
+import { getQueueToken } from '@nestjs/bullmq';
 import { Test, TestingModule } from '@nestjs/testing';
 import {
   err,
@@ -11,6 +12,7 @@ import { SERVICE_TEST_DATA } from '../repository/service.test.data';
 import { DeleteServiceUseCaseImpl } from './delete.service.usecase.impl';
 import { ServiceRepositoryTestImpl } from '../repository/service.repository.fake.impl';
 import { SecurityContext } from 'src/shared/security/context/security.context';
+import { AUDIT_LOG_QUEUE } from 'src/shared/queue/jobs/pikslot.events';
 
 describe('DeleteServiceUseCaseImpl', () => {
   let useCase: DeleteServiceUseCaseImpl;
@@ -36,6 +38,10 @@ describe('DeleteServiceUseCaseImpl', () => {
         DeleteServiceUseCaseImpl,
         { provide: IServiceRepository, useClass: ServiceRepositoryTestImpl },
         { provide: SecurityContext, useValue: securityContext },
+        {
+          provide: getQueueToken(AUDIT_LOG_QUEUE),
+          useValue: { add: jest.fn().mockResolvedValue(undefined) },
+        },
       ],
     }).compile();
 

@@ -1,3 +1,4 @@
+import { getQueueToken } from '@nestjs/bullmq';
 import { Test } from '@nestjs/testing';
 import {
   IUserRepository,
@@ -7,6 +8,12 @@ import {
 import { UserRepositoryTestImpl } from '../repository/user.repository.fake.impl';
 import { UpdateUserWorkingHoursUseCaseImpl } from './update.user.working.hours.usecase.impl';
 import { SecurityContext } from 'src/shared/security/context/security.context';
+import { AUDIT_LOG_QUEUE } from 'src/shared/queue/jobs/pikslot.events';
+
+const AUDIT_LOG_QUEUE_PROVIDER = {
+  provide: getQueueToken(AUDIT_LOG_QUEUE),
+  useValue: { add: jest.fn().mockResolvedValue(undefined) },
+};
 
 const WORKING_HOURS = {
   monday: { enabled: true, openTime: '09:00', closeTime: '17:00' },
@@ -24,6 +31,7 @@ describe('UpdateUserWorkingHoursUseCaseImpl', () => {
       providers: [
         UpdateUserWorkingHoursUseCaseImpl,
         { provide: IUserRepository, useClass: UserRepositoryTestImpl },
+        AUDIT_LOG_QUEUE_PROVIDER,
         {
           provide: SecurityContext,
           useValue: { userId: 'any', role: 'Admin', businessId: 'business-1' },
@@ -52,6 +60,7 @@ describe('UpdateUserWorkingHoursUseCaseImpl', () => {
       providers: [
         UpdateUserWorkingHoursUseCaseImpl,
         { provide: IUserRepository, useClass: UserRepositoryTestImpl },
+        AUDIT_LOG_QUEUE_PROVIDER,
         {
           provide: SecurityContext,
           useValue: {
@@ -85,6 +94,7 @@ describe('UpdateUserWorkingHoursUseCaseImpl', () => {
       providers: [
         UpdateUserWorkingHoursUseCaseImpl,
         { provide: IUserRepository, useClass: UserRepositoryTestImpl },
+        AUDIT_LOG_QUEUE_PROVIDER,
         {
           provide: SecurityContext,
           useValue: {
