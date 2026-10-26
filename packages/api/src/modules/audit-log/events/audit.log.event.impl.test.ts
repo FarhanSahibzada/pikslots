@@ -7,7 +7,7 @@ import {
 } from '@pikslots/domain';
 import { AUDIT_LOG_TEST_DATA } from '../repository/audit.log.test.data';
 import { AuditLogRepositoryTestImpl } from '../repository/audit.log.repository.fake.impl';
-import { UserLogoutAuditLogEventImpl } from './user.logout.audit.log.event.impl';
+import { AuditLogEventProcessor } from './audit.log.event.impl';
 import { PIKSLOT_EVENTS } from 'src/shared/queue/jobs/pikslot.events';
 import type { AuditLogJob } from 'src/shared/queue/jobs';
 
@@ -21,18 +21,18 @@ function buildJob(overrides: Partial<AuditLogJobDataShape> = {}): AuditLogJob {
       businessId: 'business-1',
       userId: 'user-standard-1',
       userType: 'user',
-      action: PIKSLOT_EVENTS.AUDIT_LOG.USER_LOGOUT,
-      description: 'John Doe (john@example.com) logged out',
+      action: PIKSLOT_EVENTS.AUDIT_LOG.USER_LOGIN,
+      description: 'John Doe (john@example.com) logged in',
       entityType: 'user',
       entityId: 'user-standard-1',
-      occurredAt: '2024-06-01T17:00:00.000Z',
+      occurredAt: '2024-06-01T09:00:00.000Z',
       ...overrides,
     },
   } as AuditLogJob;
 }
 
-describe('UserLogoutAuditLogEventImpl', () => {
-  let processor: UserLogoutAuditLogEventImpl;
+describe('AuditLogEventProcessor', () => {
+  let processor: AuditLogEventProcessor;
   let repository: AuditLogRepositoryTestImpl;
   let originalData: typeof AUDIT_LOG_TEST_DATA;
 
@@ -43,34 +43,44 @@ describe('UserLogoutAuditLogEventImpl', () => {
 
     const moduleRef: TestingModule = await Test.createTestingModule({
       providers: [
-        UserLogoutAuditLogEventImpl,
+        AuditLogEventProcessor,
         { provide: IAuditLogRepository, useClass: AuditLogRepositoryTestImpl },
       ],
     }).compile();
 
-    processor = moduleRef.get(UserLogoutAuditLogEventImpl);
+    processor = moduleRef.get(AuditLogEventProcessor);
     repository = moduleRef.get(IAuditLogRepository);
   });
 
-  it('persists an AuditLog entity built from the job payload, without going through a use case', async () => {
-    const job = buildJob({ ipAddress: '10.0.0.5', metadata: { foo: 'bar' } });
-    const saveSpy = jest.spyOn(repository, 'save');
+  it.each([
+    ['login', PIKSLOT_EVENTS.AUDIT_LOG.USER_LOGIN],
+    ['logout', PIKSLOT_EVENTS.AUDIT_LOG.USER_LOGOUT],
+  ])(
+    'persists an AuditLog entity for a %s job without going through a use case',
+    async (_label, action) => {
+      const job = buildJob({
+        action,
+        ipAddress: '10.0.0.5',
+        metadata: { foo: 'bar' },
+      });
+      const saveSpy = jest.spyOn(repository, 'save');
 
-    await processor.process(job);
+      await processor.process(job);
 
-    expect(saveSpy).toHaveBeenCalledTimes(1);
-    const persisted = AUDIT_LOG_TEST_DATA.find(
-      (a) => a.id === 'mock-generated-id',
-    );
-    expect(persisted).toBeDefined();
-    expect(persisted?.businessId).toBe(job.data.businessId);
-    expect(persisted?.userId).toBe(job.data.userId);
-    expect(persisted?.action).toBe(job.data.action);
-    expect(persisted?.entityType).toBe(job.data.entityType);
-    expect(persisted?.entityId).toBe(job.data.entityId);
-    expect(persisted?.ipAddress).toBe('10.0.0.5');
-    expect(persisted?.metadata).toEqual({ foo: 'bar' });
-  });
+      expect(saveSpy).toHaveBeenCalledTimes(1);
+      const persisted = AUDIT_LOG_TEST_DATA.find(
+        (a) => a.id === 'mock-generated-id',
+      );
+      expect(persisted).toBeDefined();
+      expect(persisted?.businessId).toBe(job.data.businessId);
+      expect(persisted?.userId).toBe(job.data.userId);
+      expect(persisted?.action).toBe(job.data.action);
+      expect(persisted?.entityType).toBe(job.data.entityType);
+      expect(persisted?.entityId).toBe(job.data.entityId);
+      expect(persisted?.ipAddress).toBe('10.0.0.5');
+      expect(persisted?.metadata).toEqual({ foo: 'bar' });
+    },
+  );
 
   it('throws when the repository fails to save', async () => {
     const infraError: InfrastructureError = {

@@ -5,7 +5,7 @@ import { UserRepositoryTestImpl } from '../repository/user.repository.fake.impl'
 import { LoginUserUseCaseImpl } from './login.user.usecase.impl';
 import { JwtLoginService } from 'src/shared/security/jwt/jwt.login.service';
 import { PasswordHashingService } from 'src/shared/security/hashing/password.hashing.service';
-import { PIKSLOT_EVENTS } from 'src/shared/queue/jobs/pikslot.events';
+import { AUDIT_LOG_QUEUE } from 'src/shared/queue/jobs/pikslot.events';
 
 describe('LoginUserUseCaseImpl', () => {
   let useCase: LoginUserUseCaseImpl;
@@ -25,7 +25,7 @@ describe('LoginUserUseCaseImpl', () => {
         },
         { provide: PasswordHashingService, useValue: { compare: jest.fn() } },
         {
-          provide: getQueueToken(PIKSLOT_EVENTS.AUDIT_LOG.USER_LOGIN),
+          provide: getQueueToken(AUDIT_LOG_QUEUE),
           useValue: { add: jest.fn().mockResolvedValue(undefined) },
         },
       ],

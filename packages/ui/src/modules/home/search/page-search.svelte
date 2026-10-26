@@ -29,7 +29,16 @@
 		searchStore.close();
 		goto(page.url);
 	}
+
+	function handleKeydown(event: KeyboardEvent) {
+		if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+			event.preventDefault();
+			searchStore.toggle();
+		}
+	}
 </script>
+
+<svelte:window onkeydown={handleKeydown} />
 
 <Sheet.Root bind:open={() => searchStore.open, (open) => (searchStore.open = open)}>
 	<Sheet.Content

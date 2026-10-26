@@ -23,7 +23,11 @@ import { LoginJwtPayload } from '@pikslots/shared';
 import { Queue } from 'bullmq';
 import { PasswordHashingService } from 'src/shared/security/hashing/password.hashing.service';
 import { JwtLoginService } from 'src/shared/security/jwt/jwt.login.service';
-import { PIKSLOT_EVENTS } from 'src/shared/queue/jobs/pikslot.events';
+import {
+  AUDIT_LOG_QUEUE,
+  PIKSLOT_EVENTS,
+} from 'src/shared/queue/jobs/pikslot.events';
+import type { AuditLogJobName } from 'src/shared/queue/jobs';
 
 type LoginError =
   | UnauthorizedError
@@ -78,11 +82,11 @@ export class LoginUserUseCaseImpl implements LoginUserUseCase {
     @Inject(IUserRepository) private readonly userRepository: UserRepository,
     private readonly jwtLoginService: JwtLoginService,
     private readonly passwordHashingService: PasswordHashingService,
-    @InjectQueue(PIKSLOT_EVENTS.AUDIT_LOG.USER_LOGIN)
+    @InjectQueue(AUDIT_LOG_QUEUE)
     private readonly auditLogQueue: Queue<
       AuditLogJobDataShape,
       void,
-      typeof PIKSLOT_EVENTS.AUDIT_LOG.USER_LOGIN
+      AuditLogJobName
     >,
   ) {}
 

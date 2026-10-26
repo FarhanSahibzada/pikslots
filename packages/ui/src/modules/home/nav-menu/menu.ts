@@ -32,6 +32,7 @@ export const navSecondary: {
 	url: ResolvedPathname | '#';
 	icon: Icon;
 	onclick?: () => void;
+	shortcut?: boolean;
 }[] = [
 	{
 		title: 'Settings',
@@ -40,5 +41,11 @@ export const navSecondary: {
 		onclick: () => settingsStore.toggle()
 	},
 	{ title: 'Get Help', url: '#', icon: HelpIcon },
-	{ title: 'Search', url: '#', icon: SearchIcon, onclick: () => searchStore.openSearch() }
+	{
+		title: 'Search',
+		url: '#',
+		icon: SearchIcon,
+		onclick: () => searchStore.openSearch(),
+		shortcut: true
+	}
 ];

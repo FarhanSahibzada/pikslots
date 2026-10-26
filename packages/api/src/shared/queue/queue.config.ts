@@ -1,7 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { Env } from '../config/env';
 import { BullModule } from '@nestjs/bullmq';
-import { PIKSLOT_EVENTS } from './jobs/pikslot.events';
+import { AUDIT_LOG_QUEUE, PIKSLOT_EVENTS } from './jobs/pikslot.events';
 
 export const QUEUE_CONFIG = BullModule.forRootAsync({
   inject: [ConfigService],
@@ -43,9 +43,6 @@ export const REGISTERED_QUEUES = BullModule.registerQueue(
   },
   // audit logs
   {
-    name: PIKSLOT_EVENTS.AUDIT_LOG.USER_LOGIN,
-  },
-  {
-    name: PIKSLOT_EVENTS.AUDIT_LOG.USER_LOGOUT,
+    name: AUDIT_LOG_QUEUE,
   },
 );

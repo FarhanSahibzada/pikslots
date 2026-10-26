@@ -1,18 +1,29 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
   Booking,
   BookingConflictError,
   type BookingRepository,
+  type BusinessRepository,
+  type CustomerRepository,
   err,
   IBookingRepository,
+  IBusinessRepository,
+  ICustomerRepository,
+  IUserRepository,
   InfrastructureError,
   ok,
   RegisterBookingCommand,
   RegisterBookingUseCase,
   Result,
   UnauthorizedError,
+  type UserRepository,
 } from '@pikslots/domain';
+import { formatIsoInTimezone } from '@pikslots/datetime';
 import { SecurityContext } from 'src/shared/security/context/security.context';
+import {
+  PikslotEmailService,
+  type EmailTemplateContextMap,
+} from 'src/shared/email/pikslot.email.service';
 import { v7 as uuidv7 } from 'uuid';
 
 const UNAUTHORIZED_ERROR: UnauthorizedError = {
@@ -23,10 +34,19 @@ const UNAUTHORIZED_ERROR: UnauthorizedError = {
 
 @Injectable()
 export class RegisterBookingUseCaseImpl implements RegisterBookingUseCase {
+  private readonly logger: Logger = new Logger(RegisterBookingUseCaseImpl.name);
+
   constructor(
     @Inject(IBookingRepository)
     private readonly bookingRepository: BookingRepository,
+    @Inject(ICustomerRepository)
+    private readonly customerRepository: CustomerRepository,
+    @Inject(IUserRepository)
+    private readonly userRepository: UserRepository,
+    @Inject(IBusinessRepository)
+    private readonly businessRepository: BusinessRepository,
     private readonly securityContext: SecurityContext,
+    private readonly emailService: PikslotEmailService,
   ) {}
 
   async execute(
@@ -84,6 +104,112 @@ export class RegisterBookingUseCaseImpl implements RegisterBookingUseCase {
     const saved = await this.bookingRepository.save(booking);
     if (!saved.ok) return err(saved.error);
 
+    await this.sendBookingConfirmationEmails(booking);
+
     return ok(booking);
+  }
+
+  private async sendBookingConfirmationEmails(booking: Booking): Promise<void> {
+    if (booking.label?.toLowerCase() !== 'confirmed') return;
+    if (!booking.userId) return;
+
+    const [customerResult, userResult, businessResult] = await Promise.all([
+      this.customerRepository.findById(booking.customerId),
+      this.userRepository.findById(booking.userId),
+      this.businessRepository.findById(booking.businessId),
+    ]);
+
+    if (
+      !customerResult.ok ||
+      !userResult.ok ||
+      !businessResult.ok ||
+      !customerResult.value ||
+      !userResult.value ||
+      !businessResult.value
+    ) {
+      this.logger.warn(
+        `failed to load email data for booking id ${booking.bookingId}`,
+      );
+      return;
+    }
+
+    const customer = customerResult.value;
+    const user = userResult.value;
+    const business = businessResult.value;
+
+    const shared: Omit<
+      EmailTemplateContextMap['booking-confirmation'],
+      'firstName' | 'isTeamMember'
+    > = {
+      businessName: business.name,
+      serviceName: booking.serviceSnapshot.title,
+      bookingRef: booking.bookingId,
+      bookingDate: booking.bookingDate,
+      startTime: formatIsoInTimezone(
+        booking.bookingStartTime,
+        business.locationDetails.timeZone,
+        'h:mm a',
+      ),
+      endTime: formatIsoInTimezone(
+        booking.bookingEndTime,
+        business.locationDetails.timeZone,
+        'h:mm a',
+      ),
+      teamMemberName: `${user.name.firstName} ${user.name.lastName}`.trim(),
+      guestFullName:
+        `${customer.name.firstName} ${customer.name.lastName}`.trim(),
+      price: booking.serviceSnapshot.cost / 100,
+      currency: business.locationDetails.currency,
+    };
+
+    if (customer.email) {
+      await this.sendBookingConfirmationEmail(
+        customer.email,
+        customer.name.firstName,
+        false,
+        shared,
+        booking.bookingId,
+      );
+    }
+
+    if (user.email) {
+      await this.sendBookingConfirmationEmail(
+        user.email,
+        user.name.firstName,
+        true,
+        shared,
+        booking.bookingId,
+      );
+    }
+  }
+
+  private async sendBookingConfirmationEmail(
+    to: string,
+    firstName: string,
+    isTeamMember: boolean,
+    shared: Omit<
+      EmailTemplateContextMap['booking-confirmation'],
+      'firstName' | 'isTeamMember'
+    >,
+    bookingId: string,
+  ): Promise<void> {
+    const result = await this.emailService.sendEmail({
+      to,
+      subject: isTeamMember
+        ? `New booking confirmed — ${bookingId}`
+        : `Your booking is confirmed — ${bookingId}`,
+      template: 'booking-confirmation',
+      context: {
+        firstName,
+        isTeamMember,
+        ...shared,
+      },
+    });
+
+    if (!result.ok) {
+      this.logger.warn(
+        `failed to send booking confirmation email to ${to} for booking id ${bookingId}`,
+      );
+    }
   }
 }

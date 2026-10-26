@@ -3,11 +3,11 @@ import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { AuditLog, IAuditLogRepository } from '@pikslots/domain';
 import type { AuditLogRepository } from '@pikslots/domain';
 import { AuditLogJob } from 'src/shared/queue/jobs';
-import { PIKSLOT_EVENTS } from 'src/shared/queue/jobs/pikslot.events';
+import { AUDIT_LOG_QUEUE } from 'src/shared/queue/jobs/pikslot.events';
 import { v7 as uuidv7 } from 'uuid';
 
-@Processor(PIKSLOT_EVENTS.AUDIT_LOG.USER_LOGIN)
-export class UserLoginAuditLogEventImpl extends WorkerHost {
+@Processor(AUDIT_LOG_QUEUE)
+export class AuditLogEventProcessor extends WorkerHost {
   constructor(
     @Inject(IAuditLogRepository)
     private readonly auditLogRepository: AuditLogRepository,

@@ -1,3 +1,5 @@
+export const AUDIT_LOG_QUEUE = 'audit.log' as const;
+
 export const PIKSLOT_EVENTS = {
   BUSINESS: {
     BUSINESS_REGISTRATION_INVITE: 'business.registration.invite',
