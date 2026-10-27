@@ -1,3 +1,4 @@
+import { getQueueToken } from '@nestjs/bullmq';
 import { Test, TestingModule } from '@nestjs/testing';
 import {
   Customer,
@@ -12,6 +13,7 @@ import { CUSTOMER_TEST_DATA } from '../repository/customer.test.data';
 import { DeleteCustomerUseCaseImpl } from './delete.customer.usecase.impl';
 import { CustomerRepositoryTestImpl } from '../repository/customer.repository.fake.impl';
 import { SecurityContext } from 'src/shared/security/context/security.context';
+import { AUDIT_LOG_QUEUE } from 'src/shared/queue/jobs/pikslot.events';
 
 function buildCommand(
   overrides: Partial<DeleteCustomerCommand> = {},
@@ -50,6 +52,10 @@ describe('DeleteCustomerUseCaseImpl', () => {
           useClass: CustomerRepositoryTestImpl,
         },
         { provide: SecurityContext, useValue: securityContext },
+        {
+          provide: getQueueToken(AUDIT_LOG_QUEUE),
+          useValue: { add: jest.fn().mockResolvedValue(undefined) },
+        },
       ],
     }).compile();
 

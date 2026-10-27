@@ -1,3 +1,4 @@
+import { InjectQueue } from '@nestjs/bullmq';
 import { Inject, Injectable } from '@nestjs/common';
 import {
   IUserRepository,
@@ -5,8 +6,10 @@ import {
   Result,
   err,
   ok,
+  User,
 } from '@pikslots/domain';
 import type {
+  AuditLogJobDataShape,
   InviteAlreadyAcceptedError,
   RequestInviteOtpCommand,
   RequestInviteOtpUseCase,
@@ -15,9 +18,15 @@ import type {
   UserRepository,
 } from '@pikslots/domain';
 import { InviteJwtPayload } from '@pikslots/shared';
+import { Queue } from 'bullmq';
 import { OtpService } from 'src/shared/cache/otp/otp.service';
 import { PikslotEmailService } from 'src/shared/email/pikslot.email.service';
 import { JwtInviteService } from 'src/shared/security/jwt/jwt.invite.service';
+import {
+  AUDIT_LOG_QUEUE,
+  PIKSLOT_EVENTS,
+} from 'src/shared/queue/jobs/pikslot.events';
+import type { AuditLogJobName } from 'src/shared/queue/jobs';
 
 const UNAUTHORIZED_ERROR: UnauthorizedError = {
   kind: 'unauthorized',
@@ -33,6 +42,12 @@ export class RequestInviteOtpUseCaseImpl implements RequestInviteOtpUseCase {
     private readonly otpService: OtpService,
     private readonly emailService: PikslotEmailService,
     private readonly jwtInviteService: JwtInviteService,
+    @InjectQueue(AUDIT_LOG_QUEUE)
+    private readonly auditLogQueue: Queue<
+      AuditLogJobDataShape,
+      void,
+      AuditLogJobName
+    >,
   ) {}
 
   async execute(
@@ -100,6 +115,26 @@ export class RequestInviteOtpUseCaseImpl implements RequestInviteOtpUseCase {
       });
     }
 
+    await this.logInviteOtpRequestedAudit(user);
+
     return ok({ message: 'success' });
+  }
+
+  private async logInviteOtpRequestedAudit(user: User): Promise<void> {
+    const payload: AuditLogJobDataShape = {
+      businessId: user.businessId,
+      userId: user.id,
+      userType: 'user',
+      action: PIKSLOT_EVENTS.AUDIT_LOG.USER_INVITE_OTP_REQUESTED,
+      description: `${user.name.firstName} ${user.name.lastName} (${user.email}) requested an invite verification code`,
+      entityType: 'user',
+      entityId: user.id,
+      occurredAt: new Date().toISOString(),
+    };
+
+    await this.auditLogQueue.add(
+      PIKSLOT_EVENTS.AUDIT_LOG.USER_INVITE_OTP_REQUESTED,
+      payload,
+    );
   }
 }

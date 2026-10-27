@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { formatIsoInTimezone } from '@pikslots/datetime';
+import { workingHourToUTC } from '@pikslots/datetime';
 import {
   Booking,
   type BookingRepository,
@@ -56,36 +56,39 @@ export class FindAllBookingsByBusinessForUserUseCaseImpl implements FindAllBooki
     const isPartOfSameBusiness = this.securityContext.businessId === businessId;
     const callerRole = this.securityContext.role;
     const isSelf = this.securityContext.userId === userId;
+    const isStandard = callerRole === 'Standard';
 
     if (!Booking.canViewBookings(callerRole, isPartOfSameBusiness, isSelf))
       return err(UNAUTHORIZED_ERROR);
 
-    const bookingFound = await this.bookingRepository.findAllByBusinessForUser(
-      businessId,
-      userId,
+    const startUtc = workingHourToUTC(
+      startDateTime.slice(0, 10),
+      '00:00',
+      timezone,
     );
+    const endUtc = workingHourToUTC(
+      endDateTime.slice(0, 10),
+      '00:00',
+      timezone,
+    );
+
+    const bookingFound = isStandard
+      ? await this.bookingRepository.findAllByBusinessForUser(
+          businessId,
+          userId,
+          startUtc,
+          endUtc,
+        )
+      : await this.bookingRepository.findAllByBusiness(
+          businessId,
+          startUtc,
+          endUtc,
+        );
 
     if (!bookingFound.ok) return err(bookingFound.error);
 
-    const startDate = `${startDateTime.slice(0, 10)}T00:00:00.000Z`;
-    const endDate = `${endDateTime.slice(0, 10)}T00:00:00.000Z`;
-
-    const givenStartDate = formatIsoInTimezone(
-      startDate,
-      timezone,
-      'yyyy-MM-dd',
-    );
-
-    const givenEndDate = formatIsoInTimezone(endDate, timezone, 'yyyy-MM-dd');
-
-    const filtered = bookingFound.value.filter(
-      (b) =>
-        b.bookingStartTime >= givenStartDate &&
-        b.bookingEndTime <= givenEndDate,
-    );
-
     return ok(
-      filtered.map((b) => ({
+      bookingFound.value.map((b) => ({
         id: b.id,
         bookingId: b.bookingId,
         bookingDate: b.bookingDate,

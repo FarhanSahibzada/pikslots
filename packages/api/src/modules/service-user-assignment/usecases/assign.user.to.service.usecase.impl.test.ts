@@ -19,7 +19,9 @@ describe('AssignUserToServiceUseCaseImpl', () => {
       ...SERVICE_USER_ASSIGNMENT_TEST_DATA,
     ]);
 
-    useCase = new AssignUserToServiceUseCaseImpl(repository);
+    useCase = new AssignUserToServiceUseCaseImpl(repository, {
+      add: jest.fn().mockResolvedValue(undefined),
+    } as never);
   });
 
   afterEach(() => {

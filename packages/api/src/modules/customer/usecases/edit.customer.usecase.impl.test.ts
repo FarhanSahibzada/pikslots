@@ -1,3 +1,4 @@
+import { getQueueToken } from '@nestjs/bullmq';
 import { Test, TestingModule } from '@nestjs/testing';
 import {
   Customer,
@@ -13,6 +14,7 @@ import { CUSTOMER_TEST_DATA } from '../repository/customer.test.data';
 import { EditCustomerUseCaseImpl } from './edit.customer.usecase.impl';
 import { CustomerRepositoryTestImpl } from '../repository/customer.repository.fake.impl';
 import { SecurityContext } from 'src/shared/security/context/security.context';
+import { AUDIT_LOG_QUEUE } from 'src/shared/queue/jobs/pikslot.events';
 
 const SOCIAL_LINKS: CustomerLinks = {
   Website: 'https://updated-example.com',
@@ -75,6 +77,10 @@ describe('EditCustomerUseCaseImpl', () => {
           useClass: CustomerRepositoryTestImpl,
         },
         { provide: SecurityContext, useValue: securityContext },
+        {
+          provide: getQueueToken(AUDIT_LOG_QUEUE),
+          useValue: { add: jest.fn().mockResolvedValue(undefined) },
+        },
       ],
     }).compile();
 

@@ -8,12 +8,11 @@ import Puzzle from '@tabler/icons-svelte/icons/puzzle';
 import { IconCalendarCheck } from '@tabler/icons-svelte';
 import type { Icon } from '@tabler/icons-svelte';
 import { settingsStore } from '$stores/settings.svelte.js';
+import { searchStore } from '$stores/search.svelte.js';
 import { resolve } from '$app/paths';
 import type { ResolvedPathname } from '$app/types';
 import type { UserRole } from '@pikslots/shared';
-
-const privilegedRoles: UserRole[] = ['Platform Owner', 'Business Owner', 'Admin'];
-const customerAccess: UserRole[] = ['Platform Owner', 'Business Owner', 'Admin', 'Enhanced'];
+import { customerAccess, privilegedRoles } from './search-pages';
 
 export const navPrimary: {
 	name: string;
@@ -33,6 +32,7 @@ export const navSecondary: {
 	url: ResolvedPathname | '#';
 	icon: Icon;
 	onclick?: () => void;
+	shortcut?: boolean;
 }[] = [
 	{
 		title: 'Settings',
@@ -41,5 +41,11 @@ export const navSecondary: {
 		onclick: () => settingsStore.toggle()
 	},
 	{ title: 'Get Help', url: '#', icon: HelpIcon },
-	{ title: 'Search', url: '#', icon: SearchIcon }
+	{
+		title: 'Search',
+		url: '#',
+		icon: SearchIcon,
+		onclick: () => searchStore.openSearch(),
+		shortcut: true
+	}
 ];

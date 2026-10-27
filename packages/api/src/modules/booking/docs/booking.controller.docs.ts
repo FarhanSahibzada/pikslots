@@ -45,7 +45,8 @@ export const RegisterBookingDocs = () =>
 export const FindAllBookingsByBusinessForUserDocs = () =>
   applyDecorators(
     ApiOperation({
-      summary: 'Get all bookings for a business, optionally scoped to a user',
+      summary:
+        'Get bookings for the business: Standard users receive their own bookings, elevated roles receive all business bookings',
     }),
     ApiParam({
       name: 'businessId',

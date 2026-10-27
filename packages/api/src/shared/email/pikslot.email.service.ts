@@ -20,6 +20,20 @@ export type EmailTemplateContextMap = {
     otp: string;
     otpExpiryInMins: number;
   };
+  'booking-confirmation': {
+    firstName: string;
+    isTeamMember: boolean;
+    guestFullName: string;
+    businessName: string;
+    serviceName: string;
+    bookingRef: string;
+    bookingDate: string;
+    startTime: string;
+    endTime: string;
+    teamMemberName: string;
+    price: number;
+    currency: string;
+  };
 };
 
 export type SupportedEmailTemplates = keyof EmailTemplateContextMap;

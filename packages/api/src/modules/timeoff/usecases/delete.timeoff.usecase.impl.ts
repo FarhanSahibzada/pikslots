@@ -1,3 +1,4 @@
+import { InjectQueue } from '@nestjs/bullmq';
 import { Inject } from '@nestjs/common';
 import {
   DeleteTimeoffUseCase,
@@ -10,8 +11,14 @@ import {
   TimeOffNotFound,
   UnauthorizedError,
 } from '@pikslots/domain';
-import type { TimeOffRepository } from '@pikslots/domain';
+import type { AuditLogJobDataShape, TimeOffRepository } from '@pikslots/domain';
+import { Queue } from 'bullmq';
 import { SecurityContext } from 'src/shared/security/context/security.context';
+import {
+  AUDIT_LOG_QUEUE,
+  PIKSLOT_EVENTS,
+} from 'src/shared/queue/jobs/pikslot.events';
+import type { AuditLogJobName } from 'src/shared/queue/jobs';
 
 const UNAUTHORIZED_ERROR: UnauthorizedError = {
   kind: 'unauthorized',
@@ -23,6 +30,12 @@ export class DeleteTimeoffUseCaseImpl implements DeleteTimeoffUseCase {
     @Inject(ITimeoffRepository)
     private readonly timeoffRepository: TimeOffRepository,
     private readonly securityContext: SecurityContext,
+    @InjectQueue(AUDIT_LOG_QUEUE)
+    private readonly auditLogQueue: Queue<
+      AuditLogJobDataShape,
+      void,
+      AuditLogJobName
+    >,
   ) {}
   async execute(
     id: string,
@@ -55,6 +68,26 @@ export class DeleteTimeoffUseCaseImpl implements DeleteTimeoffUseCase {
 
     if (!deleteTimeoff.ok) return err(deleteTimeoff.error);
 
+    await this.logTimeoffDeletedAudit(found.value);
+
     return ok(deleteTimeoff.value);
+  }
+
+  private async logTimeoffDeletedAudit(timeoff: Timeoff): Promise<void> {
+    const payload: AuditLogJobDataShape = {
+      businessId: timeoff.businessId,
+      userId: this.securityContext.userId,
+      userType: 'user',
+      action: PIKSLOT_EVENTS.AUDIT_LOG.TIMEOFF_DELETED,
+      description: `Timeoff '${timeoff.title}' was deleted`,
+      entityType: 'timeoff',
+      entityId: timeoff.id,
+      occurredAt: new Date().toISOString(),
+    };
+
+    await this.auditLogQueue.add(
+      PIKSLOT_EVENTS.AUDIT_LOG.TIMEOFF_DELETED,
+      payload,
+    );
   }
 }

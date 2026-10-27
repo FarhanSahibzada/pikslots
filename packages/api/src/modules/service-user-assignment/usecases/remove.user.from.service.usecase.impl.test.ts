@@ -16,7 +16,9 @@ describe('RemoveUserFromServiceUseCaseImpl', () => {
       ...SERVICE_USER_ASSIGNMENT_TEST_DATA,
     ]);
 
-    useCase = new RemoveUserFromServiceUseCaseImpl(repository);
+    useCase = new RemoveUserFromServiceUseCaseImpl(repository, {
+      add: jest.fn().mockResolvedValue(undefined),
+    } as never);
   });
 
   afterEach(() => {

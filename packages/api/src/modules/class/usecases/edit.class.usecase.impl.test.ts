@@ -14,7 +14,10 @@ import { CLASS_TEST_DATA } from '../repository/class.test.data';
 import { EditClassUseCaseImpl } from './edit.class.usecase.impl';
 import { ClassRepositoryTestImpl } from '../repository/class.repository.fake.impl';
 import { SecurityContext } from 'src/shared/security/context/security.context';
-import { PIKSLOT_EVENTS } from 'src/shared/queue/jobs/pikslot.events';
+import {
+  AUDIT_LOG_QUEUE,
+  PIKSLOT_EVENTS,
+} from 'src/shared/queue/jobs/pikslot.events';
 
 function buildCommand(
   overrides: Partial<EditClassCommand> = {},
@@ -63,6 +66,10 @@ describe('EditClassUseCaseImpl', () => {
           provide: getQueueToken(
             PIKSLOT_EVENTS.CLASS_GROUP_ASSIGNMENT.SYNC_CLASS_CLASS_GROUPS,
           ),
+          useValue: { add: jest.fn().mockResolvedValue(undefined) },
+        },
+        {
+          provide: getQueueToken(AUDIT_LOG_QUEUE),
           useValue: { add: jest.fn().mockResolvedValue(undefined) },
         },
       ],

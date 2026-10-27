@@ -216,7 +216,6 @@ export class Booking {
 
     if (isPartOfSameBusiness && isSelf && callerRole === 'Standard') return true;
 
-    // No acess
     return false;
   }
 

@@ -1,3 +1,4 @@
+import { getQueueToken } from '@nestjs/bullmq';
 import { Test, TestingModule } from '@nestjs/testing';
 import {
   EditTimeoffCommand,
@@ -11,6 +12,7 @@ import { TIMEOFF_TEST_DATA } from '../repository/timeoff.test.data';
 import { TimeOffRepositoryTestImpl } from '../repository/timeoff.repository.fake.impl';
 import { SecurityContext } from 'src/shared/security/context/security.context';
 import { EditTimeoffByIdUseCaseImpl } from './edit.timeoff.usecase.impl';
+import { AUDIT_LOG_QUEUE } from 'src/shared/queue/jobs/pikslot.events';
 
 function buildCommand(
   overrides: Partial<EditTimeoffCommand> = {},
@@ -49,6 +51,10 @@ describe('EditTimeoffByIdUseCaseImpl', () => {
         EditTimeoffByIdUseCaseImpl,
         { provide: ITimeoffRepository, useClass: TimeOffRepositoryTestImpl },
         { provide: SecurityContext, useValue: securityContext },
+        {
+          provide: getQueueToken(AUDIT_LOG_QUEUE),
+          useValue: { add: jest.fn().mockResolvedValue(undefined) },
+        },
       ],
     }).compile();
 

@@ -15,3 +15,4 @@ export * from './break/';
 export * from './s3';
 export * from './public-booking-page';
 export * from './onboarding';
+export * from './audit-log';

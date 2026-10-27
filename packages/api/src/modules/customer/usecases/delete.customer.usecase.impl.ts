@@ -1,3 +1,4 @@
+import { InjectQueue } from '@nestjs/bullmq';
 import { Inject, Injectable } from '@nestjs/common';
 import {
   err,
@@ -6,13 +7,20 @@ import {
   CustomerNotFoundError,
   DeleteCustomerCommand,
   DeleteCustomerUseCase,
+  type AuditLogJobDataShape,
   type CustomerRepository,
   ICustomerRepository,
   InfrastructureError,
   Result,
   UnauthorizedError,
 } from '@pikslots/domain';
+import { Queue } from 'bullmq';
 import { SecurityContext } from 'src/shared/security/context/security.context';
+import {
+  AUDIT_LOG_QUEUE,
+  PIKSLOT_EVENTS,
+} from 'src/shared/queue/jobs/pikslot.events';
+import type { AuditLogJobName } from 'src/shared/queue/jobs';
 
 const UNAUTHORIZED_ERROR: UnauthorizedError = {
   kind: 'unauthorized',
@@ -26,6 +34,12 @@ export class DeleteCustomerUseCaseImpl implements DeleteCustomerUseCase {
     @Inject(ICustomerRepository)
     private readonly customerRepository: CustomerRepository,
     private readonly securityContext: SecurityContext,
+    @InjectQueue(AUDIT_LOG_QUEUE)
+    private readonly auditLogQueue: Queue<
+      AuditLogJobDataShape,
+      void,
+      AuditLogJobName
+    >,
   ) {}
 
   async execute(
@@ -63,6 +77,26 @@ export class DeleteCustomerUseCaseImpl implements DeleteCustomerUseCase {
 
     if (!saved.ok) return err(saved.error);
 
+    await this.logCustomerDeletedAudit(softDeleted);
+
     return ok(undefined);
+  }
+
+  private async logCustomerDeletedAudit(customer: Customer): Promise<void> {
+    const payload: AuditLogJobDataShape = {
+      businessId: customer.businessId,
+      userId: this.securityContext.userId,
+      userType: 'user',
+      action: PIKSLOT_EVENTS.AUDIT_LOG.CUSTOMER_DELETED,
+      description: `Customer '${customer.name.firstName} ${customer.name.lastName}' was deleted`,
+      entityType: 'customer',
+      entityId: customer.id,
+      occurredAt: new Date().toISOString(),
+    };
+
+    await this.auditLogQueue.add(
+      PIKSLOT_EVENTS.AUDIT_LOG.CUSTOMER_DELETED,
+      payload,
+    );
   }
 }

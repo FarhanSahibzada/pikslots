@@ -13,7 +13,10 @@ import {
 import { RegisterBusinessUseCaseImpl } from './register.business.usecase.impl';
 import { BusinessRepositoryTestImpl } from '../repository/business.repository.fake.impl';
 import { JwtInviteService } from 'src/shared/security/jwt/jwt.invite.service';
-import { PIKSLOT_EVENTS } from 'src/shared/queue/jobs/pikslot.events';
+import {
+  AUDIT_LOG_QUEUE,
+  PIKSLOT_EVENTS,
+} from 'src/shared/queue/jobs/pikslot.events';
 import { BUSINESS_TEST_DATA } from '../repository/business.fake.data';
 
 jest.mock('uuid', () => ({
@@ -75,6 +78,10 @@ describe('RegisterBusinessUseCaseImpl', () => {
           useValue: {
             signInviteToken: jest.fn().mockReturnValue('mock-invite-jwt'),
           },
+        },
+        {
+          provide: getQueueToken(AUDIT_LOG_QUEUE),
+          useValue: { add: jest.fn().mockResolvedValue(undefined) },
         },
       ],
     }).compile();

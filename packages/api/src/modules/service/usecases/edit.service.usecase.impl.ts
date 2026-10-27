@@ -10,6 +10,7 @@ import {
   Service,
 } from '@pikslots/domain';
 import type {
+  AuditLogJobDataShape,
   SyncServiceServiceGroupsEvent,
   SyncServiceToUsersEvent,
   ServiceRepository,
@@ -20,7 +21,11 @@ import type {
 import { SecurityContext } from 'src/shared/security/context/security.context';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
-import { PIKSLOT_EVENTS } from 'src/shared/queue/jobs/pikslot.events';
+import {
+  AUDIT_LOG_QUEUE,
+  PIKSLOT_EVENTS,
+} from 'src/shared/queue/jobs/pikslot.events';
+import type { AuditLogJobName } from 'src/shared/queue/jobs';
 import {
   IPikslotS3Service,
   type PikslotS3Service,
@@ -60,6 +65,12 @@ export class EditServiceUseCaseImpl implements EditServiceUseCase {
       typeof PIKSLOT_EVENTS.SERVICE_USER_ASSIGNMENT.SYNC_SERVICE_TO_USERS
     >,
     @Inject(IPikslotS3Service) private readonly s3Service: PikslotS3Service,
+    @InjectQueue(AUDIT_LOG_QUEUE)
+    private readonly auditLogQueue: Queue<
+      AuditLogJobDataShape,
+      void,
+      AuditLogJobName
+    >,
   ) {}
 
   async execute(
@@ -134,6 +145,26 @@ export class EditServiceUseCaseImpl implements EditServiceUseCase {
       },
     );
 
+    await this.logServiceUpdatedAudit(updated);
+
     return ok(undefined);
+  }
+
+  private async logServiceUpdatedAudit(service: Service): Promise<void> {
+    const payload: AuditLogJobDataShape = {
+      businessId: service.businessId,
+      userId: this.securityContext.userId,
+      userType: 'user',
+      action: PIKSLOT_EVENTS.AUDIT_LOG.SERVICE_UPDATED,
+      description: `Service '${service.title}' was updated`,
+      entityType: 'service',
+      entityId: service.id,
+      occurredAt: new Date().toISOString(),
+    };
+
+    await this.auditLogQueue.add(
+      PIKSLOT_EVENTS.AUDIT_LOG.SERVICE_UPDATED,
+      payload,
+    );
   }
 }

@@ -1,3 +1,4 @@
+import { getQueueToken } from '@nestjs/bullmq';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { IUserRepository, UserRole } from '@pikslots/domain';
@@ -11,6 +12,7 @@ jest.mock('uuid', () => ({
 import { SecurityContext } from 'src/shared/security/context/security.context';
 import { PikslotEmailService } from 'src/shared/email/pikslot.email.service';
 import { JwtInviteService } from 'src/shared/security/jwt/jwt.invite.service';
+import { AUDIT_LOG_QUEUE } from 'src/shared/queue/jobs/pikslot.events';
 import { InviteUserUsecaseImpl } from './invite.user.usecase.impl';
 
 describe('InviteUserUsecaseImpl', () => {
@@ -49,6 +51,10 @@ describe('InviteUserUsecaseImpl', () => {
           useValue: {
             getOrThrow: jest.fn().mockReturnValue('http://frontend'),
           },
+        },
+        {
+          provide: getQueueToken(AUDIT_LOG_QUEUE),
+          useValue: { add: jest.fn().mockResolvedValue(undefined) },
         },
       ],
     }).compile();

@@ -1,9 +1,11 @@
+import { getQueueToken } from '@nestjs/bullmq';
 import { Test, TestingModule } from '@nestjs/testing';
 import { IUserRepository } from '@pikslots/domain';
 import { UserRepositoryTestImpl } from '../repository/user.repository.fake.impl';
 import { AcceptInviteUseCaseImpl } from './accept.invite.usecase.impl';
 import { OtpService } from 'src/shared/cache/otp/otp.service';
 import { PasswordHashingService } from 'src/shared/security/hashing/password.hashing.service';
+import { AUDIT_LOG_QUEUE } from 'src/shared/queue/jobs/pikslot.events';
 
 describe('AcceptInviteUseCaseImpl', () => {
   let useCase: AcceptInviteUseCaseImpl;
@@ -18,6 +20,10 @@ describe('AcceptInviteUseCaseImpl', () => {
         {
           provide: OtpService,
           useValue: { verify: jest.fn() },
+        },
+        {
+          provide: getQueueToken(AUDIT_LOG_QUEUE),
+          useValue: { add: jest.fn().mockResolvedValue(undefined) },
         },
       ],
     }).compile();

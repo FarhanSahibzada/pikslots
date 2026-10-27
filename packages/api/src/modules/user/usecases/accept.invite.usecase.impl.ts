@@ -1,3 +1,4 @@
+import { InjectQueue } from '@nestjs/bullmq';
 import { Inject, Injectable } from '@nestjs/common';
 import {
   IUserRepository,
@@ -5,17 +6,25 @@ import {
   Result,
   err,
   ok,
+  User,
 } from '@pikslots/domain';
 import type {
   AcceptInviteCommand,
   AcceptInviteUseCase,
+  AuditLogJobDataShape,
   InviteAlreadyAcceptedError,
   InvalidOtpError,
   UserNotFoundError,
   UserRepository,
 } from '@pikslots/domain';
+import { Queue } from 'bullmq';
 import { OtpService } from 'src/shared/cache/otp/otp.service';
 import { PasswordHashingService } from 'src/shared/security/hashing/password.hashing.service';
+import {
+  AUDIT_LOG_QUEUE,
+  PIKSLOT_EVENTS,
+} from 'src/shared/queue/jobs/pikslot.events';
+import type { AuditLogJobName } from 'src/shared/queue/jobs';
 
 @Injectable()
 export class AcceptInviteUseCaseImpl implements AcceptInviteUseCase {
@@ -24,6 +33,12 @@ export class AcceptInviteUseCaseImpl implements AcceptInviteUseCase {
     private readonly userRepository: UserRepository,
     private readonly otpService: OtpService,
     private readonly passwordHashingService: PasswordHashingService,
+    @InjectQueue(AUDIT_LOG_QUEUE)
+    private readonly auditLogQueue: Queue<
+      AuditLogJobDataShape,
+      void,
+      AuditLogJobName
+    >,
   ) {}
 
   async execute(
@@ -84,6 +99,26 @@ export class AcceptInviteUseCaseImpl implements AcceptInviteUseCase {
 
     if (!updateResult.ok) return err(updateResult.error);
 
+    await this.logInviteAcceptedAudit(activated);
+
     return ok({ message: 'success' });
+  }
+
+  private async logInviteAcceptedAudit(user: User): Promise<void> {
+    const payload: AuditLogJobDataShape = {
+      businessId: user.businessId,
+      userId: user.id,
+      userType: 'user',
+      action: PIKSLOT_EVENTS.AUDIT_LOG.USER_INVITE_ACCEPTED,
+      description: `${user.name.firstName} ${user.name.lastName} (${user.email}) accepted their invite`,
+      entityType: 'user',
+      entityId: user.id,
+      occurredAt: new Date().toISOString(),
+    };
+
+    await this.auditLogQueue.add(
+      PIKSLOT_EVENTS.AUDIT_LOG.USER_INVITE_ACCEPTED,
+      payload,
+    );
   }
 }

@@ -250,7 +250,12 @@ describe('FindAllBookingsByBusinessForUserUseCaseImpl', () => {
       );
 
       expect(forUserSpy).toHaveBeenCalledTimes(1);
-      expect(forUserSpy).toHaveBeenCalledWith('business-1', 'user-standard-1');
+      expect(forUserSpy).toHaveBeenCalledWith(
+        'business-1',
+        'user-standard-1',
+        '2024-01-01T00:00:00.000Z',
+        '2024-12-31T00:00:00.000Z',
+      );
       expect(allSpy).not.toHaveBeenCalled();
     });
 
@@ -273,14 +278,80 @@ describe('FindAllBookingsByBusinessForUserUseCaseImpl', () => {
     });
   });
 
-  describe('always uses findAllByBusinessForUser', () => {
-    it('calls findAllByBusinessForUser for a Business Owner', async () => {
+  describe('elevated roles receive all business bookings', () => {
+    it('calls findAllByBusiness and returns every booking for a Business Owner', async () => {
       Object.assign(securityContext, {
         userId: 'user-business-owner-1',
         role: 'Business Owner',
         businessId: 'business-1',
       });
+      const allSpy = jest.spyOn(repository, 'findAllByBusiness');
       const forUserSpy = jest.spyOn(repository, 'findAllByBusinessForUser');
+
+      const result = await useCase.execute(
+        'business-1',
+        'user-standard-1',
+        '2024-01-01',
+        '2024-12-31',
+        'UTC',
+      );
+
+      expect(allSpy).toHaveBeenCalledTimes(1);
+      expect(allSpy).toHaveBeenCalledWith(
+        'business-1',
+        '2024-01-01T00:00:00.000Z',
+        '2024-12-31T00:00:00.000Z',
+      );
+      expect(forUserSpy).not.toHaveBeenCalled();
+
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        const ids = result.value.map((b) => b.id);
+        expect(ids).toEqual(
+          expect.arrayContaining([
+            'booking-1',
+            'booking-2',
+            'booking-3',
+            'booking-6',
+            'booking-7',
+          ]),
+        );
+        expect(ids).not.toContain('booking-4'); // soft-deleted
+        expect(ids).not.toContain('booking-5'); // different business
+      }
+    });
+
+    it('calls findAllByBusiness for an Enhanced user', async () => {
+      Object.assign(securityContext, {
+        userId: 'user-enhanced-1',
+        role: 'Enhanced',
+        businessId: 'business-1',
+      });
+      const allSpy = jest.spyOn(repository, 'findAllByBusiness');
+
+      await useCase.execute(
+        'business-1',
+        'user-enhanced-1',
+        '2024-01-01',
+        '2024-12-31',
+        'UTC',
+      );
+
+      expect(allSpy).toHaveBeenCalledTimes(1);
+      expect(allSpy).toHaveBeenCalledWith(
+        'business-1',
+        '2024-01-01T00:00:00.000Z',
+        '2024-12-31T00:00:00.000Z',
+      );
+    });
+
+    it('calls findAllByBusiness for a Platform Owner', async () => {
+      Object.assign(securityContext, {
+        userId: 'user-platform-owner-1',
+        role: 'Platform Owner',
+        businessId: 'business-999',
+      });
+      const allSpy = jest.spyOn(repository, 'findAllByBusiness');
 
       await useCase.execute(
         'business-1',
@@ -290,57 +361,12 @@ describe('FindAllBookingsByBusinessForUserUseCaseImpl', () => {
         'UTC',
       );
 
-      expect(forUserSpy).toHaveBeenCalledTimes(1);
-      expect(forUserSpy).toHaveBeenCalledWith('business-1', 'user-standard-1');
-    });
-
-    it('returns only the specified user bookings when called by a Business Owner', async () => {
-      Object.assign(securityContext, {
-        userId: 'user-business-owner-1',
-        role: 'Business Owner',
-        businessId: 'business-1',
-      });
-
-      const result = await useCase.execute(
+      expect(allSpy).toHaveBeenCalledTimes(1);
+      expect(allSpy).toHaveBeenCalledWith(
         'business-1',
-        'user-standard-1',
-        '2024-01-01',
-        '2024-12-31',
-        'UTC',
+        '2024-01-01T00:00:00.000Z',
+        '2024-12-31T00:00:00.000Z',
       );
-
-      expect(result.ok).toBe(true);
-      if (result.ok) {
-        const ids = result.value.map((b) => b.id);
-        expect(ids).toEqual(expect.arrayContaining(['booking-1', 'booking-2']));
-        expect(ids).not.toContain('booking-3');
-        expect(ids).not.toContain('booking-6');
-      }
-    });
-
-    it('calls findAllByBusinessForUser for an Enhanced user', async () => {
-      Object.assign(securityContext, {
-        userId: 'user-enhanced-1',
-        role: 'Enhanced',
-        businessId: 'business-1',
-      });
-      const forUserSpy = jest.spyOn(repository, 'findAllByBusinessForUser');
-
-      const result = await useCase.execute(
-        'business-1',
-        'user-enhanced-1',
-        '2024-01-01',
-        '2024-12-31',
-        'UTC',
-      );
-
-      expect(forUserSpy).toHaveBeenCalledTimes(1);
-      expect(result.ok).toBe(true);
-      if (result.ok) {
-        const ids = result.value.map((b) => b.id);
-        expect(ids).toEqual(expect.arrayContaining(['booking-3', 'booking-6']));
-        expect(ids).not.toContain('booking-1');
-      }
     });
   });
 
@@ -408,7 +434,7 @@ describe('FindAllBookingsByBusinessForUserUseCaseImpl', () => {
       }
     });
 
-    it('propagates an InfrastructureError from findAllByBusinessForUser (elevated-role path)', async () => {
+    it('propagates an InfrastructureError from findAllByBusiness (elevated-role path)', async () => {
       Object.assign(securityContext, {
         userId: 'user-business-owner-1',
         role: 'Business Owner',
@@ -421,7 +447,7 @@ describe('FindAllBookingsByBusinessForUserUseCaseImpl', () => {
         cause: new Error('boom'),
       };
       jest
-        .spyOn(repository, 'findAllByBusinessForUser')
+        .spyOn(repository, 'findAllByBusiness')
         .mockResolvedValueOnce(err(infraError));
 
       const result = await useCase.execute(

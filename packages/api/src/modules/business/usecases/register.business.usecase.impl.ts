@@ -12,11 +12,16 @@ import {
 } from '@pikslots/domain';
 import { v7 as uuidv7 } from 'uuid';
 import type {
+  AuditLogJobDataShape,
   BusinessRegistrationInviteEvent,
   BusinessRepository,
 } from '@pikslots/domain';
 import { InjectQueue } from '@nestjs/bullmq';
-import { PIKSLOT_EVENTS } from 'src/shared/queue/jobs/pikslot.events';
+import {
+  AUDIT_LOG_QUEUE,
+  PIKSLOT_EVENTS,
+} from 'src/shared/queue/jobs/pikslot.events';
+import type { AuditLogJobName } from 'src/shared/queue/jobs';
 import { Queue } from 'bullmq';
 import { ConfigService } from '@nestjs/config';
 import { Env } from 'src/shared/config/env';
@@ -36,6 +41,12 @@ export class RegisterBusinessUseCaseImpl implements RegisterBusinessUseCase {
     >,
     private readonly configService: ConfigService<Env, true>,
     private readonly jwtInviteService: JwtInviteService,
+    @InjectQueue(AUDIT_LOG_QUEUE)
+    private readonly auditLogQueue: Queue<
+      AuditLogJobDataShape,
+      void,
+      AuditLogJobName
+    >,
   ) {}
 
   async execute(
@@ -76,7 +87,27 @@ export class RegisterBusinessUseCaseImpl implements RegisterBusinessUseCase {
       },
     );
 
+    await this.logBusinessRegisteredAudit(business);
+
     return ok({ message: 'success' });
+  }
+
+  private async logBusinessRegisteredAudit(business: Business): Promise<void> {
+    const payload: AuditLogJobDataShape = {
+      businessId: business.id,
+      userId: business.ownerId,
+      userType: 'user',
+      action: PIKSLOT_EVENTS.AUDIT_LOG.BUSINESS_REGISTERED,
+      description: `Business '${business.name}' was registered`,
+      entityType: 'business',
+      entityId: business.id,
+      occurredAt: new Date().toISOString(),
+    };
+
+    await this.auditLogQueue.add(
+      PIKSLOT_EVENTS.AUDIT_LOG.BUSINESS_REGISTERED,
+      payload,
+    );
   }
 
   private buildInviteUrl(userId: string, businessId: string): string {

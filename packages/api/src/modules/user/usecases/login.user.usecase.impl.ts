@@ -1,3 +1,4 @@
+import { InjectQueue } from '@nestjs/bullmq';
 import { Inject, Injectable } from '@nestjs/common';
 import {
   err,
@@ -8,6 +9,7 @@ import {
   Result,
 } from '@pikslots/domain';
 import type {
+  AuditLogJobDataShape,
   LoginUserCommand,
   UnauthorizedError,
   User,
@@ -18,8 +20,14 @@ import type {
   UserSuspendedError,
 } from '@pikslots/domain';
 import { LoginJwtPayload } from '@pikslots/shared';
+import { Queue } from 'bullmq';
 import { PasswordHashingService } from 'src/shared/security/hashing/password.hashing.service';
 import { JwtLoginService } from 'src/shared/security/jwt/jwt.login.service';
+import {
+  AUDIT_LOG_QUEUE,
+  PIKSLOT_EVENTS,
+} from 'src/shared/queue/jobs/pikslot.events';
+import type { AuditLogJobName } from 'src/shared/queue/jobs';
 
 type LoginError =
   | UnauthorizedError
@@ -74,6 +82,12 @@ export class LoginUserUseCaseImpl implements LoginUserUseCase {
     @Inject(IUserRepository) private readonly userRepository: UserRepository,
     private readonly jwtLoginService: JwtLoginService,
     private readonly passwordHashingService: PasswordHashingService,
+    @InjectQueue(AUDIT_LOG_QUEUE)
+    private readonly auditLogQueue: Queue<
+      AuditLogJobDataShape,
+      void,
+      AuditLogJobName
+    >,
   ) {}
 
   async execute(command: LoginUserCommand): Promise<LoginResult> {
@@ -92,7 +106,26 @@ export class LoginUserUseCaseImpl implements LoginUserUseCase {
     if (user.value.status === 'suspended' && user.value.suspendedReason)
       return err(USER_SUSPENDED(user.value.suspendedReason));
 
-    return this.issueTokens(user.value);
+    const result = this.issueTokens(user.value);
+
+    await this.logUserLoginAudit(user.value);
+
+    return result;
+  }
+
+  private async logUserLoginAudit(user: User): Promise<void> {
+    const payload: AuditLogJobDataShape = {
+      businessId: user.businessId,
+      userId: user.id,
+      userType: 'user',
+      action: PIKSLOT_EVENTS.AUDIT_LOG.USER_LOGIN,
+      description: `${user.name.firstName} ${user.name.lastName} (${user.email}) logged in`,
+      entityType: 'user',
+      entityId: user.id,
+      occurredAt: new Date().toISOString(),
+    };
+
+    await this.auditLogQueue.add(PIKSLOT_EVENTS.AUDIT_LOG.USER_LOGIN, payload);
   }
 
   private async findUser(

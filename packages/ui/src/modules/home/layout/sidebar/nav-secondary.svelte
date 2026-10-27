@@ -5,13 +5,22 @@
 	import type { Icon } from '@tabler/icons-svelte';
 	import type { ResolvedPathname } from '$app/types';
 	import { page } from '$app/stores';
+	import { browser } from '$app/environment';
 
 	let {
 		items,
 		...restProps
 	}: {
-		items: { title: string; url: ResolvedPathname | '#'; icon: Icon; onclick?: () => void }[];
+		items: {
+			title: string;
+			url: ResolvedPathname | '#';
+			icon: Icon;
+			onclick?: () => void;
+			shortcut?: boolean;
+		}[];
 	} & WithoutChildren<ComponentProps<typeof Sidebar.Group>> = $props();
+
+	const isMac = $derived(browser && /Mac|iPhone|iPad|iPod/.test(navigator.platform));
 
 	function isActive(url: string): boolean {
 		return $page.url.pathname === url || $page.url.pathname.startsWith(url + '/');
@@ -30,12 +39,22 @@
 								<a href={item.url} {...props} onclick={item.onclick}>
 									<item.icon />
 									<span>{item.title}</span>
+									{#if item.shortcut}
+										<span class="ml-auto text-xs text-muted-foreground"
+											>{isMac ? '⌘K' : 'Ctrl K'}</span
+										>
+									{/if}
 								</a>
 							{:else}
-								<a href={'#'} {...props} onclick={item.onclick}>
+								<button type="button" {...props} onclick={item.onclick}>
 									<item.icon />
 									<span>{item.title}</span>
-								</a>
+									{#if item.shortcut}
+										<span class="ml-auto text-xs text-muted-foreground"
+											>{isMac ? '⌘K' : 'Ctrl K'}</span
+										>
+									{/if}
+								</button>
 							{/if}
 						{/snippet}
 					</Sidebar.MenuButton>

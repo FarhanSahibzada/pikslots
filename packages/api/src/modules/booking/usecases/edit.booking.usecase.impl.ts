@@ -1,8 +1,10 @@
+import { InjectQueue } from '@nestjs/bullmq';
 import { Inject, Injectable } from '@nestjs/common';
 import {
   Booking,
   BookingConflictError,
   BookingNotFoundError,
+  type AuditLogJobDataShape,
   type BookingRepository,
   EditBookingUseCase,
   EditBookingUseCaseCommand,
@@ -13,7 +15,13 @@ import {
   Result,
   UnauthorizedError,
 } from '@pikslots/domain';
+import { Queue } from 'bullmq';
 import { SecurityContext } from 'src/shared/security/context/security.context';
+import {
+  AUDIT_LOG_QUEUE,
+  PIKSLOT_EVENTS,
+} from 'src/shared/queue/jobs/pikslot.events';
+import type { AuditLogJobName } from 'src/shared/queue/jobs';
 
 const UNAUTHORIZED_ERROR: UnauthorizedError = {
   kind: 'unauthorized',
@@ -27,6 +35,12 @@ export class EditBookingUseCaseImpl implements EditBookingUseCase {
     @Inject(IBookingRepository)
     private readonly bookingRepository: BookingRepository,
     private readonly securityContext: SecurityContext,
+    @InjectQueue(AUDIT_LOG_QUEUE)
+    private readonly auditLogQueue: Queue<
+      AuditLogJobDataShape,
+      void,
+      AuditLogJobName
+    >,
   ) {}
 
   async execute(
@@ -97,6 +111,26 @@ export class EditBookingUseCaseImpl implements EditBookingUseCase {
 
     if (!saved.ok) return err(saved.error);
 
+    await this.logBookingUpdatedAudit(updated);
+
     return ok(updated);
+  }
+
+  private async logBookingUpdatedAudit(booking: Booking): Promise<void> {
+    const payload: AuditLogJobDataShape = {
+      businessId: booking.businessId,
+      userId: this.securityContext.userId,
+      userType: 'user',
+      action: PIKSLOT_EVENTS.AUDIT_LOG.BOOKING_UPDATED,
+      description: `Booking ${booking.bookingId} was updated`,
+      entityType: 'booking',
+      entityId: booking.id,
+      occurredAt: new Date().toISOString(),
+    };
+
+    await this.auditLogQueue.add(
+      PIKSLOT_EVENTS.AUDIT_LOG.BOOKING_UPDATED,
+      payload,
+    );
   }
 }

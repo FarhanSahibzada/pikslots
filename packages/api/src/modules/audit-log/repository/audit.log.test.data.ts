@@ -1,0 +1,47 @@
+// audit.log.test.data.ts
+import { AuditLog } from '@pikslots/domain';
+
+export const AUDIT_LOG_TEST_DATA: AuditLog[] = [
+  AuditLog.reconstitute({
+    id: 'audit-log-1',
+    businessId: 'business-1',
+    userId: 'user-standard-1',
+    userType: 'user',
+    action: 'audit.log.user.login',
+    description: 'John Doe (john@example.com) logged in',
+    entityType: 'user',
+    entityId: 'user-standard-1',
+    occurredAt: new Date('2024-06-01T09:00:00Z'),
+    ipAddress: '10.0.0.1',
+    metadata: null,
+    createdAt: new Date('2024-06-01T09:00:00Z'),
+  }),
+  AuditLog.reconstitute({
+    id: 'audit-log-2',
+    businessId: 'business-1',
+    userId: 'user-standard-1',
+    userType: 'user',
+    action: 'audit.log.user.logout',
+    description: 'John Doe (john@example.com) logged out',
+    entityType: 'user',
+    entityId: 'user-standard-1',
+    occurredAt: new Date('2024-06-01T17:00:00Z'),
+    ipAddress: '10.0.0.1',
+    metadata: null,
+    createdAt: new Date('2024-06-01T17:00:00Z'),
+  }),
+  AuditLog.reconstitute({
+    id: 'audit-log-3',
+    businessId: 'business-2',
+    userId: 'user-enhanced-1',
+    userType: 'user',
+    action: 'audit.log.user.login',
+    description: 'Jane Roe (jane@example.com) logged in',
+    entityType: 'user',
+    entityId: 'user-enhanced-1',
+    occurredAt: new Date('2024-06-02T09:00:00Z'),
+    ipAddress: '10.0.0.2',
+    metadata: null,
+    createdAt: new Date('2024-06-02T09:00:00Z'),
+  }),
+];
