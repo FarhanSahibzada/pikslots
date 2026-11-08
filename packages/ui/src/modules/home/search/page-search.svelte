@@ -74,7 +74,7 @@
 									<page.icon class="text-muted-foreground" />
 									<div class="flex flex-col">
 										<span>{page.label}</span>
-										<span class="text-muted-foreground text-xs">{page.description}</span>
+										<span class="text-xs text-muted-foreground">{page.description}</span>
 									</div>
 								</Command.Item>
 							{/each}
